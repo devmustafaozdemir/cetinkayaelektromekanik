@@ -24,7 +24,42 @@ Her sayfa istekte Supabase'ten okunur: panelde kaydettiğiniz değişiklik **an�
 
 ## Yükleme paketi
 
-GitHub › **Actions › Next.js paketi** › en son yeşil çalıştırma › **Artifacts › cetinkaya-web**. İndirilen zip'in içindekiler sunucuya yüklenecek dosyalardır (`server.js`, `.next/`, `public/`, `node_modules/`). `npm install` gerekmez.
+Her güncellemede GitHub paketi kendisi hazırlar:
+
+- **Releases › "Site paketi (son sürüm)" › `deploy.zip`** — deponun ana sayfasında sağdaki *Releases* bölümünden; süresiz durur.
+- ya da **Actions › Next.js paketi** › son çalıştırma › **Artifacts › cetinkaya-web** (30 gün saklanır).
+
+Zip'in içindekiler sunucuya yüklenecek dosyalardır (`server.js`, `.next/`, `public/`, `node_modules/`). `npm install` gerekmez.
+
+## GitHub ile otomatik yükleme (isteğe bağlı)
+
+Sunucu bilgilerini bir kez GitHub'a girerseniz, her güncellemeden sonra site sunucuya **kendiliğinden** yüklenir ve yeniden başlatılır.
+GitHub › depo › **Settings › Secrets and variables › Actions › Secrets › New repository secret**:
+
+**cPanel (FTP):**
+
+| Secret | Değer |
+|---|---|
+| `FTP_SERVER` | FTP sunucusu, örn. `ftp.cetinkayaelektromekanik.com.tr` |
+| `FTP_USERNAME` | cPanel › FTP Accounts'taki kullanıcı |
+| `FTP_PASSWORD` | O kullanıcının şifresi |
+| `FTP_DIR` | (isteğe bağlı) Uygulama klasörü, varsayılan `cetinkaya-web/` — sonunda `/` olsun |
+
+Yükleme bitince `tmp/restart.txt` güncellenir; cPanel uygulamayı kendiliğinden yeniden başlatır. İlk kurulumdaki *Setup Node.js App* ayarları (A bölümü) bir kez elle yapılmalıdır.
+
+**VPS (SSH):**
+
+| Secret | Değer |
+|---|---|
+| `SSH_HOST` | Sunucu IP'si veya alan adı |
+| `SSH_USER` | Kullanıcı adı |
+| `SSH_KEY` | Bu kullanıcıya tanımlı **özel** SSH anahtarı (tamamı, `-----BEGIN…` dahil) |
+| `SSH_DIR` | (isteğe bağlı) Varsayılan `/var/www/cetinkaya` |
+| `SSH_PORT` | (isteğe bağlı) Varsayılan `22` |
+
+Dosyalar rsync ile yüklenir (sunucudaki `.env` korunur), ardından `pm2 restart cetinkaya` çalışır.
+
+Secrets girilmemişse bu adımlar atlanır; paket yine Releases'e konur.
 
 Kendi bilgisayarınızda üretmek için: `cd web && npm ci && npm run build && npm run package` → `web/deploy/` ve `web/deploy.zip`.
 

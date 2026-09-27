@@ -1,5 +1,9 @@
-# Builds the Next.js site (web/) and publishes a ready-to-upload package:
-# Actions › "Next.js paketi" › son çalıştırma › Artifacts › cetinkaya-web (deploy.zip).
+# Next.js sitesini (web/) derler, paketler ve yayınlar:
+#  1) Her güncellemede "Next.js paketi" artifact'i + "site-latest" Release'i (deploy.zip) güncellenir.
+#  2) Sunucu bilgileri Secrets'a girilmişse site sunucuya otomatik yüklenir:
+#     - FTP (cPanel):  FTP_SERVER, FTP_USERNAME, FTP_PASSWORD, (isteğe bağlı) FTP_DIR
+#     - SSH (VPS):     SSH_HOST, SSH_USER, SSH_KEY, (isteğe bağlı) SSH_DIR, SSH_PORT
+# Ayrıntılar: web/README.md › "GitHub ile otomatik yükleme"
 name: Next.js paketi
 
 on:
@@ -7,9 +11,19 @@ on:
     paths: ['web/**', 'assets/**', '.github/workflows/nextjs.yml']
   workflow_dispatch:
 
+permissions:
+  contents: write
+
+concurrency:
+  group: nextjs-deploy
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      FTP_SERVER: ${{ secrets.FTP_SERVER }}
+      SSH_HOST: ${{ secrets.SSH_HOST }}
     defaults:
       run:
         working-directory: web
@@ -26,9 +40,66 @@ jobs:
         env:
           NEXT_TELEMETRY_DISABLED: 1
       - run: npm run package
+
       - uses: actions/upload-artifact@v4
         with:
           name: cetinkaya-web
           path: web/deploy
           include-hidden-files: true
           retention-days: 30
+
+      # Downloadable package that never expires: Releases › site-latest › deploy.zip
+      - name: Release'i güncelle
+        if: github.ref_name == github.event.repository.default_branch
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: site-latest
+          name: Site paketi (son sürüm)
+          target_commitish: ${{ github.sha }}
+          make_latest: true
+          files: web/deploy.zip
+          body: |
+            Sunucuya yüklenecek hazır Next.js paketi (commit ${{ github.sha }}).
+            Kurulum: web/README.md
+
+      # ---- Automatic deploy (only when the secrets exist) ----
+      - name: Yeniden başlatma işareti (cPanel/Passenger)
+        if: env.FTP_SERVER != '' || env.SSH_HOST != ''
+        run: mkdir -p deploy/tmp && date > deploy/tmp/restart.txt
+
+      - name: FTP ile yükle (cPanel)
+        if: env.FTP_SERVER != ''
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: web/deploy/
+          server-dir: ${{ secrets.FTP_DIR || 'cetinkaya-web/' }}
+          exclude: |
+            **/.env
+            **/.env.local
+
+      - name: SSH ile yükle (VPS)
+        if: env.SSH_HOST != ''
+        uses: burnett01/rsync-deployments@7.0.2
+        with:
+          switches: -az --delete --exclude=.env
+          path: web/deploy/
+          remote_path: ${{ secrets.SSH_DIR || '/var/www/cetinkaya' }}
+          remote_host: ${{ secrets.SSH_HOST }}
+          remote_port: ${{ secrets.SSH_PORT || '22' }}
+          remote_user: ${{ secrets.SSH_USER }}
+          remote_key: ${{ secrets.SSH_KEY }}
+
+      - name: Uygulamayı yeniden başlat (VPS)
+        if: env.SSH_HOST != ''
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT || '22' }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd ${{ secrets.SSH_DIR || '/var/www/cetinkaya' }}
+            pm2 restart cetinkaya --update-env || pm2 start server.js --name cetinkaya --node-args="--env-file=.env"
