@@ -101,9 +101,10 @@ function db_seed(): void
             '<p>Drenaj dalgıç pompaları; su basan bodrumlar, asansör kuyuları, şantiyeler ve rögarlarda biriken suyun tahliyesi için kullanılır.</p><ul><li>Şamandıralı otomatik çalışma seçeneği</li><li>Taşınabilir, hafif yapı</li><li>Kolay kurulum</li></ul>',
             "Marka|Sumak\nTip|Drenaj dalgıç pompa\nKullanım alanı|Bodrum, asansör kuyusu, şantiye"],
     ];
-    $st = $pdo->prepare('INSERT INTO products(category_id, brand, featured, title, slug, summary, content, specs, sort) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)');
+    $models = ['tank:galvaniz', 'tank:paslanmaz', 'tank:grp', 'tank:sandvic', 'booster:3', 'booster:2', 'booster:1', 'pump:vertical', 'pump:circulator', 'pump:horizontal', 'sub:deep', 'sub:drain'];
+    $st = $pdo->prepare('INSERT INTO products(category_id, brand, featured, title, slug, summary, content, specs, sort, model) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
     foreach ($products as $i => [$cat, $brand, $featured, $title, $summary, $content, $specs]) {
-        $st->execute([$cat, $brand, $featured, $title, slugify($title), $summary, $content, $specs, $i + 1]);
+        $st->execute([$cat, $brand, $featured, $title, slugify($title), $summary, $content, $specs, $i + 1, $models[$i]]);
     }
 
     $services = [

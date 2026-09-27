@@ -18,8 +18,26 @@ if ($method === 'POST') {
         $slug = unique_slug('product_categories', slugify(post_str('slug', 100) ?: $name), $id ?: null);
         $art = array_key_exists($_POST['art'] ?? '', product_arts()) ? $_POST['art'] : 'tank';
         $summary = post_str('summary', 400);
-        if ($id) q('UPDATE product_categories SET name = ?, slug = ?, art = ?, summary = ? WHERE id = ?', [$name, $slug, $art, $summary, $id]);
-        else q('INSERT INTO product_categories(name, slug, art, summary, sort) VALUES(?, ?, ?, ?, (SELECT COALESCE(MAX(sort),0)+1 FROM product_categories))', [$name, $slug, $art, $summary]);
+        $old = $id ? q_one('SELECT photo FROM product_categories WHERE id = ?', [$id]) : null;
+        $photo = post_str('photo', 500);
+        if ($photo !== '' && !preg_match('#^https://#', $photo) && $photo !== ($old['photo'] ?? '')) {
+            flash('error', 'Fotoğraf bağlantısı https:// ile başlamalı.');
+            redirect(admin_url('pcategories', $id ? ['id' => $id] : []));
+        }
+        if (!empty($_FILES['photo_file']['name'])) {
+            try {
+                $photo = store_image($_FILES['photo_file'], 1400);
+            } catch (RuntimeException $ex) {
+                flash('error', $ex->getMessage());
+                redirect(admin_url('pcategories', $id ? ['id' => $id] : []));
+            }
+        }
+        if ($old && $old['photo'] !== $photo && !preg_match('#^https?://#', $old['photo'])) delete_upload($old['photo']);
+        $credit = post_str('photo_credit', 200);
+        $source = post_str('photo_source', 500);
+        if ($source !== '' && !preg_match('#^https://#', $source)) $source = '';
+        if ($id) q('UPDATE product_categories SET name = ?, slug = ?, art = ?, summary = ?, photo = ?, photo_credit = ?, photo_source = ? WHERE id = ?', [$name, $slug, $art, $summary, $photo, $credit, $source, $id]);
+        else q('INSERT INTO product_categories(name, slug, art, summary, photo, photo_credit, photo_source, sort) VALUES(?, ?, ?, ?, ?, ?, ?, (SELECT COALESCE(MAX(sort),0)+1 FROM product_categories))', [$name, $slug, $art, $summary, $photo, $credit, $source]);
         flash('success', 'Kategori kaydedildi.');
     }
     redirect(admin_url('pcategories'));

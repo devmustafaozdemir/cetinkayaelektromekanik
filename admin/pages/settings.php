@@ -38,6 +38,25 @@ $groups = [
 ];
 $tab = array_key_exists($_GET['tab'] ?? '', $groups) ? $_GET['tab'] : 'general';
 
+if ($method === 'POST' && $tab === 'general' && isset($_POST['logo_action'])) {
+    foreach (['logo', 'logo_light'] as $key) {
+        if (!empty($_POST['remove_' . $key])) {
+            delete_upload(setting($key));
+            setting_set($key, '');
+        } elseif (!empty($_FILES[$key]['name'])) {
+            try {
+                $name = store_image($_FILES[$key], 800);
+                delete_upload(setting($key));
+                setting_set($key, $name);
+            } catch (RuntimeException $ex) {
+                flash('error', $ex->getMessage());
+            }
+        }
+    }
+    flash('success', 'Logo güncellendi.');
+    redirect(admin_url('settings', ['tab' => 'general']));
+}
+
 if ($method === 'POST') {
     $errors = 0;
     foreach ($groups[$tab][2] as $key => [$label, $type]) {

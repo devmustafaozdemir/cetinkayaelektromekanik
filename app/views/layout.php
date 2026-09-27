@@ -20,11 +20,11 @@ $active = $active ?? '';
 <meta property="og:url" content="<?= e($canonical) ?>">
 <meta property="og:locale" content="tr_TR">
 <?php if (!empty($og_image)): ?><meta property="og:image" content="<?= e($og_image) ?>"><meta name="twitter:card" content="summary_large_image"><?php endif; ?>
-<meta name="theme-color" content="#0b1a2c">
+<meta name="theme-color" content="#10303d">
 <link rel="icon" href="<?= asset('img/favicon.svg') ?>" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,500..800&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="<?= asset('css/site.css') ?>">
 <?php if (!empty($schema)): ?><script type="application/ld+json"><?= json_encode(array_filter($schema, fn($v) => $v !== null), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) ?></script><?php endif; ?>
 </head>

@@ -1,21 +1,10 @@
-<?php partial('page-hero', ['heading' => 'Hizmetlerimiz', 'lead' => 'Satışını yaptığımız ürünler için keşiften montaja, bakımdan sevkiyata kadar uçtan uca destek.', 'crumbs' => [[null, 'Hizmetler']]]); ?>
-<section class="section">
+<?php partial('page-hero', ['heading' => 'Hizmetler', 'lead' => 'Sattığımız ürünler için keşif, montaj, bakım ve sevkiyat desteği.', 'crumbs' => [[null, 'Hizmetler']]]); ?>
+<section class="block">
   <div class="container">
-    <div class="services-grid">
+    <ul class="svc-list">
       <?php foreach ($services as $s): ?>
-        <a href="/hizmetler/<?= e($s['slug']) ?>" class="service-card reveal">
-          <span class="service-card__icon"><?= icon($s['icon']) ?></span>
-          <h3><?= e($s['title']) ?></h3>
-          <p><?= e($s['summary']) ?></p>
-          <span class="link-arrow">Detaylı bilgi <?= icon('arrow-right') ?></span>
-        </a>
+        <li><a href="/hizmetler/<?= e($s['slug']) ?>"><?= icon($s['icon']) ?><h3><?= e($s['title']) ?></h3><p><?= e($s['summary']) ?></p></a></li>
       <?php endforeach; ?>
-    </div>
-  </div>
-</section>
-<section class="section section--muted">
-  <div class="container">
-    <div class="section-head"><span class="eyebrow">Markalarımız</span><h2>Güçlü markalar, güvenilir ürünler</h2><p>Satış ve hizmetlerimizi dünya çapında tanınan markaların ürünleriyle sunuyoruz.</p></div>
-    <?php partial('brand-logos'); ?>
+    </ul>
   </div>
 </section>

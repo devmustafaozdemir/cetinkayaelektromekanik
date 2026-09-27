@@ -7,7 +7,9 @@ Modüler su depoları, pompa ve hidrofor sistemleri satışı için kurumsal web
 ## Özellikler
 
 **Web sitesi**
-- Modern, mobil uyumlu tasarım; ürün grupları açılır menüsü
+- Marka renkleri (lacivert, kırmızı, galvaniz grisi), Archivo + Source Sans 3 yazı tipleri, mobil uyumlu tasarım
+- **Depo hesaplayıcı (ana sayfa):** en/boy/yükseklik ve panel malzemesi seçilir; çizim, hacim, litre ve yaklaşık daire sayısı anında güncellenir, “Bu ölçüde teklif iste” ölçüleri teklif formuna taşır
+- **2D çizim + 3D görünüm:** her ürün için sunucuda üretilen SVG çizim; “3D incele” ile döndürülebilir, yakınlaştırılabilir 3D model (Three.js, yalnızca tıklanınca yüklenir)
 - **Ürün kataloğu:** kategoriler, marka filtresi, arama, ürün detay sayfası (teknik özellik tablosu, benzer ürünler)
 - **Teklif sistemi:** her üründe “Teklif İste”, ana sayfada hızlı teklif formu, talep türleri (ürün, proje/keşif, montaj, bakım-servis); müşteriye talep numarası verilir
 - Markalar sayfası (Meksis, Grundfos, Wilo, Standart Pompa, Sumak)
@@ -44,6 +46,24 @@ php -S localhost:8000 router.php
 ```
 
 Ardından `http://localhost:8000` ve `http://localhost:8000/admin` adreslerini açın.
+
+## 2D çizimler ve 3D modeller
+
+Ürün görselleri fotoğraf gerektirmez: her ürünün **model tipi** (admin → Ürünler → “Çizim ve 3D model”) hem 2D çizimi hem 3D modeli belirler.
+
+| Model tipi | Örnek |
+|---|---|
+| `tank:galvaniz`, `tank:paslanmaz`, `tank:grp`, `tank:sandvic` | Modüler depo (1×1 m paneller, ölçüye göre kurulur) |
+| `booster:1` … `booster:4` | Tek/çift/üç/dört pompalı hidrofor seti |
+| `pump:horizontal`, `pump:vertical`, `pump:circulator` | Yatay santrifüj, dikey çok kademeli, sirkülasyon |
+| `sub:deep`, `sub:drain` | Derin kuyu ve drenaj dalgıç pompası |
+
+- 2D çizimler: `app/models.php` (sunucuda SVG olarak üretilir, JavaScript gerekmez)
+- 3D modeller: `assets/src/viewer3d.js` → derlenmiş hali `assets/js/viewer3d.js` (repoda hazır, hostingde Node.js gerekmez)
+- Teknoloji: **Three.js** (parametrik modeller, OrbitControls, RoomEnvironment yansımaları). Paket yaklaşık 150 KB (gzip) ve yalnızca 3D butonuna basıldığında yüklenir; WebGL desteklemeyen cihazlarda 3D butonu gizlenir.
+- 3D kodunu değiştirdikten sonra: `npm install && npm run build:3d`
+
+Gerçek ürün fotoğrafı yüklerseniz ürün sayfasında önce fotoğraf gösterilir, 3D model yine açılabilir. Logo, admin → Site Ayarları → Genel → Logo bölümünden yüklenebilir; yüklenmezse yerleşik SVG logo kullanılır.
 
 ## GitHub Pages önizlemesi
 

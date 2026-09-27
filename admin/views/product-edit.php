@@ -34,7 +34,18 @@
       <?php if ($id): ?><p class="muted small"><?= icon('calculator') ?> Bu ürün için <?= $quoteCount ?> teklif talebi alındı.</p><?php endif; ?>
     </div>
     <div class="card">
-      <h3>Ürün görseli</h3>
+      <h3>Çizim ve 3D model</h3>
+      <p class="muted small">Ürün sayfasında gösterilen çizim ve “3D incele” modeli bu seçime göre oluşturulur. Fotoğraf yüklerseniz sayfada önce fotoğraf görünür, 3D model yine kullanılabilir.</p>
+      <label class="field"><span>Model tipi</span>
+        <select name="model" data-model-select>
+          <option value="">Kategoriye göre otomatik</option>
+          <?php foreach (model_types() as $k => $l): ?><option value="<?= $k ?>"<?= ($row['model'] ?? '') === $k ? ' selected' : '' ?>><?= e($l) ?></option><?php endforeach; ?>
+        </select>
+      </label>
+      <div class="model-preview"><?= model_svg(product_model($row + ['art' => q_val('SELECT art FROM product_categories WHERE id = ?', [(int)($row['category_id'] ?? 0)]) ?: 'tank'])) ?></div>
+    </div>
+    <div class="card">
+      <h3>Ürün fotoğrafı <small class="muted">(isteğe bağlı)</small></h3>
       <label class="dropzone<?= isset($errors['image']) ? ' has-error' : '' ?>" data-dropzone>
         <input type="file" name="image" accept="image/jpeg,image/png,image/webp,image/gif">
         <img src="<?= e(upload_url($row['image'])) ?>" alt="" data-preview<?= $row['image'] ? '' : ' hidden' ?>>

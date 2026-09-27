@@ -281,110 +281,51 @@ function product_arts(): array
     return ['tank' => 'Modüler depo', 'pump' => 'Santrifüj pompa', 'booster' => 'Hidrofor', 'submersible' => 'Dalgıç pompa', 'drop' => 'Su damlası'];
 }
 
-/** Built-in SVG illustrations used when a product has no photo. */
+/** Category photo with the illustration as fallback (shown if the photo is missing or fails to load). */
+function category_photo(array $c, bool $credit = true): string
+{
+    $art = product_art($c['art'] ?? 'tank');
+    $src = !empty($c['photo']) ? $c['photo'] : '';
+    if ($src === '') {
+        return '<span class="photo photo--art">' . $art . '</span>';
+    }
+    if (!preg_match('#^https?://#', $src)) {
+        $src = upload_url($src);
+    }
+    $cap = '';
+    if ($credit && !empty($c['photo_credit'])) {
+        $label = 'Fotoğraf: ' . e($c['photo_credit']);
+        $cap = '<figcaption>' . (!empty($c['photo_source']) ? '<a href="' . e($c['photo_source']) . '" target="_blank" rel="noopener">' . $label . '</a>' : $label) . '</figcaption>';
+    }
+    return '<figure class="photo"><img src="' . e($src) . '" alt="' . e($c['name'] ?? '') . '" loading="lazy" data-fallback><span class="photo__art" hidden>' . $art . '</span>' . $cap . '</figure>';
+}
+
+/** Brand logo: uploaded file if set, otherwise the built-in SVG wordmark. */
+function site_logo(bool $light = false): string
+{
+    if (setting('logo') !== '') {
+        return '<img class="logo__img" src="' . e(upload_url(setting(($light && setting('logo_light') !== '') ? 'logo_light' : 'logo'))) . '" alt="' . e(setting('site_name')) . '">';
+    }
+    $navy = $light ? '#ffffff' : '#1f3a60';
+    return '<svg class="logo__svg" viewBox="0 0 420 88" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="' . e(setting('site_name')) . '">'
+        . '<defs><linearGradient id="lgS" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f1f3f5"/><stop offset=".45" stop-color="#aeb5bd"/><stop offset=".55" stop-color="#d7dbe0"/><stop offset="1" stop-color="#7d8690"/></linearGradient></defs>'
+        // Ç
+        . '<path d="M44 8H22C12 8 6 14 6 24v28c0 10 6 16 16 16h22V56H24c-4 0-6-2-6-6V26c0-4 2-6 6-6h20z" fill="url(#lgS)" stroke="#6b737c" stroke-width="1"/>'
+        . '<path d="M22 68h8l-3 8h-6l2-4h-3z" fill="url(#lgS)" stroke="#6b737c" stroke-width="1"/>'
+        // E with red wedge
+        . '<path d="M50 8h36l-4 12H62v6h-8z" fill="url(#lgS)" stroke="#6b737c" stroke-width="1"/>'
+        . '<path d="M54 30l30-6-24 18h-8z" fill="#e1161c"/>'
+        . '<path d="M50 46h26l-4 10H62v2h26l-4 10H50z" fill="url(#lgS)" stroke="#6b737c" stroke-width="1"/>'
+        . '<text x="104" y="50" font-family="Archivo, Arial Black, sans-serif" font-weight="800" font-size="44" style="font-stretch:112%" fill="' . $navy . '" letter-spacing="1">ÇETİNKAYA</text>'
+        . '<path d="M106 69h26M384 69h26" stroke="#e1161c" stroke-width="3"/>'
+        . '<text x="258" y="75" text-anchor="middle" font-family="Archivo, Arial, sans-serif" font-weight="700" font-size="17" fill="#e1161c" letter-spacing="5.2">ELEKTROMEKANİK</text>'
+        . '</svg>';
+}
+
+/** Category/product drawing by category art key (see app/models.php). */
 function product_art(string $kind, string $class = 'art'): string
 {
-    $svg = match ($kind) {
-        'pump' => '<ellipse cx="120" cy="196" rx="86" ry="10" fill="#0b1a2c" opacity=".12"/>
-            <rect x="40" y="170" width="160" height="16" rx="4" fill="#1b3656"/>
-            <rect x="108" y="92" width="92" height="60" rx="14" fill="url(#m)"/>
-            <g fill="#0b1a2c" opacity=".25"><rect x="118" y="100" width="4" height="44" rx="2"/><rect x="130" y="100" width="4" height="44" rx="2"/><rect x="142" y="100" width="4" height="44" rx="2"/><rect x="154" y="100" width="4" height="44" rx="2"/><rect x="166" y="100" width="4" height="44" rx="2"/><rect x="178" y="100" width="4" height="44" rx="2"/></g>
-            <circle cx="80" cy="122" r="42" fill="url(#b)"/><circle cx="80" cy="122" r="26" fill="#2c7fb8"/><circle cx="80" cy="122" r="10" fill="#e0f2fe"/>
-            <rect x="66" y="60" width="28" height="24" rx="4" fill="url(#b)"/><rect x="60" y="54" width="40" height="10" rx="3" fill="#1b3656"/>
-            <rect x="20" y="112" width="20" height="20" rx="3" fill="url(#b)"/><rect x="12" y="106" width="10" height="32" rx="3" fill="#1b3656"/>
-            <rect x="96" y="150" width="104" height="22" rx="4" fill="#11263f"/><rect x="46" y="160" width="60" height="12" rx="3" fill="#11263f"/>',
-        'booster' => '<ellipse cx="120" cy="200" rx="100" ry="10" fill="#0b1a2c" opacity=".12"/>
-            <rect x="24" y="182" width="192" height="12" rx="3" fill="#1b3656"/>
-            <rect x="30" y="40" width="180" height="14" rx="7" fill="url(#b)"/>
-            <rect x="30" y="160" width="180" height="14" rx="7" fill="url(#b)"/>
-            <g><rect x="52" y="54" width="16" height="30" fill="#94a3b8"/><rect x="42" y="84" width="36" height="58" rx="10" fill="url(#m)"/><rect x="46" y="142" width="28" height="18" rx="4" fill="#2c7fb8"/></g>
-            <g><rect x="112" y="54" width="16" height="30" fill="#94a3b8"/><rect x="102" y="84" width="36" height="58" rx="10" fill="url(#m)"/><rect x="106" y="142" width="28" height="18" rx="4" fill="#2c7fb8"/></g>
-            <g><rect x="172" y="54" width="16" height="30" fill="#94a3b8"/><rect x="162" y="84" width="36" height="58" rx="10" fill="url(#m)"/><rect x="166" y="142" width="28" height="18" rx="4" fill="#2c7fb8"/></g>
-            <rect x="96" y="16" width="48" height="24" rx="4" fill="#11263f"/><circle cx="110" cy="28" r="4" fill="#22c55e"/><circle cx="124" cy="28" r="4" fill="#f59e0b"/>',
-        'submersible' => '<ellipse cx="120" cy="206" rx="40" ry="8" fill="#0b1a2c" opacity=".12"/>
-            <path d="M120 10v26" stroke="#1b3656" stroke-width="6" stroke-linecap="round"/>
-            <rect x="96" y="34" width="48" height="26" rx="6" fill="#1b3656"/>
-            <rect x="92" y="60" width="56" height="70" rx="8" fill="url(#b)"/>
-            <g fill="#e0f2fe" opacity=".7"><rect x="100" y="72" width="40" height="4" rx="2"/><rect x="100" y="84" width="40" height="4" rx="2"/><rect x="100" y="96" width="40" height="4" rx="2"/><rect x="100" y="108" width="40" height="4" rx="2"/></g>
-            <rect x="96" y="130" width="48" height="12" fill="#11263f"/>
-            <rect x="92" y="142" width="56" height="54" rx="10" fill="url(#m)"/>
-            <circle cx="60" cy="90" r="5" fill="#7dd3fc" opacity=".6"/><circle cx="178" cy="120" r="7" fill="#7dd3fc" opacity=".5"/><circle cx="170" cy="70" r="4" fill="#7dd3fc" opacity=".6"/>',
-        'drop' => '<path d="M120 24C94 64 66 96 66 132a54 54 0 0 0 108 0c0-36-28-68-54-108z" fill="url(#b)"/><path d="M96 138a26 26 0 0 0 22 26" stroke="#e0f2fe" stroke-width="8" stroke-linecap="round" fill="none" opacity=".8"/>',
-        default => '<ellipse cx="120" cy="204" rx="104" ry="10" fill="#0b1a2c" opacity=".12"/>
-            <path d="M24 70l96-34 96 34v120H24z" fill="#11263f" opacity=".0"/>
-            <g>' . implode('', array_map(fn($i) => sprintf('<rect x="%d" y="%d" width="46" height="46" rx="3" fill="url(#p)" stroke="#0b1a2c" stroke-opacity=".25"/><circle cx="%d" cy="%d" r="9" fill="none" stroke="#0b1a2c" stroke-opacity=".18" stroke-width="3"/>', 26 + ($i % 4) * 48, 60 + intdiv($i, 4) * 48, 49 + ($i % 4) * 48, 83 + intdiv($i, 4) * 48), range(0, 11))) . '</g>
-            <rect x="22" y="54" width="196" height="8" rx="2" fill="#1b3656"/><rect x="22" y="200" width="196" height="6" rx="2" fill="#1b3656"/>
-            <rect x="170" y="36" width="30" height="20" rx="3" fill="#1b3656"/><path d="M30 120h-14v40" stroke="#2c7fb8" stroke-width="8" fill="none" stroke-linecap="round"/>',
-    };
-    return '<svg class="' . e($class) . '" viewBox="0 0 240 220" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>'
-        . '<linearGradient id="b" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#38bdf8"/><stop offset="1" stop-color="#0369a1"/></linearGradient>'
-        . '<linearGradient id="m" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e2e8f0"/><stop offset="1" stop-color="#94a3b8"/></linearGradient>'
-        . '<linearGradient id="p" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f1f5f9"/><stop offset=".5" stop-color="#cbd5e1"/><stop offset="1" stop-color="#e2e8f0"/></linearGradient>'
-        . '</defs>' . $svg . '</svg>';
-}
-
-/* ---------- Uploads ---------- */
-
-/**
- * Validates, re-encodes and stores an uploaded image. Re-encoding through GD strips
- * any payload that might be hidden in the original file.
- */
-function store_image(array $file, int $maxWidth = 1600): string
-{
-    if (($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
-        throw new RuntimeException('Dosya yüklenemedi.');
-    }
-    if ($file['size'] > 8 * 1024 * 1024) {
-        throw new RuntimeException('Görsel en fazla 8 MB olabilir.');
-    }
-    $info = @getimagesize($file['tmp_name']);
-    if (!$info) {
-        throw new RuntimeException('Geçerli bir görsel dosyası seçin.');
-    }
-    $img = match ($info[2]) {
-        IMAGETYPE_JPEG => @imagecreatefromjpeg($file['tmp_name']),
-        IMAGETYPE_PNG  => @imagecreatefrompng($file['tmp_name']),
-        IMAGETYPE_WEBP => @imagecreatefromwebp($file['tmp_name']),
-        IMAGETYPE_GIF  => @imagecreatefromgif($file['tmp_name']),
-        default        => false,
-    };
-    if (!$img) {
-        throw new RuntimeException('Desteklenen formatlar: JPG, PNG, WEBP, GIF.');
-    }
-    if ($info[2] === IMAGETYPE_JPEG && function_exists('exif_read_data')) {
-        $exif = @exif_read_data($file['tmp_name']);
-        $rot = [3 => 180, 6 => -90, 8 => 90][$exif['Orientation'] ?? 0] ?? 0;
-        if ($rot) {
-            $img = imagerotate($img, $rot, 0);
-        }
-    }
-    $w = imagesx($img);
-    $h = imagesy($img);
-    if ($w > $maxWidth) {
-        $nh = (int)round($h * $maxWidth / $w);
-        $dst = imagecreatetruecolor($maxWidth, $nh);
-        imagealphablending($dst, false);
-        imagesavealpha($dst, true);
-        imagecopyresampled($dst, $img, 0, 0, 0, 0, $maxWidth, $nh, $w, $h);
-        imagedestroy($img);
-        $img = $dst;
-    }
-    imagepalettetotruecolor($img);
-    imagesavealpha($img, true);
-    if (!is_dir(UPLOAD_DIR)) {
-        mkdir(UPLOAD_DIR, 0775, true);
-    }
-    $name = date('Ymd') . '-' . bin2hex(random_bytes(8)) . '.webp';
-    imagewebp($img, UPLOAD_DIR . '/' . $name, 82);
-    imagedestroy($img);
-    return $name;
-}
-
-function delete_upload(?string $name): void
-{
-    if ($name && preg_match('/^[\w.-]+$/', $name) && is_file(UPLOAD_DIR . '/' . $name)) {
-        @unlink(UPLOAD_DIR . '/' . $name);
-    }
+    return model_svg(art_default_model($kind), $class);
 }
 
 /* ---------- Icons (Lucide-style, stroke based) ---------- */
@@ -441,6 +382,7 @@ function icon(string $name, string $class = 'icon'): string
         'tag'       => '<path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/>',
         'layers'    => '<path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/>',
         'external'  => '<path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>',
+        'panels'    => '<rect x="3" y="4" width="18" height="16" rx="1.5"/><path d="M9 4v16"/><path d="M15 4v16"/><path d="M3 12h18"/>',
         'droplet'   => '<path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/>',
         'ruler'     => '<path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2"/><path d="m11.5 9.5 2-2"/><path d="m8.5 6.5 2-2"/><path d="m17.5 15.5 2-2"/>',
         'grid'      => '<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/>',

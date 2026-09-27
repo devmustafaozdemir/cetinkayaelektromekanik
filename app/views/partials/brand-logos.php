@@ -1,5 +1,3 @@
-<ul class="brand-row">
-  <?php foreach (brands() as $b): ?>
-    <li class="brand-row__item"><a href="/urunler?marka=<?= rawurlencode($b['name']) ?>"><span><?= e($b['name']) ?></span><small><?= e($b['desc'] ?: 'Çözüm ortağı') ?></small></a></li>
-  <?php endforeach; ?>
+<ul class="brandline" aria-label="Sattığımız markalar">
+  <?php foreach (brands() as $b): ?><li><a href="/urunler?marka=<?= rawurlencode($b['name']) ?>"><?= e($b['name']) ?></a></li><?php endforeach; ?>
 </ul>

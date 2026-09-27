@@ -136,7 +136,7 @@ function rewrite(string $html, bool $isAdmin = false): string
     $html = preg_replace('#href="/urunler/kategori/([a-z0-9-]+)\?marka=[^"]*"#', 'href="' . $base . 'urunler/kategori/$1/"', $html);
     $html = preg_replace('#href="/teklif-al\?urun=([a-z0-9-]+)"#', 'href="' . $base . 'teklif-al/urun/$1/"', $html);
     // Site-absolute URLs → base path
-    $html = preg_replace_callback('#(href|src|action)="/(?!/)([^"]*)"#', function ($m) use ($base) {
+    $html = preg_replace_callback('#(href|src|action|data-viewer)="/(?!/)([^"]*)"#', function ($m) use ($base) {
         $path = $m[2];
         if (str_starts_with('/' . $path, $base)) {
             return $m[0]; // already rewritten

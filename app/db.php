@@ -28,6 +28,7 @@ function db_init(string $path): void
         $__pdo->sqliteCreateFunction('now_tr', $now, 0);
     }
     db_migrate();
+    db_add_columns();
     if ($fresh) {
         require APP . '/seed.php';
         db_seed();
@@ -158,6 +159,21 @@ CREATE TABLE IF NOT EXISTS messages (
     created_at TEXT NOT NULL DEFAULT (datetime('now','localtime'))
 );
 SQL);
+}
+
+/** Adds columns introduced after the first release to existing databases. */
+function db_add_columns(): void
+{
+    $cols = array_column(db()->query('PRAGMA table_info(product_categories)')->fetchAll(), 'name');
+    $pcols = array_column(db()->query('PRAGMA table_info(products)')->fetchAll(), 'name');
+    if (!in_array('model', $pcols, true)) {
+        db()->exec("ALTER TABLE products ADD COLUMN model TEXT NOT NULL DEFAULT ''");
+    }
+    if (!in_array('photo', $cols, true)) {
+        db()->exec("ALTER TABLE product_categories ADD COLUMN photo TEXT NOT NULL DEFAULT ''");
+        db()->exec("ALTER TABLE product_categories ADD COLUMN photo_credit TEXT NOT NULL DEFAULT ''");
+        db()->exec("ALTER TABLE product_categories ADD COLUMN photo_source TEXT NOT NULL DEFAULT ''");
+    }
 }
 
 function q(string $sql, array $params = []): PDOStatement

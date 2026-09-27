@@ -1,0 +1,12 @@
+{
+  "name": "cetinkaya-site-assets",
+  "private": true,
+  "description": "Builds the lazy-loaded 3D viewer (assets/js/viewer3d.js). The PHP site itself needs no Node.js at runtime.",
+  "scripts": {
+    "build:3d": "esbuild assets/src/viewer3d.js --bundle --format=esm --minify --target=es2020 --legal-comments=eof --outfile=assets/js/viewer3d.js"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "three": "0.186.1"
+  }
+}

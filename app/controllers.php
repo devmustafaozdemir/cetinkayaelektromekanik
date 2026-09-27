@@ -414,6 +414,16 @@ function page_quote(string $method): void
     if (isset($_GET['tamam']) && !empty($_SESSION['last_quote'])) {
         $created = q_one('SELECT * FROM quotes WHERE code = ?', [$_SESSION['last_quote']]);
     }
+    // Prefill from the home page tank sizer: ?olcu=4x3x2&malzeme=galvaniz
+    if ($method === 'GET' && preg_match('/^(\d{1,2})x(\d{1,2})x(\d)$/', (string)($_GET['olcu'] ?? ''), $m)) {
+        [$w, $l, $h] = [(int)$m[1], (int)$m[2], (int)$m[3]];
+        $mat = ['galvaniz' => 'galvaniz', 'paslanmaz' => 'paslanmaz çelik', 'grp' => 'GRP', 'sandvic' => 'izolasyonlu'][$_GET['malzeme'] ?? ''] ?? 'galvaniz';
+        $cat = (string)q_val("SELECT name FROM product_categories WHERE art = 'tank' ORDER BY sort LIMIT 1");
+        $_SESSION['old'] = [
+            'category' => $cat,
+            'quantity' => "{$w} × {$l} × {$h} m, " . ($w * $l * $h) . " m³ {$mat} modüler depo",
+        ];
+    }
     render('quote', [
         'title'       => 'Teklif Al',
         'description' => 'Modüler su deposu, pompa ve hidrofor sistemleri için hızlı teklif alın.',

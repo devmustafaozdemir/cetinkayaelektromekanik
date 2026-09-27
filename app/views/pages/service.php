@@ -1,29 +1,19 @@
 <?php partial('page-hero', ['heading' => $service['title'], 'lead' => $service['summary'], 'crumbs' => [['/hizmetler', 'Hizmetler'], [null, $service['title']]]]); ?>
-<section class="section">
-  <div class="container layout-aside">
+<section class="block block--tight">
+  <div class="container pd__body">
     <article class="prose">
       <?= $service['content'] ?>
-      <div class="inline-cta">
-        <span class="inline-cta__icon"><?= icon($service['icon']) ?></span>
-        <div><strong>Bu hizmet için talep oluşturun</strong><p>Formu doldurun, ekibimiz en kısa sürede sizinle iletişime geçsin.</p></div>
-        <a href="/teklif-al" class="btn btn--primary">Talep Oluştur</a>
+      <div class="callout">
+        <p><strong>Bu hizmet için görüşelim</strong>Kısa bir form doldurun, ekibimiz sizi arasın.</p>
+        <a href="/teklif-al" class="btn btn--signal">Talep oluştur</a>
       </div>
     </article>
-    <aside class="aside">
-      <div class="aside-card">
-        <h3>Diğer Hizmetler</h3>
-        <ul class="aside-links">
-          <?php foreach ($others as $o): ?>
-            <li><a href="/hizmetler/<?= e($o['slug']) ?>"><?= icon($o['icon']) ?><span><?= e($o['title']) ?></span><?= icon('chevron-right', 'icon icon--end') ?></a></li>
-          <?php endforeach; ?>
-        </ul>
-      </div>
-      <div class="aside-card aside-card--dark">
-        <h3>Hemen ulaşın</h3>
-        <p>Sorularınız için uzman ekibimizle görüşün.</p>
-        <a href="<?= e(tel_href(setting('phone'))) ?>" class="btn btn--primary btn--block"><?= icon('phone') ?> <?= e(setting('phone')) ?></a>
-        <a href="<?= e(wa_href(setting('whatsapp', setting('phone2')), 'Merhaba, ' . $service['title'] . ' hakkında bilgi almak istiyorum.')) ?>" class="btn btn--outline-light btn--block" target="_blank" rel="noopener"><?= icon('whatsapp') ?> WhatsApp</a>
-      </div>
+    <aside class="aside-box">
+      <h2>Diğer hizmetler</h2>
+      <ul class="aside-links">
+        <?php foreach ($others as $o): ?><li><a href="/hizmetler/<?= e($o['slug']) ?>"><?= e($o['title']) ?></a></li><?php endforeach; ?>
+      </ul>
+      <a href="<?= e(tel_href(setting('phone'))) ?>" class="btn btn--line-light btn--block"><?= icon('phone') ?> <?= e(setting('phone')) ?></a>
     </aside>
   </div>
 </section>

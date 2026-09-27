@@ -19,7 +19,7 @@
       <tr>
         <td>
           <a href="<?= admin_url('products', ['a' => 'edit', 'id' => $r['id']]) ?>" class="row-title">
-            <span class="thumb thumb--art"><?php if ($r['image']): ?><img src="<?= e(upload_url($r['image'])) ?>" alt=""><?php else: ?><?= product_art($r['art'] ?? 'tank') ?><?php endif; ?></span>
+            <span class="thumb thumb--art"><?php if ($r['image']): ?><img src="<?= e(upload_url($r['image'])) ?>" alt=""><?php else: ?><?= model_svg(product_model($r)) ?><?php endif; ?></span>
             <span><?= e($r['title']) ?><?php if ($r['featured']): ?> <span class="tag tag--amber"><?= icon('star') ?> Öne çıkan</span><?php endif; ?><small>/urunler/<?= e($r['slug']) ?></small></span>
           </a>
         </td>

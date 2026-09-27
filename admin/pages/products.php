@@ -27,6 +27,7 @@ if ($a === 'edit') {
             'summary'     => post_str('summary', 400),
             'content'     => sanitize_html((string)($_POST['content'] ?? '')),
             'specs'       => post_str('specs', 5000),
+            'model'       => array_key_exists($_POST['model'] ?? '', model_types()) ? $_POST['model'] : '',
             'featured'    => !empty($_POST['featured']) ? 1 : 0,
             'active'      => !empty($_POST['active']) ? 1 : 0,
         ];
@@ -49,11 +50,11 @@ if ($a === 'edit') {
             $d['image'] = $image;
             if ($row) {
                 q('UPDATE products SET title=:title, slug=:slug, category_id=:category_id, brand=:brand, summary=:summary, content=:content, specs=:specs,
-                   featured=:featured, active=:active, image=:image, updated_at=now_tr() WHERE id=:id', $d + ['id' => $id]);
+                   featured=:featured, active=:active, image=:image, model=:model, updated_at=now_tr() WHERE id=:id', $d + ['id' => $id]);
             } else {
                 $d['sort'] = (int)q_val('SELECT COALESCE(MAX(sort),0)+1 FROM products');
-                q('INSERT INTO products(title, slug, category_id, brand, summary, content, specs, featured, active, image, sort, created_at, updated_at)
-                   VALUES(:title, :slug, :category_id, :brand, :summary, :content, :specs, :featured, :active, :image, :sort, now_tr(), now_tr())', $d);
+                q('INSERT INTO products(title, slug, category_id, brand, summary, content, specs, featured, active, image, model, sort, created_at, updated_at)
+                   VALUES(:title, :slug, :category_id, :brand, :summary, :content, :specs, :featured, :active, :image, :model, :sort, now_tr(), now_tr())', $d);
                 $id = (int)db()->lastInsertId();
             }
             flash('success', 'Ürün kaydedildi.');
@@ -63,7 +64,7 @@ if ($a === 'edit') {
     }
     admin_render('product-edit', [
         'title'      => $id ? 'Ürünü Düzenle' : 'Yeni Ürün',
-        'row'        => $row ?? ['title' => '', 'slug' => '', 'category_id' => (int)($_GET['kategori'] ?? 0) ?: null, 'brand' => '', 'summary' => '', 'content' => '', 'specs' => '', 'featured' => 0, 'active' => 1, 'image' => ''],
+        'row'        => $row ?? ['title' => '', 'slug' => '', 'category_id' => (int)($_GET['kategori'] ?? 0) ?: null, 'brand' => '', 'summary' => '', 'content' => '', 'specs' => '', 'featured' => 0, 'active' => 1, 'image' => '', 'model' => ''],
         'id'         => $id,
         'errors'     => $errors,
         'categories' => q_all('SELECT * FROM product_categories ORDER BY sort, id'),

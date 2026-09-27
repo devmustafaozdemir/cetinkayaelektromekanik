@@ -4,3 +4,4 @@
 !/uploads/.gitkeep
 /config.local.php
 .DS_Store
+/node_modules/

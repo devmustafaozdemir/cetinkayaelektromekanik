@@ -1,8 +1,8 @@
 <div class="faq">
-  <?php foreach ($faqs as $i => $f): ?>
-    <details class="faq__item"<?= $i === 0 ? ' open' : '' ?>>
-      <summary><?= e($f['question']) ?><span class="faq__icon"><?= icon('plus') ?></span></summary>
-      <div class="faq__answer"><p><?= nl2br(e($f['answer'])) ?></p></div>
+  <?php foreach ($faqs as $f): ?>
+    <details class="faq__item">
+      <summary><?= e($f['question']) ?><span class="faq__sign" aria-hidden="true"></span></summary>
+      <p><?= nl2br(e($f['answer'])) ?></p>
     </details>
   <?php endforeach; ?>
 </div>

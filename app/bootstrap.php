@@ -35,6 +35,7 @@ if (session_status() === PHP_SESSION_NONE) {
 require APP . '/db.php';
 require APP . '/helpers.php';
 require APP . '/sanitize.php';
+require APP . '/models.php';
 
 db_init($config['db_path']);
 

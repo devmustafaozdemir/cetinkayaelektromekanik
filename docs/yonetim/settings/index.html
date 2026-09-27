@@ -6,14 +6,14 @@
 <meta name="robots" content="noindex, nofollow">
 <meta name="csrf" content="">
 <title>Site Ayarları | Yönetim Paneli</title>
-<link rel="icon" href="/cetinkayaelektromekanik/assets/img/favicon.svg?v=1790507125" type="image/svg+xml">
+<link rel="icon" href="/cetinkayaelektromekanik/assets/img/favicon.svg?v=1790510745" type="image/svg+xml">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/cetinkayaelektromekanik/assets/css/admin.css?v=1790509025">
+<link rel="stylesheet" href="/cetinkayaelektromekanik/assets/css/admin.css?v=1790510731">
 </head>
 <body><div id="gh-preview" style="position:relative;z-index:100;background:#fef3c7;color:#78350f;font:500 13px/1.4 system-ui,sans-serif;padding:8px 16px;text-align:center"><strong>Önizleme sürümü</strong> — bu kopya GitHub Pages üzerinde çalışır; formlar ve yönetim paneli burada işlem yapmaz. <a href="/cetinkayaelektromekanik/" style="text-decoration:underline;font-weight:600">Siteye dön</a></div>
 <div class="app">
   <aside class="sidebar" id="sidebar">
-    <a href="/cetinkayaelektromekanik/yonetim/" class="sidebar__brand"><span class="logo-mark"><svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg></span><div><strong>Çetinkaya</strong><small>Yönetim Paneli</small></div></a>
+    <a href="/cetinkayaelektromekanik/yonetim/" class="sidebar__brand"><span class="logo-mark"><svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="1.5"/><path d="M9 4v16"/><path d="M15 4v16"/><path d="M3 12h18"/></svg></span><div><strong>Çetinkaya</strong><small>Yönetim Paneli</small></div></a>
     <nav class="sidebar__nav">
                         <a href="/cetinkayaelektromekanik/yonetim/" class=""><svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Genel Bakış</span></a>
                                 <a href="/cetinkayaelektromekanik/yonetim/quotes/" class=""><svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></svg><span>Teklif Talepleri</span><em class="count">2</em></a>
@@ -59,7 +59,30 @@
           <a href="/cetinkayaelektromekanik/yonetim/settings-about/" class=""><svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Hakkımızda</a>
           <a href="/cetinkayaelektromekanik/yonetim/settings-social/" class=""><svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg> Sosyal Medya</a>
       </nav>
-  <form method="post" class="card form-stack">
+  <div>
+    <form method="post" enctype="multipart/form-data" class="card form-stack">
+    <input type="hidden" name="_csrf" value="">    <input type="hidden" name="logo_action" value="1">
+    <h3>Logo</h3>
+    <p class="muted small">Yüklemezseniz sitede yerleşik logo çizimi kullanılır. Şeffaf arka planlı PNG önerilir; koyu alt bilgi için açık renkli ikinci bir sürüm yükleyebilirsiniz.</p>
+    <div class="form-row">
+              <div class="field"><span>Logo (açık zemin)</span>
+          <label class="dropzone dropzone--sm" data-dropzone>
+            <input type="file" name="logo" accept="image/png,image/webp,image/jpeg">
+            <img src="" alt="" data-preview hidden style="object-fit:contain">
+            <span class="dropzone__hint"><svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg> Dosya seçin</span>
+          </label>
+                  </div>
+              <div class="field"><span>Logo (koyu zemin, opsiyonel)</span>
+          <label class="dropzone dropzone--sm dropzone--dark" data-dropzone>
+            <input type="file" name="logo_light" accept="image/png,image/webp,image/jpeg">
+            <img src="" alt="" data-preview hidden style="object-fit:contain">
+            <span class="dropzone__hint"><svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg> Dosya seçin</span>
+          </label>
+                  </div>
+          </div>
+    <div><button class="btn btn--primary"><svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> Logoyu Kaydet</button></div>
+  </form>
+    <form method="post" class="card form-stack">
     <input type="hidden" name="_csrf" value="">    <h3>Genel</h3>
           <label class="field">
         <span>Firma adı</span>
@@ -83,6 +106,7 @@ Sumak|Pompa sistemleri</textarea>
                 <small class="muted">Her satıra bir marka: Marka Adı | Kısa açıklama (örn. Grundfos | Pompa ve hidrofor sistemleri)</small>      </label>
         <div><button class="btn btn--primary"><svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> Değişiklikleri Kaydet</button></div>
   </form>
+  </div>
 </div>
     </div>
   </div>
