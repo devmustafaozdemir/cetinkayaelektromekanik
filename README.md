@@ -2,15 +2,14 @@
 
 Modüler su depoları, pompa ve hidrofor sistemleri satışı için kurumsal web sitesi: ürün kataloğu, online teklif sistemi, blog ve yönetim paneli.
 
-İki şekilde yayınlanabilir:
+**Teknoloji:** Next.js 16 (React, TypeScript) + Supabase (veritabanı, giriş, görseller). Kurulum ve sunucuya yükleme: [`web/README.md`](web/README.md).
 
-| | **A) GitHub Pages + Supabase** (önerilen) | **B) PHP hosting** |
-|---|---|---|
-| Maliyet | Ücretsiz | Hosting ücreti |
-| Site | Statik HTML (GitHub Pages) | PHP 8.1+ ve SQLite |
-| İçerik, teklifler, görseller | Supabase (Postgres, Auth, Storage) | `data/site.sqlite`, `uploads/` |
-| Yönetim paneli | `…/yonetim/` | `…/admin/` |
-| Kurulum | [Supabase ile yayın](#a-supabase-ile-yayın-önerilen) | [Kurulum (hosting)](#b-kurulum-php-hosting) |
+| Klasör | Durum |
+|---|---|
+| `web/` | **Güncel site** (Next.js, kendi sunucunuzda Node.js ile çalışır) |
+| `assets/` | Ortak stil, etkileşim betikleri, 3D görüntüleyici, yönetim paneli kaynağı |
+| `supabase/` | Veritabanı şeması ve örnek içerik |
+| `app/`, `admin/`, `index.php`, `docs/`, `tools/build-*.php` | Önceki PHP sürümü ve GitHub Pages önizlemesi (Next.js sürümü yayına alınınca kaldırılabilir) |
 
 ## Özellikler
 

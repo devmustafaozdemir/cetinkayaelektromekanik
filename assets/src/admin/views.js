@@ -14,7 +14,8 @@ const area = (name, label, value = '', rows = 3, extra = '') =>
 const sw = (name, label, on) =>
   `<label class="switch"><input type="checkbox" name="${name}" value="1"${on ? ' checked' : ''}><span class="switch__ui"></span><span>${label}</span></label>`;
 const empty = (ic, title, text = '', action = '') => `<div class="empty">${icon(ic)}<h3>${title}</h3>${text ? `<p class="muted">${text}</p>` : ''}${action}</div>`;
-const publishNote = '<p class="muted small publish-note">' + icon('external') + ' Kaydettiğiniz değişiklikler sitede birkaç dakika içinde görünür.</p>';
+// live: the Next.js site reads Supabase on every request, so saves show up immediately
+const publishNote = '<p class="muted small publish-note">' + icon('external') + (window.APP_CONFIG?.live ? ' Kaydettiğiniz değişiklikler sitede hemen görünür.' : ' Kaydettiğiniz değişiklikler sitede birkaç dakika içinde görünür.') + '</p>';
 
 function slugWire(root) {
   const src = $('[data-slug-source]', root);

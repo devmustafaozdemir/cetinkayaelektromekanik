@@ -154,7 +154,7 @@ function shell() {
             : `<a href="${href}" data-nav="${key}">${icon(ic)}<span>${label}</span><em class="count" data-count="${key}" hidden></em></a>`)).join('')}
         </nav>
         <div class="sidebar__foot">
-          <button type="button" class="sidebar__site" data-publish>${icon('zap')} Siteyi şimdi yayınla</button>
+          ${window.APP_CONFIG?.live ? '' : `<button type="button" class="sidebar__site" data-publish>${icon('zap')} Siteyi şimdi yayınla</button>`}
           <a href="${esc(SITE_URL)}" target="_blank" rel="noopener" class="sidebar__site">${icon('external')} Siteyi görüntüle</a>
         </div>
       </aside>
@@ -191,7 +191,8 @@ function shell() {
   document.addEventListener('click', () => $('.dropdown.is-open')?.classList.remove('is-open'));
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { setSidebar(false); $('.dropdown.is-open')?.classList.remove('is-open'); } });
   $('[data-signout]').onclick = async () => { await sb.auth.signOut(); location.hash = '#/'; authScreen('login'); };
-  $('[data-publish]').onclick = publishNow;
+  const pub = $('[data-publish]');
+  if (pub) pub.onclick = publishNow;
   shellReady = true;
 }
 
