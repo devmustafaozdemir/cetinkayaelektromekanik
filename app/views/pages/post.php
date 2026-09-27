@@ -42,9 +42,9 @@
       <div class="prose post-content">
         <?= $post['content'] ?>
         <div class="inline-cta">
-          <span class="inline-cta__icon"><?= icon('wrench') ?></span>
-          <div><strong>Cihazınız için profesyonel destek mi gerekiyor?</strong><p>Online servis talebi oluşturun, uzman ekibimiz sizinle iletişime geçsin.</p></div>
-          <a href="/servis-talebi" class="btn btn--primary">Servis Talebi</a>
+          <span class="inline-cta__icon"><?= icon('calculator') ?></span>
+          <div><strong>Projeniz için doğru ürünü birlikte seçelim</strong><p>İhtiyacınızı paylaşın, size özel teklifle dönüş yapalım.</p></div>
+          <a href="/teklif-al" class="btn btn--primary">Teklif Al</a>
         </div>
         <?php if ($prev || $next): ?>
         <nav class="post-nav" aria-label="Diğer yazılar">

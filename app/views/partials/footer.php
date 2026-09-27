@@ -1,16 +1,16 @@
 <?php
-$services = q_all('SELECT title, slug FROM services WHERE active = 1 ORDER BY sort, id LIMIT 6');
+$footCats = q_all('SELECT name, slug FROM product_categories ORDER BY sort, id');
 $socials = array_filter(['instagram' => setting('instagram'), 'facebook' => setting('facebook'), 'linkedin' => setting('linkedin'), 'youtube' => setting('youtube')]);
 ?>
 <section class="cta-band">
   <div class="container cta-band__inner">
     <div>
-      <h2>Cihazınız mı arızalandı?</h2>
-      <p>Online servis talebi oluşturun, takip kodunuzla süreci adım adım izleyin.</p>
+      <h2>Projeniz için fiyat mı almak istiyorsunuz?</h2>
+      <p>İhtiyacınızı paylaşın, size en uygun ürün ve fiyatla hızlıca dönüş yapalım.</p>
     </div>
     <div class="cta-band__actions">
-      <a href="/servis-talebi" class="btn btn--primary btn--lg"><?= icon('clipboard') ?> Servis Talebi Oluştur</a>
-      <a href="<?= e(wa_href(setting('whatsapp', setting('phone2')), 'Merhaba, servis hakkında bilgi almak istiyorum.')) ?>" class="btn btn--light btn--lg" target="_blank" rel="noopener"><?= icon('whatsapp') ?> WhatsApp</a>
+      <a href="/teklif-al" class="btn btn--primary btn--lg"><?= icon('calculator') ?> Hemen Teklif Al</a>
+      <a href="<?= e(wa_href(setting('whatsapp', setting('phone2')), 'Merhaba, ürünleriniz hakkında fiyat bilgisi almak istiyorum.')) ?>" class="btn btn--light btn--lg" target="_blank" rel="noopener"><?= icon('whatsapp') ?> WhatsApp</a>
     </div>
   </div>
 </section>
@@ -21,7 +21,7 @@ $socials = array_filter(['instagram' => setting('instagram'), 'facebook' => sett
         <span class="logo__mark"><?= icon('zap') ?></span>
         <span class="logo__text"><strong>Çetinkaya</strong><small>Elektromekanik</small></span>
       </a>
-      <p><?= e(setting('site_tagline')) ?>. Profesyonel el aletleri onarımı, motor bobinajı ve orijinal yedek parça.</p>
+      <p><?= e(setting('site_tagline')) ?>. Keşif, teklif, sevkiyat ve montajda yanınızdayız.</p>
       <?php if ($socials): ?>
       <div class="socials">
         <?php foreach ($socials as $name => $link): ?>
@@ -31,11 +31,12 @@ $socials = array_filter(['instagram' => setting('instagram'), 'facebook' => sett
       <?php endif; ?>
     </div>
     <div>
-      <h3>Hizmetler</h3>
+      <h3>Ürünler</h3>
       <ul>
-        <?php foreach ($services as $s): ?>
-          <li><a href="/hizmetler/<?= e($s['slug']) ?>"><?= e($s['title']) ?></a></li>
+        <?php foreach ($footCats as $c): ?>
+          <li><a href="/urunler/kategori/<?= e($c['slug']) ?>"><?= e($c['name']) ?></a></li>
         <?php endforeach; ?>
+        <li><a href="/markalar">Markalar</a></li>
       </ul>
     </div>
     <div>
@@ -44,7 +45,8 @@ $socials = array_filter(['instagram' => setting('instagram'), 'facebook' => sett
         <li><a href="/hakkimizda">Hakkımızda</a></li>
         <li><a href="/blog">Blog</a></li>
         <li><a href="/sss">Sıkça Sorulan Sorular</a></li>
-        <li><a href="/servis-takip">Servis Takip</a></li>
+        <li><a href="/hizmetler">Hizmetler</a></li>
+        <li><a href="/teklif-al">Teklif Al</a></li>
         <li><a href="/iletisim">İletişim</a></li>
       </ul>
     </div>
@@ -59,7 +61,7 @@ $socials = array_filter(['instagram' => setting('instagram'), 'facebook' => sett
   </div>
   <div class="container footer__bottom">
     <span>© <?= date('Y') ?> <?= e(setting('site_name')) ?>. Tüm hakları saklıdır.</span>
-    <span class="footer__brands"><?php foreach (setting_lines('brands') as $b): ?><span><?= e($b) ?></span><?php endforeach; ?> Yetkili Servisi</span>
+    <span class="footer__brands"><?php foreach (brands() as $b): ?><span><?= e($b['name']) ?></span><?php endforeach; ?></span>
   </div>
 </footer>
-<a class="fab-wa" href="<?= e(wa_href(setting('whatsapp', setting('phone2')), 'Merhaba, servis hakkında bilgi almak istiyorum.')) ?>" target="_blank" rel="noopener" aria-label="WhatsApp ile yazın"><?= icon('whatsapp') ?></a>
+<a class="fab-wa" href="<?= e(wa_href(setting('whatsapp', setting('phone2')), 'Merhaba, ürünleriniz hakkında fiyat bilgisi almak istiyorum.')) ?>" target="_blank" rel="noopener" aria-label="WhatsApp ile yazın"><?= icon('whatsapp') ?></a>

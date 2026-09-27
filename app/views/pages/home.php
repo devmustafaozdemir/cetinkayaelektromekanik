@@ -10,41 +10,46 @@ $values = setting_lines('about_values');
       <h1><?= e(setting('hero_title')) ?></h1>
       <p class="hero__lead"><?= e(setting('hero_text')) ?></p>
       <div class="hero__actions">
-        <a href="/servis-talebi" class="btn btn--primary btn--lg"><?= icon('clipboard') ?> Online Servis Talebi</a>
+        <a href="/urunler" class="btn btn--primary btn--lg"><?= icon('grid') ?> Ürünleri İncele</a>
         <a href="<?= e(tel_href(setting('phone'))) ?>" class="btn btn--outline-light btn--lg"><?= icon('phone') ?> Hemen Arayın</a>
       </div>
       <ul class="hero__trust">
-        <li><?= icon('check-circle') ?> Orijinal yedek parça</li>
-        <li><?= icon('check-circle') ?> Onayınız olmadan işlem yok</li>
-        <li><?= icon('check-circle') ?> Online durum takibi</li>
+        <li><?= icon('check-circle') ?> Orijinal ve garantili ürün</li>
+        <li><?= icon('check-circle') ?> Projeye özel kapasite seçimi</li>
+        <li><?= icon('check-circle') ?> Montaj ve servis desteği</li>
       </ul>
     </div>
     <div class="hero__card reveal">
       <div class="track-card">
         <div class="track-card__head">
-          <span class="track-card__icon"><?= icon('search') ?></span>
+          <span class="track-card__icon"><?= icon('calculator') ?></span>
           <div>
-            <h2>Cihazınız ne durumda?</h2>
-            <p>Takip kodunuzla servis sürecini anlık görün.</p>
+            <h2>Hızlı teklif alın</h2>
+            <p>Bilgilerinizi bırakın, satış ekibimiz sizi arasın.</p>
           </div>
         </div>
-        <form action="/servis-takip" method="get" class="track-card__form">
+        <form action="/teklif-al" method="post" class="track-card__form">
+          <?= csrf_field() ?>
+          <input type="hidden" name="quick" value="1">
+          <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
           <label class="field">
-            <span>Takip Kodu</span>
-            <input type="text" name="kod" placeholder="CE-26XXXXX" required autocomplete="off" style="text-transform:uppercase">
+            <span>Ad Soyad</span>
+            <input type="text" name="name" required autocomplete="name" placeholder="Adınız Soyadınız">
           </label>
           <label class="field">
-            <span>Telefonunuzun son 4 hanesi</span>
-            <input type="text" name="telefon" inputmode="numeric" placeholder="1320" required maxlength="20">
+            <span>Telefon</span>
+            <input type="tel" name="phone" required autocomplete="tel" placeholder="05xx xxx xx xx">
           </label>
-          <button class="btn btn--primary btn--block"><?= icon('search') ?> Sorgula</button>
+          <label class="field">
+            <span>İlgilendiğiniz ürün</span>
+            <select name="category">
+              <?php foreach ($categories as $c): ?><option><?= e($c['name']) ?></option><?php endforeach; ?>
+              <option>Emin değilim, danışmak istiyorum</option>
+            </select>
+          </label>
+          <button class="btn btn--primary btn--block"><?= icon('arrow-right') ?> Teklif İste</button>
         </form>
-        <ol class="track-card__steps" aria-hidden="true">
-          <li class="done"><span></span>Talep</li>
-          <li class="done"><span></span>Tespit</li>
-          <li class="current"><span></span>Onarım</li>
-          <li><span></span>Teslim</li>
-        </ol>
+        <p class="track-card__note"><?= icon('shield') ?> Bilgileriniz yalnızca teklif için kullanılır.</p>
       </div>
     </div>
   </div>
@@ -66,61 +71,65 @@ $values = setting_lines('about_values');
 <section class="section">
   <div class="container">
     <div class="section-head">
-      <span class="eyebrow">Hizmetlerimiz</span>
-      <h2>Arızadan teslimata, uçtan uca servis</h2>
-      <p>Profesyonel el aletlerinden endüstriyel motorlara kadar tüm onarım ihtiyaçlarınız için uzman ekip ve donanımlı atölye.</p>
+      <span class="eyebrow">Ürün Gruplarımız</span>
+      <h2>Su depolama ve basınçlandırmada eksiksiz çözüm</h2>
+      <p>Depodan pompaya, hidrofordan dalgıç pompaya kadar ihtiyacınız olan tüm ürünler tek adreste.</p>
     </div>
-    <div class="services-grid">
-      <?php foreach ($services as $s): ?>
-        <a href="/hizmetler/<?= e($s['slug']) ?>" class="service-card reveal">
-          <span class="service-card__icon"><?= icon($s['icon']) ?></span>
-          <h3><?= e($s['title']) ?></h3>
-          <p><?= e($s['summary']) ?></p>
-          <span class="link-arrow">Detaylı bilgi <?= icon('arrow-right') ?></span>
+    <div class="cat-grid">
+      <?php foreach ($categories as $c): ?>
+        <a href="/urunler/kategori/<?= e($c['slug']) ?>" class="cat-card reveal">
+          <span class="cat-card__art"><?= product_art($c['art']) ?></span>
+          <span class="cat-card__body">
+            <h3><?= e($c['name']) ?></h3>
+            <p><?= e($c['summary']) ?></p>
+            <span class="link-arrow"><?= (int)$c['cnt'] ?> ürün <?= icon('arrow-right') ?></span>
+          </span>
         </a>
       <?php endforeach; ?>
     </div>
   </div>
 </section>
 
+<?php if ($products): ?>
 <section class="section section--muted">
+  <div class="container">
+    <div class="section-head section-head--row">
+      <div>
+        <span class="eyebrow">Öne Çıkan Ürünler</span>
+        <h2>En çok tercih edilenler</h2>
+      </div>
+      <a href="/urunler" class="btn btn--ghost">Tüm ürünler <?= icon('arrow-right') ?></a>
+    </div>
+    <div class="products-grid">
+      <?php foreach ($products as $p) partial('product-card', ['p' => $p]); ?>
+    </div>
+  </div>
+</section>
+<?php endif; ?>
+
+<section class="section">
   <div class="container">
     <div class="section-head">
       <span class="eyebrow">Nasıl Çalışıyoruz?</span>
-      <h2>4 adımda şeffaf servis süreci</h2>
-      <p>Her aşamada bilgilendirilirsiniz; onayınız olmadan hiçbir ücretli işlem yapılmaz.</p>
+      <h2>İhtiyaçtan teslimata 4 adım</h2>
+      <p>Doğru ürünü doğru kapasitede seçmeniz için sürecin her adımında yanınızdayız.</p>
     </div>
     <ol class="process">
-      <li class="reveal"><span class="process__num">01</span><span class="process__icon"><?= icon('clipboard') ?></span><h3>Talep & Teslim</h3><p>Online talep oluşturun ya da cihazınızı servisimize getirin. Takip kodunuz anında oluşur.</p></li>
-      <li class="reveal"><span class="process__num">02</span><span class="process__icon"><?= icon('stethoscope') ?></span><h3>Arıza Tespiti</h3><p>Uzman teknisyenlerimiz cihazı söküp detaylı arıza tespiti yapar.</p></li>
-      <li class="reveal"><span class="process__num">03</span><span class="process__icon"><?= icon('wrench') ?></span><h3>Onay & Onarım</h3><p>Fiyat bilgisini onaylamanızın ardından orijinal parçalarla onarım yapılır.</p></li>
-      <li class="reveal"><span class="process__num">04</span><span class="process__icon"><?= icon('check-circle') ?></span><h3>Test & Teslim</h3><p>Cihaz yük altında test edilir, teslime hazır olduğunda bilgilendirilirsiniz.</p></li>
+      <li class="reveal"><span class="process__num">01</span><span class="process__icon"><?= icon('clipboard') ?></span><h3>İhtiyaç Analizi</h3><p>Kullanım amacını, tüketimi ve kurulum alanını birlikte değerlendiriyoruz.</p></li>
+      <li class="reveal"><span class="process__num">02</span><span class="process__icon"><?= icon('ruler') ?></span><h3>Kapasite & Ürün Seçimi</h3><p>Depo hacmi, debi ve basınç hesabıyla en uygun ürünü belirliyoruz.</p></li>
+      <li class="reveal"><span class="process__num">03</span><span class="process__icon"><?= icon('calculator') ?></span><h3>Şeffaf Teklif</h3><p>Ürün, sevkiyat ve montaj kalemleriyle net ve anlaşılır teklif sunuyoruz.</p></li>
+      <li class="reveal"><span class="process__num">04</span><span class="process__icon"><?= icon('truck') ?></span><h3>Sevkiyat & Montaj</h3><p>Ürünlerinizi teslim ediyor, istenirse montaj ve devreye almayı yapıyoruz.</p></li>
     </ol>
   </div>
 </section>
 
-<section class="section">
+<section class="section section--muted">
   <div class="container split">
     <div class="split__visual reveal" aria-hidden="true">
       <div class="motor-art">
-        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f59e0b"/><stop offset="1" stop-color="#ea580c"/></linearGradient>
-            <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1e3a5f"/><stop offset="1" stop-color="#0b1a2c"/></linearGradient>
-          </defs>
-          <circle cx="200" cy="200" r="170" fill="url(#g2)"/>
-          <g class="spin" style="transform-origin:200px 200px">
-            <?php for ($i = 0; $i < 12; $i++): ?>
-              <rect x="192" y="48" width="16" height="46" rx="4" fill="#f59e0b" opacity=".9" transform="rotate(<?= $i * 30 ?> 200 200)"/>
-            <?php endfor; ?>
-          </g>
-          <circle cx="200" cy="200" r="98" fill="none" stroke="#2c5282" stroke-width="10"/>
-          <circle cx="200" cy="200" r="70" fill="url(#g1)"/>
-          <circle cx="200" cy="200" r="22" fill="#0b1a2c"/>
-          <path d="M205 160l-26 46h20l-6 34 28-48h-20z" fill="#fff"/>
-        </svg>
-        <div class="float-badge float-badge--a"><?= icon('shield') ?><span><strong>Yetkili</strong> Servis</span></div>
-        <div class="float-badge float-badge--b"><?= icon('package') ?><span><strong>Orijinal</strong> Parça</span></div>
+        <div class="art-stage"><?= product_art('tank') ?></div>
+        <div class="float-badge float-badge--a"><?= icon('shield') ?><span><strong>Orijinal</strong> Ürün</span></div>
+        <div class="float-badge float-badge--b"><?= icon('wrench') ?><span><strong>Montaj</strong> Desteği</span></div>
       </div>
     </div>
     <div class="split__content">
@@ -135,13 +144,35 @@ $values = setting_lines('about_values');
   </div>
 </section>
 
+<?php if ($services): ?>
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Satış Sonrası</span>
+      <h2>Satıştan sonra da yanınızdayız</h2>
+      <p>Keşif, montaj ve bakım hizmetlerimizle sistemleriniz uzun yıllar sorunsuz çalışsın.</p>
+    </div>
+    <div class="services-grid services-grid--4">
+      <?php foreach ($services as $s): ?>
+        <a href="/hizmetler/<?= e($s['slug']) ?>" class="service-card reveal">
+          <span class="service-card__icon"><?= icon($s['icon']) ?></span>
+          <h3><?= e($s['title']) ?></h3>
+          <p><?= e($s['summary']) ?></p>
+          <span class="link-arrow">Detaylı bilgi <?= icon('arrow-right') ?></span>
+        </a>
+      <?php endforeach; ?>
+    </div>
+  </div>
+</section>
+<?php endif; ?>
+
 <?php if ($posts): ?>
 <section class="section section--muted">
   <div class="container">
     <div class="section-head section-head--row">
       <div>
         <span class="eyebrow">Blog</span>
-        <h2>Bakım rehberleri ve teknik bilgiler</h2>
+        <h2>Rehberler ve teknik bilgiler</h2>
       </div>
       <a href="/blog" class="btn btn--ghost">Tüm yazılar <?= icon('arrow-right') ?></a>
     </div>
@@ -161,7 +192,7 @@ $values = setting_lines('about_values');
       <div class="contact-mini">
         <a href="<?= e(tel_href(setting('phone'))) ?>" class="contact-mini__item"><?= icon('phone') ?><span><small>Telefon</small><?= e(setting('phone')) ?></span></a>
         <a href="<?= e(wa_href(setting('whatsapp', setting('phone2')))) ?>" target="_blank" rel="noopener" class="contact-mini__item"><?= icon('whatsapp') ?><span><small>WhatsApp</small><?= e(setting('whatsapp', setting('phone2'))) ?></span></a>
-        <a href="<?= e(setting('map_link')) ?>" target="_blank" rel="noopener" class="contact-mini__item"><?= icon('map-pin') ?><span><small>Adres</small>İzmit Sanayi Sitesi</span></a>
+        <a href="<?= e(setting('map_link')) ?>" target="_blank" rel="noopener" class="contact-mini__item"><?= icon('map-pin') ?><span><small>Adres</small><?= e(setting('address_short', 'Kocaeli')) ?></span></a>
       </div>
     </div>
     <div>

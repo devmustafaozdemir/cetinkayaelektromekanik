@@ -14,11 +14,12 @@
     <div class="auth__side">
       <div class="auth__brand"><span class="logo-mark"><?= icon('zap') ?></span><div><strong>Çetinkaya</strong><small>Yönetim Paneli</small></div></div>
       <div>
-        <h1>Servis, blog ve site içeriğinizi tek yerden yönetin.</h1>
+        <h1>Ürünlerinizi, tekliflerinizi ve site içeriğinizi tek yerden yönetin.</h1>
         <ul>
-          <li><?= icon('clipboard') ?> Servis taleplerini takip edin, durum güncelleyin</li>
+          <li><?= icon('calculator') ?> Teklif taleplerini takip edin, satışa dönüştürün</li>
+          <li><?= icon('package') ?> Ürün kataloğunu güncel tutun</li>
           <li><?= icon('file-text') ?> Blog yazıları yayınlayın</li>
-          <li><?= icon('settings') ?> Hizmetleri ve iletişim bilgilerini düzenleyin</li>
+          
         </ul>
       </div>
       <small>© <?= date('Y') ?> <?= e(setting('site_name')) ?></small>

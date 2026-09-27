@@ -5,8 +5,8 @@
       <?= $service['content'] ?>
       <div class="inline-cta">
         <span class="inline-cta__icon"><?= icon($service['icon']) ?></span>
-        <div><strong>Bu hizmet için servis talebi oluşturun</strong><p>Formu doldurun, takip kodunuzla süreci online izleyin.</p></div>
-        <a href="/servis-talebi" class="btn btn--primary">Talep Oluştur</a>
+        <div><strong>Bu hizmet için talep oluşturun</strong><p>Formu doldurun, ekibimiz en kısa sürede sizinle iletişime geçsin.</p></div>
+        <a href="/teklif-al" class="btn btn--primary">Talep Oluştur</a>
       </div>
     </article>
     <aside class="aside">

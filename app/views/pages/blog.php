@@ -7,7 +7,7 @@ $qs = function (int $p) use ($search) {
     return $q ? '?' . http_build_query($q) : '';
 };
 ?>
-<?php partial('page-hero', ['heading' => $category ? $category['name'] : 'Blog', 'lead' => $category ? 'Bu kategorideki tüm yazılar' : 'Bakım rehberleri, teknik bilgiler ve servisimizden haberler.', 'crumbs' => $crumbs]); ?>
+<?php partial('page-hero', ['heading' => $category ? $category['name'] : 'Blog', 'lead' => $category ? 'Bu kategorideki tüm yazılar' : 'Su depolama, pompa ve hidrofor sistemleri hakkında rehberler, teknik bilgiler ve duyurular.', 'crumbs' => $crumbs]); ?>
 <section class="section section--tight">
   <div class="container">
     <div class="blog-toolbar">

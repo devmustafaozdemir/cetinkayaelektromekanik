@@ -93,27 +93,55 @@ CREATE TABLE IF NOT EXISTS faqs (
     sort     INTEGER NOT NULL DEFAULT 0,
     active   INTEGER NOT NULL DEFAULT 1
 );
-CREATE TABLE IF NOT EXISTS service_requests (
-    id         INTEGER PRIMARY KEY AUTOINCREMENT,
-    code       TEXT NOT NULL UNIQUE,
-    name       TEXT NOT NULL,
-    phone      TEXT NOT NULL,
-    email      TEXT NOT NULL DEFAULT '',
-    company    TEXT NOT NULL DEFAULT '',
-    brand      TEXT NOT NULL DEFAULT '',
-    device     TEXT NOT NULL DEFAULT '',
-    model      TEXT NOT NULL DEFAULT '',
-    warranty   INTEGER NOT NULL DEFAULT 0,
-    issue      TEXT NOT NULL DEFAULT '',
-    status     TEXT NOT NULL DEFAULT 'received',
-    admin_note TEXT NOT NULL DEFAULT '',
-    ip         TEXT NOT NULL DEFAULT '',
-    created_at TEXT NOT NULL DEFAULT (datetime('now','localtime')),
-    updated_at TEXT NOT NULL DEFAULT (datetime('now','localtime'))
+CREATE TABLE IF NOT EXISTS product_categories (
+    id      INTEGER PRIMARY KEY AUTOINCREMENT,
+    name    TEXT NOT NULL,
+    slug    TEXT NOT NULL UNIQUE,
+    art     TEXT NOT NULL DEFAULT 'tank',
+    summary TEXT NOT NULL DEFAULT '',
+    sort    INTEGER NOT NULL DEFAULT 0
 );
-CREATE TABLE IF NOT EXISTS request_log (
+CREATE TABLE IF NOT EXISTS products (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    title       TEXT NOT NULL,
+    slug        TEXT NOT NULL UNIQUE,
+    category_id INTEGER REFERENCES product_categories(id) ON DELETE SET NULL,
+    brand       TEXT NOT NULL DEFAULT '',
+    image       TEXT NOT NULL DEFAULT '',
+    summary     TEXT NOT NULL DEFAULT '',
+    content     TEXT NOT NULL DEFAULT '',
+    specs       TEXT NOT NULL DEFAULT '',
+    featured    INTEGER NOT NULL DEFAULT 0,
+    active      INTEGER NOT NULL DEFAULT 1,
+    sort        INTEGER NOT NULL DEFAULT 0,
+    created_at  TEXT NOT NULL DEFAULT (datetime('now','localtime')),
+    updated_at  TEXT NOT NULL DEFAULT (datetime('now','localtime'))
+);
+CREATE INDEX IF NOT EXISTS idx_products_cat ON products(category_id, active);
+CREATE TABLE IF NOT EXISTS quotes (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    code         TEXT NOT NULL UNIQUE,
+    type         TEXT NOT NULL DEFAULT 'product',
+    name         TEXT NOT NULL,
+    company      TEXT NOT NULL DEFAULT '',
+    phone        TEXT NOT NULL,
+    email        TEXT NOT NULL DEFAULT '',
+    city         TEXT NOT NULL DEFAULT '',
+    product_id   INTEGER REFERENCES products(id) ON DELETE SET NULL,
+    product_name TEXT NOT NULL DEFAULT '',
+    category     TEXT NOT NULL DEFAULT '',
+    quantity     TEXT NOT NULL DEFAULT '',
+    message      TEXT NOT NULL DEFAULT '',
+    status       TEXT NOT NULL DEFAULT 'new',
+    admin_note   TEXT NOT NULL DEFAULT '',
+    source       TEXT NOT NULL DEFAULT 'web',
+    ip           TEXT NOT NULL DEFAULT '',
+    created_at   TEXT NOT NULL DEFAULT (datetime('now','localtime')),
+    updated_at   TEXT NOT NULL DEFAULT (datetime('now','localtime'))
+);
+CREATE TABLE IF NOT EXISTS quote_log (
     id         INTEGER PRIMARY KEY AUTOINCREMENT,
-    request_id INTEGER NOT NULL REFERENCES service_requests(id) ON DELETE CASCADE,
+    quote_id   INTEGER NOT NULL REFERENCES quotes(id) ON DELETE CASCADE,
     status     TEXT NOT NULL,
     note       TEXT NOT NULL DEFAULT '',
     created_at TEXT NOT NULL DEFAULT (datetime('now','localtime'))

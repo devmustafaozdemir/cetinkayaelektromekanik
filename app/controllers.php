@@ -23,11 +23,116 @@ function published_posts_sql(): string
 function page_home(): void
 {
     render('home', [
-        'active'   => 'home',
-        'services' => q_all('SELECT * FROM services WHERE active = 1 ORDER BY sort, id LIMIT 6'),
-        'posts'    => q_all('SELECT p.*, c.name AS category, c.slug AS category_slug ' . published_posts_sql() . ' ORDER BY p.featured DESC, p.published_at DESC LIMIT 3'),
-        'faqs'     => q_all('SELECT * FROM faqs WHERE active = 1 ORDER BY sort, id LIMIT 5'),
-        'schema'   => local_business_schema(),
+        'active'     => 'home',
+        'categories' => product_categories_with_counts(),
+        'products'   => q_all(products_sql() . ' AND p.featured = 1 ORDER BY p.sort, p.id LIMIT 8'),
+        'services'   => q_all('SELECT * FROM services WHERE active = 1 ORDER BY sort, id LIMIT 4'),
+        'posts'      => q_all('SELECT p.*, c.name AS category, c.slug AS category_slug ' . published_posts_sql() . ' ORDER BY p.featured DESC, p.published_at DESC LIMIT 3'),
+        'faqs'       => q_all('SELECT * FROM faqs WHERE active = 1 ORDER BY sort, id LIMIT 5'),
+        'schema'     => local_business_schema(),
+    ]);
+}
+
+/* ---------- Products ---------- */
+
+function products_sql(): string
+{
+    return 'SELECT p.*, c.name AS category, c.slug AS category_slug, c.art AS art
+            FROM products p LEFT JOIN product_categories c ON c.id = p.category_id WHERE p.active = 1';
+}
+
+function product_categories_with_counts(): array
+{
+    return q_all('SELECT c.*, (SELECT COUNT(*) FROM products p WHERE p.category_id = c.id AND p.active = 1) AS cnt FROM product_categories c ORDER BY c.sort, c.id');
+}
+
+function product_listing(?array $category): void
+{
+    $where = '';
+    $params = [];
+    if ($category) {
+        $where .= ' AND p.category_id = ?';
+        $params[] = $category['id'];
+    }
+    $brand = trim((string)($_GET['marka'] ?? ''));
+    if ($brand !== '') {
+        $where .= ' AND p.brand = ?';
+        $params[] = $brand;
+    }
+    $search = trim((string)($_GET['q'] ?? ''));
+    if ($search !== '') {
+        $where .= ' AND (p.title LIKE ? OR p.summary LIKE ? OR p.brand LIKE ?)';
+        array_push($params, '%' . $search . '%', '%' . $search . '%', '%' . $search . '%');
+    }
+    $brandParams = $category ? [$category['id']] : [];
+    render('products', [
+        'title'       => $category ? $category['name'] : 'Ürünler',
+        'description' => $category ? $category['summary'] : 'Meksis modüler su depoları, Grundfos, Wilo, Standart Pompa ve Sumak pompa ve hidrofor sistemleri.',
+        'active'      => 'products',
+        'category'    => $category,
+        'categories'  => product_categories_with_counts(),
+        'products'    => q_all(products_sql() . $where . ' ORDER BY c.sort, p.sort, p.id', $params),
+        'brandList'   => array_column(q_all("SELECT DISTINCT brand FROM products WHERE active = 1 AND brand != ''" . ($category ? ' AND category_id = ?' : '') . ' ORDER BY brand', $brandParams), 'brand'),
+        'brand'       => $brand,
+        'search'      => $search,
+        'noindex'     => $search !== '' || $brand !== '',
+    ]);
+}
+
+function page_products(): void
+{
+    product_listing(null);
+}
+
+function page_product_category(string $method, string $slug): void
+{
+    $cat = q_one('SELECT * FROM product_categories WHERE slug = ?', [$slug]);
+    if (!$cat) {
+        not_found();
+        return;
+    }
+    product_listing($cat);
+}
+
+function page_product(string $method, string $slug): void
+{
+    $product = q_one(products_sql() . ' AND p.slug = ?', [$slug]);
+    if (!$product) {
+        not_found();
+        return;
+    }
+    $image = $product['image'] ? base_url() . upload_url($product['image']) : '';
+    render('product', [
+        'title'       => $product['title'],
+        'description' => $product['summary'],
+        'og_image'    => $image,
+        'active'      => 'products',
+        'product'     => $product,
+        'specs'       => parse_specs($product['specs']),
+        'related'     => q_all(products_sql() . ' AND p.id != ? ORDER BY (p.category_id = ?) DESC, (p.brand = ?) DESC, p.sort LIMIT 4', [$product['id'], (int)$product['category_id'], $product['brand']]),
+        'schema'      => [
+            '@context'    => 'https://schema.org',
+            '@type'       => 'Product',
+            'name'        => $product['title'],
+            'description' => $product['summary'],
+            'brand'       => $product['brand'] ? ['@type' => 'Brand', 'name' => $product['brand']] : null,
+            'image'       => $image ?: null,
+            'category'    => $product['category'],
+        ],
+    ]);
+}
+
+function page_brands(): void
+{
+    $counts = [];
+    foreach (q_all("SELECT brand, COUNT(*) c FROM products WHERE active = 1 GROUP BY brand") as $r) {
+        $counts[$r['brand']] = (int)$r['c'];
+    }
+    render('brands', [
+        'title'       => 'Markalar',
+        'description' => 'Satışını yaptığımız markalar: ' . implode(', ', array_column(brands(), 'name')) . '.',
+        'active'      => 'brands',
+        'counts'      => $counts,
     ]);
 }
 
@@ -267,86 +372,57 @@ function page_contact(string $method): void
     ]);
 }
 
-function page_request(string $method): void
+function page_quote(string $method): void
 {
     $errors = [];
     $created = null;
+    $product = null;
+    if (!empty($_REQUEST['urun'])) {
+        $product = q_one(products_sql() . ' AND p.slug = ?', [(string)$_REQUEST['urun']]);
+    }
     if ($method === 'POST') {
         csrf_check();
         $d = [];
-        foreach (['name', 'phone', 'email', 'company', 'brand', 'device', 'model', 'issue'] as $k) {
-            $d[$k] = trim((string)($_POST[$k] ?? ''));
+        foreach (['name' => 120, 'company' => 160, 'phone' => 40, 'email' => 160, 'city' => 60, 'category' => 120, 'quantity' => 120, 'message' => 5000] as $k => $max) {
+            $d[$k] = mb_substr(trim((string)($_POST[$k] ?? '')), 0, $max);
         }
-        $d['warranty'] = !empty($_POST['warranty']) ? 1 : 0;
+        $d['type'] = array_key_exists($_POST['type'] ?? '', quote_types()) ? $_POST['type'] : 'product';
+        $quick = !empty($_POST['quick']);
         if (!empty($_POST['website'])) {
-            redirect(url('servis-talebi'));
+            redirect(url('teklif-al'));
         }
         if (mb_strlen($d['name']) < 2) $errors['name'] = 'Adınızı yazın.';
         if (strlen(preg_replace('/\D/', '', $d['phone'])) < 10) $errors['phone'] = 'Geçerli bir telefon numarası girin.';
         if ($d['email'] !== '' && !filter_var($d['email'], FILTER_VALIDATE_EMAIL)) $errors['email'] = 'Geçerli bir e-posta adresi girin.';
-        if ($d['device'] === '') $errors['device'] = 'Cihaz türünü yazın.';
-        if (mb_strlen($d['issue']) < 5) $errors['issue'] = 'Arızayı kısaca açıklayın.';
-        if (empty($_POST['kvkk'])) $errors['kvkk'] = 'Devam etmek için aydınlatma metnini onaylayın.';
-        if (!$errors && too_many_submissions('service_requests', 3, 30)) $errors['form'] = 'Kısa sürede çok fazla talep oluşturdunuz. Lütfen bizi arayın.';
+        if (!$quick && !$product && $d['category'] === '' && mb_strlen($d['message']) < 5) $errors['message'] = 'İhtiyacınızı kısaca yazın veya bir ürün grubu seçin.';
+        if (!$quick && empty($_POST['kvkk'])) $errors['kvkk'] = 'Devam etmek için aydınlatma metnini onaylayın.';
+        if (!$errors && too_many_submissions('quotes', 5, 30)) $errors['form'] = 'Kısa sürede çok fazla talep oluşturdunuz. Lütfen bizi arayın.';
         if (!$errors) {
-            $code = new_request_code();
-            q('INSERT INTO service_requests(code, name, phone, email, company, brand, device, model, warranty, issue, ip, created_at, updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,now_tr(),now_tr())', [
-                $code, mb_substr($d['name'], 0, 120), mb_substr($d['phone'], 0, 40), mb_substr($d['email'], 0, 160),
-                mb_substr($d['company'], 0, 160), mb_substr($d['brand'], 0, 60), mb_substr($d['device'], 0, 120),
-                mb_substr($d['model'], 0, 120), $d['warranty'], mb_substr($d['issue'], 0, 5000), client_ip(),
+            $code = new_quote_code();
+            q('INSERT INTO quotes(code, type, name, company, phone, email, city, product_id, product_name, category, quantity, message, ip, created_at, updated_at)
+               VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,now_tr(),now_tr())', [
+                $code, $d['type'], $d['name'], $d['company'], $d['phone'], $d['email'], $d['city'],
+                $product['id'] ?? null, $product['title'] ?? '', $product['category'] ?? $d['category'], $d['quantity'], $d['message'], client_ip(),
             ]);
-            q('INSERT INTO request_log(request_id, status, note, created_at) VALUES(?, ?, ?, now_tr())', [db()->lastInsertId(), 'received', 'Online talep oluşturuldu.']);
-            notify_admin("Yeni servis talebi {$code}", "Ad: {$d['name']}\nTelefon: {$d['phone']}\nCihaz: {$d['brand']} {$d['device']} {$d['model']}\nGaranti: " . ($d['warranty'] ? 'Evet' : 'Hayır') . "\n\n{$d['issue']}");
-            $_SESSION['last_request'] = $code;
-            redirect(url('servis-talebi?tamam=1'));
+            q('INSERT INTO quote_log(quote_id, status, note, created_at) VALUES(?, ?, ?, now_tr())', [db()->lastInsertId(), 'new', $quick ? 'Hızlı teklif formundan geldi.' : 'Web sitesinden teklif talebi.']);
+            notify_admin("Yeni teklif talebi {$code}", "Talep türü: " . quote_types()[$d['type']] . "\nAd: {$d['name']}\nFirma: {$d['company']}\nTelefon: {$d['phone']}\nE-posta: {$d['email']}\nŞehir: {$d['city']}\nÜrün: " . ($product['title'] ?? $d['category']) . "\nMiktar: {$d['quantity']}\n\n{$d['message']}");
+            $_SESSION['last_quote'] = $code;
+            redirect(url('teklif-al?tamam=1'));
         }
         $_SESSION['old'] = $d;
     }
-    if (isset($_GET['tamam']) && !empty($_SESSION['last_request'])) {
-        $created = q_one('SELECT * FROM service_requests WHERE code = ?', [$_SESSION['last_request']]);
+    if (isset($_GET['tamam']) && !empty($_SESSION['last_quote'])) {
+        $created = q_one('SELECT * FROM quotes WHERE code = ?', [$_SESSION['last_quote']]);
     }
-    render('request', [
-        'title'       => 'Online Servis Talebi',
-        'description' => 'Arızalı cihazınız için online servis talebi oluşturun, takip kodunuzla süreci anlık izleyin.',
-        'active'      => 'request',
+    render('quote', [
+        'title'       => 'Teklif Al',
+        'description' => 'Modüler su deposu, pompa ve hidrofor sistemleri için hızlı teklif alın.',
+        'active'      => 'quote',
         'errors'      => $errors,
         'created'     => $created,
-        'brands'      => setting_lines('brands'),
-    ]);
-}
-
-function page_track(string $method): void
-{
-    $result = null;
-    $error = null;
-    $code = strtoupper(trim((string)($_REQUEST['kod'] ?? '')));
-    $phone = trim((string)($_REQUEST['telefon'] ?? ''));
-    if ($code !== '' || $phone !== '') {
-        $key = 'track_' . client_ip();
-        $_SESSION[$key] = array_filter($_SESSION[$key] ?? [], fn($t) => $t > time() - 600);
-        if (count($_SESSION[$key]) >= 15) {
-            $error = 'Çok fazla sorgu yaptınız. Lütfen birkaç dakika sonra tekrar deneyin.';
-        } else {
-            $_SESSION[$key][] = time();
-            $row = q_one('SELECT * FROM service_requests WHERE code = ?', [$code]);
-            $last4 = substr(preg_replace('/\D/', '', $phone), -4);
-            if ($row && strlen($last4) === 4 && str_ends_with(preg_replace('/\D/', '', $row['phone']), $last4)) {
-                $result = $row;
-                $result['log'] = q_all('SELECT * FROM request_log WHERE request_id = ? ORDER BY id', [$row['id']]);
-            } else {
-                $error = 'Bu bilgilerle eşleşen bir servis kaydı bulunamadı. Takip kodunu ve telefon numarasını kontrol edin.';
-            }
-        }
-    }
-    render('track', [
-        'title'       => 'Servis Takip',
-        'description' => 'Takip kodunuz ve telefon numaranızla cihazınızın servis durumunu anlık öğrenin.',
-        'active'      => 'track',
-        'result'      => $result,
-        'error'       => $error,
-        'code'        => $code,
-        'phone'       => $phone,
-        'noindex'     => $code !== '',
+        'product'     => $product,
+        'categories'  => q_all('SELECT name FROM product_categories ORDER BY sort, id'),
+        'noindex'     => $created !== null || $product !== null,
     ]);
 }
 
@@ -354,7 +430,9 @@ function page_sitemap(): void
 {
     header('Content-Type: application/xml; charset=utf-8');
     $b = base_url();
-    $urls = [['/', null], ['/hizmetler', null], ['/hakkimizda', null], ['/blog', null], ['/sss', null], ['/iletisim', null], ['/servis-talebi', null], ['/servis-takip', null]];
+    $urls = [['/', null], ['/urunler', null], ['/markalar', null], ['/hizmetler', null], ['/hakkimizda', null], ['/blog', null], ['/sss', null], ['/iletisim', null], ['/teklif-al', null]];
+    foreach (q_all('SELECT slug FROM product_categories') as $c) $urls[] = ['/urunler/kategori/' . $c['slug'], null];
+    foreach (q_all('SELECT slug, updated_at FROM products WHERE active = 1') as $p) $urls[] = ['/urunler/' . $p['slug'], $p['updated_at']];
     foreach (q_all('SELECT slug FROM services WHERE active = 1') as $s) $urls[] = ['/hizmetler/' . $s['slug'], null];
     foreach (q_all('SELECT slug FROM categories') as $c) $urls[] = ['/blog/kategori/' . $c['slug'], null];
     foreach (q_all('SELECT p.slug, p.updated_at ' . published_posts_sql()) as $p) $urls[] = ['/blog/' . $p['slug'], $p['updated_at']];
@@ -368,7 +446,7 @@ function page_sitemap(): void
 function page_robots(): void
 {
     header('Content-Type: text/plain; charset=utf-8');
-    echo "User-agent: *\nDisallow: /admin/\nDisallow: /servis-takip?\n\nSitemap: " . base_url() . "/sitemap.xml\n";
+    echo "User-agent: *\nDisallow: /admin/\n\nSitemap: " . base_url() . "/sitemap.xml\n";
 }
 
 function local_business_schema(): array
@@ -376,7 +454,7 @@ function local_business_schema(): array
     $same = array_values(array_filter([setting('instagram'), setting('facebook'), setting('linkedin'), setting('youtube')]));
     return array_filter([
         '@context'    => 'https://schema.org',
-        '@type'       => 'LocalBusiness',
+        '@type'       => 'Store',
         'name'        => setting('site_name'),
         'description' => setting('meta_description'),
         'url'         => base_url(),

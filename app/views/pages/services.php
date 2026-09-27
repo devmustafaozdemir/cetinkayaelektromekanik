@@ -1,4 +1,4 @@
-<?php partial('page-hero', ['heading' => 'Hizmetlerimiz', 'lead' => 'Yetkili servis güvencesiyle profesyonel el aletleri ve elektrik motorları için eksiksiz onarım, bakım ve yedek parça hizmetleri.', 'crumbs' => [[null, 'Hizmetler']]]); ?>
+<?php partial('page-hero', ['heading' => 'Hizmetlerimiz', 'lead' => 'Satışını yaptığımız ürünler için keşiften montaja, bakımdan sevkiyata kadar uçtan uca destek.', 'crumbs' => [[null, 'Hizmetler']]]); ?>
 <section class="section">
   <div class="container">
     <div class="services-grid">
@@ -15,7 +15,7 @@
 </section>
 <section class="section section--muted">
   <div class="container">
-    <div class="section-head"><span class="eyebrow">Yetkili Markalar</span><h2>Üretici onaylı servis</h2><p>Garanti kapsamındaki ürünleriniz üretici prosedürlerine uygun olarak onarılır.</p></div>
+    <div class="section-head"><span class="eyebrow">Markalarımız</span><h2>Güçlü markalar, güvenilir ürünler</h2><p>Satış ve hizmetlerimizi dünya çapında tanınan markaların ürünleriyle sunuyoruz.</p></div>
     <?php partial('brand-logos'); ?>
   </div>
 </section>

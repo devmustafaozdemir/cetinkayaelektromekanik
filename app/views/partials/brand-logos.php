@@ -1,5 +1,5 @@
 <ul class="brand-row">
-  <?php foreach (setting_lines('brands') as $b): ?>
-    <li class="brand-row__item brand--<?= e(slugify($b)) ?>"><span><?= e($b) ?></span><small>Yetkili Servis</small></li>
+  <?php foreach (brands() as $b): ?>
+    <li class="brand-row__item"><a href="/urunler?marka=<?= rawurlencode($b['name']) ?>"><span><?= e($b['name']) ?></span><small><?= e($b['desc'] ?: 'Çözüm ortağı') ?></small></a></li>
   <?php endforeach; ?>
 </ul>

@@ -1,14 +1,17 @@
 <?php
 $user = current_user();
-$newRequests = (int)q_val("SELECT COUNT(*) FROM service_requests WHERE status = 'received'");
+$newQuotes = (int)q_val("SELECT COUNT(*) FROM quotes WHERE status = 'new'");
 $unread = (int)q_val('SELECT COUNT(*) FROM messages WHERE is_read = 0');
 $menu = [
     ['dashboard', 'Genel Bakış', 'home', 0],
-    ['requests', 'Servis Talepleri', 'clipboard', $newRequests],
+    ['quotes', 'Teklif Talepleri', 'calculator', $newQuotes],
     ['messages', 'Mesajlar', 'inbox', $unread],
+    [null, 'Katalog'],
+    ['products', 'Ürünler', 'package', 0],
+    ['pcategories', 'Ürün Kategorileri', 'grid', 0],
     [null, 'İçerik'],
     ['posts', 'Blog Yazıları', 'file-text', 0],
-    ['categories', 'Kategoriler', 'tag', 0],
+    ['categories', 'Blog Kategorileri', 'tag', 0],
     ['services', 'Hizmetler', 'layers', 0],
     ['faqs', 'SSS', 'help', 0],
     [null, 'Sistem'],
@@ -51,7 +54,7 @@ $menu = [
       <button class="icon-btn menu-btn" type="button" data-sidebar-open aria-label="Menü"><?= icon('menu') ?></button>
       <h1 class="topnav__title"><?= e($title ?? '') ?></h1>
       <div class="topnav__right">
-        <a href="<?= admin_url('requests', ['a' => 'edit']) ?>" class="btn btn--primary btn--sm hide-sm"><?= icon('plus') ?> Servis Kaydı</a>
+        <a href="<?= admin_url('quotes', ['a' => 'edit']) ?>" class="btn btn--primary btn--sm hide-sm"><?= icon('plus') ?> Teklif Kaydı</a>
         <div class="user-menu">
           <button type="button" class="user-menu__btn" data-dropdown><span class="avatar"><?= e(mb_strtoupper(mb_substr($user['name'] ?: $user['username'], 0, 1))) ?></span><span class="hide-sm"><?= e($user['name'] ?: $user['username']) ?></span><?= icon('chevron-down') ?></button>
           <div class="dropdown">

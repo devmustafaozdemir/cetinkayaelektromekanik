@@ -12,6 +12,7 @@
   const nav = document.getElementById('nav');
   if (toggle && nav) {
     const setOpen = (open) => {
+      if (open && header) nav.style.top = Math.max(0, header.getBoundingClientRect().bottom) + 'px';
       nav.classList.toggle('is-open', open);
       toggle.setAttribute('aria-expanded', String(open));
       toggle.setAttribute('aria-label', open ? 'Menüyü kapat' : 'Menüyü aç');

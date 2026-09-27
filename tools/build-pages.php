@@ -28,20 +28,22 @@ $_SERVER['HTTP_HOST'] = '127.0.0.1';
 require $root . '/app/bootstrap.php';
 q("INSERT INTO users(username, name, password_hash, created_at) VALUES('demo', 'Demo Yönetici', ?, now_tr())", [password_hash('demo-preview', PASSWORD_DEFAULT)]);
 $demo = [
-    ['CE-26DEMO1', 'Ahmet Yılmaz', '0532 000 12 34', 'Makita', 'Kırıcı-Delici', 'HR2470', 1, 'Çalışırken kıvılcım yapıyor, güç kaybı var.', 'repairing', 'Kömür ve rotor değişimi onaylandı. Tahmini teslim: 2 iş günü.',
-        [['received', 'Cihaz servise teslim alındı.', '-3 days'], ['inspecting', 'Arıza tespiti yapılıyor.', '-2 days'], ['quote', 'Rotor ve kömür değişimi gerekiyor, fiyat bilgisi iletildi.', '-1 day'], ['repairing', 'Müşteri onayı alındı, onarıma başlandı.', '-3 hours']]],
-    ['CE-26DEMO2', 'Kaya Yapı Ltd.', '0262 000 55 66', 'Metabo', 'Avuç Taşlama', 'W 750-125', 0, 'Şalter arızalı, çalışmıyor.', 'ready', '',
-        [['received', 'Online talep oluşturuldu.', '-5 days'], ['inspecting', '', '-4 days'], ['repairing', 'Şalter değiştirildi.', '-2 days'], ['ready', 'Cihaz test edildi, teslime hazır.', '-1 day']]],
-    ['CE-26DEMO3', 'Mehmet Demir', '0544 000 77 88', 'HiKOKI', 'Daire Testere', 'C7ST', 1, 'Motor dönmüyor, uğultu yapıyor.', 'received', '',
-        [['received', 'Online talep oluşturuldu.', '-2 hours']]],
+    ['TK-26DEMO1', 'product', 'Ahmet Yılmaz', 'Yılmaz Yapı', '0532 000 12 34', 'İzmit / Kocaeli', 1, 'Meksis Galvaniz Modüler Su Deposu', 'Modüler Su Depoları', '30 m³', '24 daireli site projemiz için bodruma kurulacak depo fiyatı istiyoruz.', 'quoted', '3x5x2 m öneri yapıldı, montaj dahil fiyat iletildi.',
+        [['new', 'Web sitesinden teklif talebi.', '-3 days'], ['contacted', 'Telefonla görüşüldü, alan ölçüleri alındı.', '-2 days'], ['quoted', 'Teklif e-posta ile gönderildi.', '-1 day']]],
+    ['TK-26DEMO2', 'product', 'Elif Şahin', 'Şahin Otel', '0262 000 55 66', 'Kartepe / Kocaeli', 5, 'Grundfos Çok Pompalı Hidrofor Seti', 'Hidrofor Sistemleri', '1 set', 'Otelimiz için mevcut hidroforun yenilenmesi gerekiyor.', 'won', 'Sipariş onaylandı, montaj planlanıyor.',
+        [['new', 'Web sitesinden teklif talebi.', '-6 days'], ['quoted', 'Teklif iletildi.', '-4 days'], ['won', 'Sipariş onaylandı.', '-1 day']]],
+    ['TK-26DEMO3', 'project', 'Mehmet Demir', '', '0544 000 77 88', 'Gebze / Kocaeli', null, '', 'Birden fazla / proje', '', 'Fabrika için yangın ve kullanma suyu deposu ile pompa sistemi projesi.', 'new', '',
+        [['new', 'Web sitesinden teklif talebi.', '-2 hours']]],
+    ['TK-26DEMO4', 'product', 'Can Arslan', '', '0555 000 33 44', 'Derince / Kocaeli', 11, 'Standart Pompa Derin Kuyu Dalgıç Pompası', 'Dalgıç Pompalar', '1 adet', '80 metre kuyu için pompa lazım.', 'new', '',
+        [['new', 'Hızlı teklif formundan geldi.', '-5 hours']]],
 ];
-foreach ($demo as [$code, $name, $phone, $brand, $device, $model, $warranty, $issue, $status, $note, $log]) {
+foreach ($demo as [$code, $type, $name, $company, $phone, $city, $pid, $pname, $cat, $qty, $msg, $status, $note, $log]) {
     $created = date('Y-m-d H:i:s', strtotime($log[0][2]));
-    q('INSERT INTO service_requests(code, name, phone, brand, device, model, warranty, issue, status, admin_note, created_at, updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)',
-        [$code, $name, $phone, $brand, $device, $model, $warranty, $issue, $status, $note, $created, $created]);
-    $rid = db()->lastInsertId();
+    q('INSERT INTO quotes(code, type, name, company, phone, city, product_id, product_name, category, quantity, message, status, admin_note, created_at, updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+        [$code, $type, $name, $company, $phone, $city, $pid, $pname, $cat, $qty, $msg, $status, $note, $created, date('Y-m-d H:i:s', strtotime(end($log)[2]))]);
+    $qid = db()->lastInsertId();
     foreach ($log as [$st, $n, $when]) {
-        q('INSERT INTO request_log(request_id, status, note, created_at) VALUES(?,?,?,?)', [$rid, $st, $n, date('Y-m-d H:i:s', strtotime($when))]);
+        q('INSERT INTO quote_log(quote_id, status, note, created_at) VALUES(?,?,?,?)', [$qid, $st, $n, date('Y-m-d H:i:s', strtotime($when))]);
     }
 }
 q("INSERT INTO messages(name, email, phone, subject, message, created_at) VALUES('Ayşe Kara', 'ayse@example.com', '0555 000 11 22', 'Kurumsal bakım anlaşması', 'Merhaba, firmamızdaki 25 adet el aleti için periyodik bakım anlaşması yapmak istiyoruz. Bilgi verebilir misiniz?', ?)", [date('Y-m-d H:i:s', strtotime('-1 hour'))]);
@@ -129,6 +131,10 @@ function rewrite(string $html, bool $isAdmin = false): string
         return $m[1] . '="' . $base . 'yonetim/' . ($slug === 'dashboard' ? '' : $slug . '/') . '"';
     }, $html);
     $html = preg_replace('#(href|action)="/admin/"#', '$1="' . $base . 'yonetim/"', $html);
+    // Query-string pages → pre-rendered static folders
+    $html = preg_replace_callback('#href="/urunler\?marka=([^"&]+)"#', fn($m) => 'href="' . $base . 'urunler/marka/' . slugify(rawurldecode($m[1])) . '/"', $html);
+    $html = preg_replace('#href="/urunler/kategori/([a-z0-9-]+)\?marka=[^"]*"#', 'href="' . $base . 'urunler/kategori/$1/"', $html);
+    $html = preg_replace('#href="/teklif-al\?urun=([a-z0-9-]+)"#', 'href="' . $base . 'teklif-al/urun/$1/"', $html);
     // Site-absolute URLs → base path
     $html = preg_replace_callback('#(href|src|action)="/(?!/)([^"]*)"#', function ($m) use ($base) {
         $path = $m[2];
@@ -152,11 +158,6 @@ function preview_chrome(string $html, bool $isAdmin): string
 <script>
 document.addEventListener('submit', function (e) {
   var f = e.target;
-  if (f.method.toLowerCase() === 'get' && f.querySelector('[name=kod]')) {
-    e.preventDefault();
-    location.href = '{$base}servis-takip/ornek/';
-    return;
-  }
   if (f.method.toLowerCase() === 'get' && f.querySelector('[name=q]')) {
     e.preventDefault();
     alert('Önizleme sürümünde arama çalışmaz. Canlı sitede yazılarda arama yapılır.');
@@ -182,7 +183,8 @@ $paths = array_map(fn($u) => parse_url(html_entity_decode($u), PHP_URL_PATH), $m
 
 // Admin page list must be known before rewriting links
 $adminList = [
-    '?p=dashboard', '?p=requests', '?p=requests&a=edit&id=1', '?p=requests&a=edit&id=2', '?p=requests&a=edit&id=3', '?p=requests&a=edit',
+    '?p=dashboard', '?p=quotes', '?p=quotes&a=edit&id=1', '?p=quotes&a=edit&id=2', '?p=quotes&a=edit&id=3', '?p=quotes&a=edit&id=4', '?p=quotes&a=edit',
+    '?p=products', '?p=products&a=edit', '?p=products&a=edit&id=1', '?p=products&a=edit&id=5', '?p=products&a=edit&id=8', '?p=products&a=edit&id=11', '?p=pcategories',
     '?p=messages', '?p=posts', '?p=posts&a=edit', '?p=posts&a=edit&id=1', '?p=posts&a=edit&id=2', '?p=posts&a=edit&id=3', '?p=posts&a=edit&id=4',
     '?p=categories', '?p=services', '?p=services&a=edit&id=1', '?p=services&a=edit', '?p=faqs',
     '?p=settings', '?p=settings&tab=contact', '?p=settings&tab=home', '?p=settings&tab=about', '?p=settings&tab=social', '?p=account',
@@ -198,8 +200,14 @@ foreach ($paths as $path) {
     }
     write(($path === '/' ? '' : $path . '/') . 'index.html', preview_chrome(rewrite($html), false));
 }
-[, $html] = fetch($host . '/servis-takip?kod=CE-26DEMO1&telefon=1234');
-write('servis-takip/ornek/index.html', preview_chrome(rewrite($html), false));
+foreach (brands() as $b) {
+    [, $html] = fetch($host . '/urunler?marka=' . rawurlencode($b['name']));
+    write('urunler/marka/' . $b['slug'] . '/index.html', preview_chrome(rewrite($html), false));
+}
+foreach (q_all('SELECT slug FROM products WHERE active = 1') as $pr) {
+    [, $html] = fetch($host . '/teklif-al?urun=' . $pr['slug']);
+    write('teklif-al/urun/' . $pr['slug'] . '/index.html', preview_chrome(rewrite($html), false));
+}
 [, $html] = fetch($host . '/bulunamadi');
 write('404.html', preview_chrome(rewrite($html), false));
 write('robots.txt', "User-agent: *\nDisallow: /\n");

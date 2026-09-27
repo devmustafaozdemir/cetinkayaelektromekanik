@@ -23,17 +23,17 @@ $stats = array_map(fn($l) => array_pad(explode('|', $l, 2), 2, ''), setting_line
 </section>
 <section class="section section--muted">
   <div class="container">
-    <div class="section-head"><span class="eyebrow">Yetkili Servis</span><h2>Güvendiğiniz markaların yetkili servisi</h2></div>
+    <div class="section-head"><span class="eyebrow">Markalarımız</span><h2>Güvendiğiniz markaların ürünleri</h2></div>
     <?php partial('brand-logos'); ?>
   </div>
 </section>
 <section class="section">
   <div class="container">
     <div class="features">
-      <div class="feature reveal"><span class="feature__icon"><?= icon('award') ?></span><h3>Uzman Kadro</h3><p>Üretici eğitimlerinden geçmiş, deneyimli teknik ekip.</p></div>
-      <div class="feature reveal"><span class="feature__icon"><?= icon('gauge') ?></span><h3>Test Donanımı</h3><p>Onarım sonrası yük, izolasyon ve güvenlik testleri.</p></div>
-      <div class="feature reveal"><span class="feature__icon"><?= icon('package') ?></span><h3>Parça Stoğu</h3><p>Sık kullanılan orijinal parçalarda hazır stok.</p></div>
-      <div class="feature reveal"><span class="feature__icon"><?= icon('users') ?></span><h3>Kurumsal Destek</h3><p>Sanayi kuruluşlarına özel planlı bakım ve öncelikli servis.</p></div>
+      <div class="feature reveal"><span class="feature__icon"><?= icon('ruler') ?></span><h3>Doğru Kapasite</h3><p>Depo hacmi, debi ve basınç hesabıyla ihtiyaca uygun seçim.</p></div>
+      <div class="feature reveal"><span class="feature__icon"><?= icon('award') ?></span><h3>Güçlü Markalar</h3><p>Meksis, Grundfos, Wilo, Standart Pompa ve Sumak ürünleri.</p></div>
+      <div class="feature reveal"><span class="feature__icon"><?= icon('truck') ?></span><h3>Hızlı Teslimat</h3><p>Stok ürünlerde hızlı, proje ürünlerinde planlı sevkiyat.</p></div>
+      <div class="feature reveal"><span class="feature__icon"><?= icon('users') ?></span><h3>Satış Sonrası Destek</h3><p>Keşif, montaj, devreye alma ve periyodik bakım desteği.</p></div>
     </div>
   </div>
 </section>

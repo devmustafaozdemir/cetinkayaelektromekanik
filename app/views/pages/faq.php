@@ -1,4 +1,4 @@
-<?php partial('page-hero', ['heading' => 'Sıkça Sorulan Sorular', 'lead' => 'Servis süreci, garanti ve onarım hakkında merak edilenler.', 'crumbs' => [[null, 'SSS']]]); ?>
+<?php partial('page-hero', ['heading' => 'Sıkça Sorulan Sorular', 'lead' => 'Ürünler, teklif süreci, montaj ve servis hakkında merak edilenler.', 'crumbs' => [[null, 'SSS']]]); ?>
 <section class="section">
   <div class="container container--narrow">
     <?php partial('faq-list', ['faqs' => $faqs]); ?>

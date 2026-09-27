@@ -18,7 +18,7 @@ if ($method === 'POST') {
     redirect(admin_url('categories'));
 }
 admin_render('categories', [
-    'title' => 'Kategoriler',
+    'title' => 'Blog Kategorileri',
     'rows'  => q_all('SELECT c.*, (SELECT COUNT(*) FROM posts p WHERE p.category_id = c.id) AS cnt FROM categories c ORDER BY c.name'),
     'edit'  => $id ? q_one('SELECT * FROM categories WHERE id = ?', [$id]) : null,
 ]);

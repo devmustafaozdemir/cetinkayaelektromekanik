@@ -9,13 +9,14 @@ function db_seed(): void
 
     $settings = [
         'site_name'        => 'Çetinkaya Elektromekanik',
-        'site_tagline'     => 'Makita · Metabo · HiKOKI Yetkili Servisi',
-        'meta_description' => 'İzmit / Kocaeli\'de Makita, Metabo ve HiKOKI (Hitachi) yetkili servisi. Elektrikli el aletleri onarımı, motor bobinajı, orijinal yedek parça ve online servis takibi.',
+        'site_tagline'     => 'Modüler Su Depoları · Pompa ve Hidrofor Sistemleri',
+        'meta_description' => 'Kocaeli / İzmit\'te Meksis modüler su depoları, Grundfos, Wilo, Standart Pompa ve Sumak pompa ve hidrofor sistemleri satışı. Projeye özel keşif, teklif, montaj ve servis.',
         'phone'            => '0262 335 13 20',
         'phone2'           => '0533 033 79 04',
         'whatsapp'         => '0533 033 79 04',
         'email'            => 'info@cetinkayaelektromekanik.com.tr',
         'address'          => 'Sanayi Mah. 12. Cad. İzmit Sanayi Sitesi 11. Blok No:1, 41040 İzmit / Kocaeli',
+        'address_short'    => 'İzmit Sanayi Sitesi, Kocaeli',
         'hours'            => "Pazartesi – Cuma: 08:30 – 18:30\nCumartesi: 08:30 – 14:00\nPazar: Kapalı",
         'map_embed'        => 'https://www.google.com/maps?q=%C4%B0zmit+Sanayi+Sitesi+11.+Blok+Kocaeli&output=embed',
         'map_link'         => 'https://www.google.com/maps/search/?api=1&query=%C3%87etinkaya+Elektromekanik+%C4%B0zmit',
@@ -23,33 +24,97 @@ function db_seed(): void
         'facebook'         => '',
         'linkedin'         => '',
         'youtube'          => '',
-        'brands'           => "Makita\nMetabo\nHiKOKI",
-        'hero_badge'       => 'Kocaeli\'nin güvenilir yetkili servisi',
-        'hero_title'       => 'Elektrikli aletleriniz ilk günkü performansına kavuşsun.',
-        'hero_text'        => 'Makita, Metabo ve HiKOKI yetkili servisi olarak; profesyonel el aletleri onarımı, motor bobinajı ve orijinal yedek parça tedarikini tek çatı altında sunuyoruz. Cihazınızın durumunu online takip edin.',
-        'stats'            => "3|Yetkili Marka\n100%|Orijinal Yedek Parça\n7/24|Online Servis Takibi\n1|Merkezi Servis Noktası",
-        'about_title'      => 'Atölyemizde her cihaz, ustalık ve özenle yeniden hayat bulur.',
-        'about_text'       => "Çetinkaya Elektromekanik, İzmit Sanayi Sitesi'nde profesyonel ve endüstriyel elektrikli el aletlerinin satış sonrası hizmetlerini sunan bir yetkili servis işletmesidir.\n\nMakita, Metabo ve HiKOKI (eski adıyla Hitachi) markalarının yetkili servisi olarak garanti kapsamındaki ve garanti dışındaki tüm onarımları üretici standartlarında, orijinal yedek parçalarla gerçekleştiriyoruz. Bireysel ustalardan sanayi kuruluşlarına kadar geniş bir müşteri kitlesine hızlı, şeffaf ve güvenilir hizmet vermeyi ilke ediniyoruz.\n\nArıza tespitinden teslimata kadar her aşamada sizi bilgilendiriyor, onayınız olmadan işlem yapmıyoruz.",
-        'about_values'     => "Orijinal yedek parça garantisi\nÜretici standartlarında test ve kalibrasyon\nOnayınız alınmadan işlem yapılmaz\nŞeffaf fiyatlandırma ve hızlı teslim",
+        'brands'           => "Meksis|Modüler su depoları\nGrundfos|Pompa ve hidrofor sistemleri\nWilo|Pompa ve hidrofor sistemleri\nStandart Pompa|Pompa ve hidrofor sistemleri\nSumak|Pompa sistemleri",
+        'hero_badge'       => 'Su depolama ve pompa sistemlerinde çözüm ortağınız',
+        'hero_title'       => 'Suyunuzu güvenle depolayın, doğru basınçla ulaştırın.',
+        'hero_text'        => 'Meksis modüler su depoları ile Grundfos, Wilo, Standart Pompa ve Sumak pompa ve hidrofor sistemlerini projenize uygun seçiyor, hızlı teklif ve montaj desteğiyle teslim ediyoruz.',
+        'stats'            => "5|Güçlü Marka\n4|Ürün Grubu\n%100|Orijinal Ürün\n7/24|Online Teklif",
+        'about_title'      => 'Doğru ürün, doğru kapasite, zamanında teslimat.',
+        'about_text'       => "Çetinkaya Elektromekanik, İzmit merkezli olarak modüler su depoları, pompa ve hidrofor sistemlerinin satışını yapan bir firmadır.\n\nMeksis modüler su depoları ile Grundfos, Wilo, Standart Pompa ve Sumak markalarının ürünlerini; konut, site, otel, hastane, fabrika ve tarım projelerinin ihtiyacına göre seçiyor, kapasite hesabından teklife, sevkiyattan montaja kadar sürecin her adımında yanınızda oluyoruz.\n\nSatış sonrası keşif, montaj ve bakım desteğimizle kurduğumuz sistemlerin uzun yıllar sorunsuz çalışmasını hedefliyoruz.",
+        'about_values'     => "Orijinal ve garantili ürün\nİhtiyaca göre doğru kapasite seçimi\nHızlı teklif ve şeffaf fiyatlandırma\nSatış sonrası montaj ve bakım desteği",
     ];
     $st = $pdo->prepare('INSERT OR REPLACE INTO settings(key, value) VALUES(?, ?)');
     foreach ($settings as $k => $v) {
         $st->execute([$k, $v]);
     }
 
+    $cats = [
+        ['Modüler Su Depoları', 'tank', 'Galvaniz, paslanmaz, GRP ve izolasyonlu panel seçenekleriyle her kapasiteye uygun modüler depolar.'],
+        ['Hidrofor Sistemleri', 'booster', 'Binalarda sabit ve yeterli su basıncı için tek, çift ve çok pompalı hidrofor setleri.'],
+        ['Santrifüj Pompalar', 'pump', 'Temiz su transferi, ısıtma-soğutma ve sulama için yatay ve dikey santrifüj pompalar.'],
+        ['Dalgıç Pompalar', 'submersible', 'Kuyu, drenaj ve atık su uygulamaları için dalgıç pompa çözümleri.'],
+    ];
+    $st = $pdo->prepare('INSERT INTO product_categories(name, slug, art, summary, sort) VALUES(?, ?, ?, ?, ?)');
+    foreach ($cats as $i => [$name, $art, $summary]) {
+        $st->execute([$name, slugify($name), $art, $summary, $i + 1]);
+    }
+
+    $tankInfo = '<p>Modüler su depoları, standart ölçülerdeki panellerin sahada cıvatalı bağlantıyla birleştirilmesiyle kurulur. Bu sayede dar kapılardan ve merdivenlerden kolayca taşınır; bodrum, çatı veya teknik hacimlere istenen ölçüde depo kurulabilir.</p>';
+    $products = [
+        // [category, brand, featured, title, summary, content, specs]
+        [1, 'Meksis', 1, 'Meksis Galvaniz Modüler Su Deposu',
+            'Sıcak daldırma galvaniz panellerden oluşan, ekonomik ve dayanıklı modüler su deposu.',
+            $tankInfo . '<h3>Öne çıkan özellikler</h3><ul><li>Sıcak daldırma galvaniz kaplı çelik paneller</li><li>Sahada hızlı ve kolay montaj</li><li>İhtiyaca göre genişletilebilir kapasite</li><li>Kullanma ve yangın suyu depolamaya uygun</li></ul>',
+            "Marka|Meksis\nPanel malzemesi|Sıcak daldırma galvaniz çelik\nKapasite|Projeye göre\nKullanım alanı|Kullanma suyu, yangın suyu\nMontaj|Cıvatalı panel sistemi"],
+        [1, 'Meksis', 1, 'Meksis Paslanmaz Çelik Modüler Su Deposu',
+            'Hijyenik içme suyu depolaması için paslanmaz çelik panelli modüler su deposu.',
+            $tankInfo . '<h3>Öne çıkan özellikler</h3><ul><li>Paslanmaz çelik paneller ile hijyenik depolama</li><li>Korozyona karşı yüksek dayanım</li><li>Kolay temizlenebilir yüzey</li><li>Uzun kullanım ömrü</li></ul>',
+            "Marka|Meksis\nPanel malzemesi|Paslanmaz çelik\nKapasite|Projeye göre\nKullanım alanı|İçme ve kullanma suyu\nMontaj|Cıvatalı panel sistemi"],
+        [1, 'Meksis', 0, 'Meksis GRP (CTP) Modüler Su Deposu',
+            'Cam elyaf takviyeli polyester panellerden hafif ve korozyona dayanıklı modüler depo.',
+            $tankInfo . '<h3>Öne çıkan özellikler</h3><ul><li>Hafif, korozyona dayanıklı GRP paneller</li><li>Işık geçirmeyen yapı ile yosunlaşmaya karşı koruma</li><li>Düşük bakım ihtiyacı</li></ul>',
+            "Marka|Meksis\nPanel malzemesi|GRP (cam elyaf takviyeli polyester)\nKapasite|Projeye göre\nKullanım alanı|İçme ve kullanma suyu\nMontaj|Cıvatalı panel sistemi"],
+        [1, 'Meksis', 0, 'Meksis İzolasyonlu (Sandviç Panel) Modüler Su Deposu',
+            'Dış mekân ve soğuk iklimler için ısı yalıtımlı panellere sahip modüler su deposu.',
+            $tankInfo . '<h3>Öne çıkan özellikler</h3><ul><li>Isı yalıtımlı sandviç panel yapısı</li><li>Donma ve aşırı ısınmaya karşı koruma</li><li>Çatı ve açık alan uygulamalarına uygun</li></ul>',
+            "Marka|Meksis\nPanel yapısı|İzolasyonlu sandviç panel\nKapasite|Projeye göre\nKullanım alanı|Dış mekân, çatı uygulamaları\nMontaj|Cıvatalı panel sistemi"],
+        [2, 'Grundfos', 1, 'Grundfos Çok Pompalı Hidrofor Seti',
+            'Frekans kontrollü, yüksek verimli çok pompalı hidrofor sistemi.',
+            '<p>Çok pompalı hidrofor setleri; apartman, site, otel ve hastane gibi değişken su tüketimi olan binalarda sabit basınç sağlar. Frekans kontrolü sayesinde pompalar ihtiyaç kadar çalışır, enerji tüketimi düşer.</p><h3>Öne çıkan özellikler</h3><ul><li>Frekans konvertörlü sabit basınç kontrolü</li><li>Pompalar arası otomatik sıralı çalışma</li><li>Kuru çalışma ve aşırı akım koruması</li><li>Kompakt, montaja hazır şase</li></ul>',
+            "Marka|Grundfos\nPompa sayısı|2 – 6 (projeye göre)\nKontrol|Frekans kontrollü, sabit basınç\nKullanım alanı|Konut, site, otel, hastane, endüstri"],
+        [2, 'Wilo', 1, 'Wilo Çift Pompalı Hidrofor Sistemi',
+            'Asil-yedek veya paralel çalışma imkânı sunan çift pompalı hidrofor seti.',
+            '<p>Çift pompalı hidrofor sistemleri, bir pompanın arıza veya bakım durumunda diğerinin devreye girmesiyle kesintisiz su sağlar.</p><h3>Öne çıkan özellikler</h3><ul><li>Asil-yedek ve paralel çalışma</li><li>Basınç tanklı veya frekans kontrollü seçenekler</li><li>Sessiz ve verimli çalışma</li></ul>',
+            "Marka|Wilo\nPompa sayısı|2\nKontrol|Basınç şalterli / frekans kontrollü\nKullanım alanı|Apartman, işyeri, küçük tesis"],
+        [2, 'Standart Pompa', 0, 'Standart Pompa Kompakt Hidrofor',
+            'Müstakil ev ve küçük işletmeler için tek pompalı, kompakt hidrofor.',
+            '<p>Tek pompalı kompakt hidroforlar; müstakil konut, bahçe ve küçük işletmelerde şebeke basıncının yetersiz olduğu durumlarda pratik bir çözümdür.</p><ul><li>Kompakt, kolay montaj</li><li>Basınç tanklı yapı</li><li>Düşük bakım ihtiyacı</li></ul>',
+            "Marka|Standart Pompa\nPompa sayısı|1\nKullanım alanı|Müstakil konut, bahçe, küçük işletme"],
+        [3, 'Grundfos', 1, 'Grundfos Dikey Çok Kademeli Pompa',
+            'Yüksek basınç gerektiren uygulamalar için dikey çok kademeli santrifüj pompa.',
+            '<p>Dikey çok kademeli pompalar; hidrofor setleri, kazan besleme, su arıtma ve endüstriyel proseslerde yüksek basınç ihtiyacını az yer kaplayarak karşılar.</p><ul><li>Az yer kaplayan dikey yapı</li><li>Yüksek verim</li><li>Paslanmaz çelik gövde seçenekleri</li></ul>',
+            "Marka|Grundfos\nTip|Dikey çok kademeli santrifüj\nKullanım alanı|Basınçlandırma, kazan besleme, endüstri"],
+        [3, 'Wilo', 0, 'Wilo Sirkülasyon Pompası',
+            'Isıtma, soğutma ve kullanım sıcak suyu sistemleri için sirkülasyon pompası.',
+            '<p>Sirkülasyon pompaları, kapalı devre ısıtma-soğutma sistemlerinde ve kullanım sıcak suyu hatlarında suyun dolaşımını sağlar.</p><ul><li>Enerji verimli motor seçenekleri</li><li>Sessiz çalışma</li><li>Kolay montaj</li></ul>',
+            "Marka|Wilo\nTip|Sirkülasyon pompası\nKullanım alanı|Isıtma, soğutma, sıcak su"],
+        [3, 'Sumak', 0, 'Sumak Yatay Santrifüj Pompa',
+            'Temiz su transferi ve sulama için yatay milli santrifüj pompa.',
+            '<p>Yatay santrifüj pompalar; su transferi, sulama ve genel amaçlı basınçlandırma uygulamalarında ekonomik ve güvenilir bir çözüm sunar.</p><ul><li>Sağlam döküm gövde</li><li>Kolay bakım</li><li>Geniş debi aralığı</li></ul>',
+            "Marka|Sumak\nTip|Yatay santrifüj\nKullanım alanı|Su transferi, sulama, basınçlandırma"],
+        [4, 'Standart Pompa', 1, 'Standart Pompa Derin Kuyu Dalgıç Pompası',
+            'Derin kuyulardan su temini için paslanmaz çelik gövdeli dalgıç pompa.',
+            '<p>Derin kuyu dalgıç pompaları; tarımsal sulama, içme suyu ve sanayi tesislerinde kuyudan su çekmek için kullanılır.</p><ul><li>Paslanmaz çelik gövde</li><li>Farklı kuyu çaplarına uygun seçenekler</li><li>Yüksek basma yüksekliği</li></ul>',
+            "Marka|Standart Pompa\nTip|Derin kuyu dalgıç pompa\nKullanım alanı|Sulama, içme suyu, sanayi"],
+        [4, 'Sumak', 0, 'Sumak Drenaj Dalgıç Pompası',
+            'Bodrum, asansör kuyusu ve şantiyelerde su tahliyesi için drenaj pompası.',
+            '<p>Drenaj dalgıç pompaları; su basan bodrumlar, asansör kuyuları, şantiyeler ve rögarlarda biriken suyun tahliyesi için kullanılır.</p><ul><li>Şamandıralı otomatik çalışma seçeneği</li><li>Taşınabilir, hafif yapı</li><li>Kolay kurulum</li></ul>',
+            "Marka|Sumak\nTip|Drenaj dalgıç pompa\nKullanım alanı|Bodrum, asansör kuyusu, şantiye"],
+    ];
+    $st = $pdo->prepare('INSERT INTO products(category_id, brand, featured, title, slug, summary, content, specs, sort) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)');
+    foreach ($products as $i => [$cat, $brand, $featured, $title, $summary, $content, $specs]) {
+        $st->execute([$cat, $brand, $featured, $title, slugify($title), $summary, $content, $specs, $i + 1]);
+    }
+
     $services = [
-        ['Elektrikli El Aletleri Onarımı', 'drill', 'Matkap, kırıcı-delici, taşlama, daire testere, planya ve tüm profesyonel el aletlerinin arıza tespiti ve onarımı.',
-            '<p>Profesyonel kullanımdaki elektrikli el aletleri yoğun çalışma koşullarında aşınır. Atölyemizde cihazınızı söküp detaylı arıza tespiti yapıyor, yalnızca gerekli parçaları değiştiriyoruz.</p><h3>Onarımını yaptığımız cihazlar</h3><ul><li>Darbeli ve darbesiz matkaplar, vidalamalar</li><li>Kırıcı-deliciler ve kırıcılar</li><li>Avuç ve büyük taşlama makineleri</li><li>Daire, dekupaj, tilki kuyruğu ve gönye testereler</li><li>Planya, freze, zımpara ve polisaj makineleri</li><li>Akülü aletler ve şarj cihazları</li></ul><h3>Süreç</h3><p>Cihaz teslim alındıktan sonra arıza tespiti yapılır, fiyat bilgisi size iletilir ve onayınızla onarıma başlanır. Onarım sonrası cihazınız yük altında test edilerek teslim edilir.</p>'],
-        ['Motor Bobinajı & Sarım', 'cog', 'Yanan rotor ve statorların hassas sarımı; endüstriyel elektrik motorlarının bakım ve onarımı.',
-            '<p>Aşırı yüklenme, nem ya da kömür aşınması nedeniyle yanan motor sargıları, doğru tel kesiti ve izolasyon sınıfı kullanılarak yeniden sarılır.</p><h3>Hizmet kapsamı</h3><ul><li>Rotor (endüvi) ve stator sarımı</li><li>Kollektör tornalama ve temizliği</li><li>Rulman, kömür ve kömür yuvası değişimi</li><li>İzolasyon (megger) ve balans testleri</li></ul><p>Bobinaj sonrası her motor, yüksüz ve yük altında test edilir.</p>'],
-        ['Yetkili Garanti Servisi', 'shield', 'Makita, Metabo ve HiKOKI ürünleri için üretici onaylı garanti kapsamında ücretsiz onarım.',
-            '<p>Garanti süresi devam eden Makita, Metabo ve HiKOKI ürünleriniz, üretici prosedürlerine uygun şekilde yetkili servisimizde onarılır.</p><h3>Garanti başvurusu için</h3><ul><li>Fatura veya garanti belgesi</li><li>Cihazın tüm aksesuarlarıyla birlikte teslimi</li><li>Arızanın kısa açıklaması</li></ul><p>Kullanım hatası, düşme veya yetkisiz müdahale kaynaklı arızalar garanti kapsamı dışındadır; bu durumda onarım öncesi fiyat onayınız alınır.</p>'],
-        ['Orijinal Yedek Parça', 'package', 'Kömür, rotor, stator, şalter, dişli ve tüm yedek parçalarda orijinal ürün tedariki.',
-            '<p>Cihazınızın ömrünü ve güvenliğini doğrudan etkileyen yedek parçalarda yalnızca orijinal ürün kullanıyoruz.</p><ul><li>Karbon fırçalar (kömür)</li><li>Rotor, stator ve alan bobinleri</li><li>Şalterler, kablolar, dişli grupları</li><li>Akü ve şarj cihazları</li></ul><p>Stokta bulunmayan parçalar distribütör üzerinden kısa sürede temin edilir.</p>'],
-        ['Periyodik Bakım', 'calendar', 'Cihazlarınızın ömrünü uzatan temizlik, yağlama, kömür kontrolü ve güvenlik testleri.',
-            '<p>Düzenli bakım, arıza oranını ve beklenmedik iş kayıplarını azaltır. Periyodik bakımda cihazınız sökülerek temizlenir, yağlanır ve aşınan parçalar raporlanır.</p><ul><li>İç temizlik ve toz tahliyesi</li><li>Dişli kutusu gres yenileme</li><li>Kömür ve kollektör kontrolü</li><li>Kablo, şalter ve elektrik güvenlik testleri</li></ul>'],
-        ['Kurumsal Servis Çözümleri', 'building', 'Sanayi kuruluşları ve şantiyeler için toplu bakım, öncelikli servis ve cihaz parkı yönetimi.',
-            '<p>Fabrika, atölye ve şantiyelerdeki cihaz parkınız için planlı bakım programları oluşturuyor, öncelikli servis sunuyoruz.</p><ul><li>Toplu cihaz teslim alma ve teslim</li><li>Cihaz bazlı servis geçmişi</li><li>Öncelikli arıza tespiti</li><li>Kurumsal fiyatlandırma</li></ul>'],
+        ['Keşif & Projelendirme', 'ruler', 'Yerinde keşif, su ihtiyacı ve depo/pompa kapasite hesabı ile projenize en uygun sistemin belirlenmesi.',
+            '<p>Doğru ürün seçimi, doğru hesapla başlar. Uzman ekibimiz yerinde keşif yaparak kullanım amacını, kişi/ünite sayısını, bina yüksekliğini ve mevcut tesisatı değerlendirir.</p><h3>Neleri hesaplıyoruz?</h3><ul><li>Günlük su ihtiyacı ve depo hacmi</li><li>Depo yerleşimi ve panel ölçüleri</li><li>Gerekli debi ve basma yüksekliği</li><li>Pompa sayısı ve kontrol tipi</li></ul><p>Keşif sonrası size ürün ve kapasite önerisiyle birlikte detaylı teklif sunuyoruz.</p>'],
+        ['Montaj & Kurulum', 'wrench', 'Modüler su deposu montajı, hidrofor ve pompa kurulumu ile devreye alma.',
+            '<p>Satın aldığınız modüler su depoları ile pompa ve hidrofor sistemlerinin montajını deneyimli ekiplerimizle yapıyoruz.</p><ul><li>Modüler depo panel montajı ve sızdırmazlık testi</li><li>Hidrofor ve pompa yerleşimi</li><li>Elektrik bağlantıları ve devreye alma</li><li>Çalışma testleri ve kullanıcı bilgilendirmesi</li></ul>'],
+        ['Bakım & Servis', 'gauge', 'Pompa ve hidrofor sistemleri için periyodik bakım, arıza tespiti ve onarım desteği.',
+            '<p>Satış sonrası desteğimizle sistemlerinizin verimli ve kesintisiz çalışmasını sağlıyoruz.</p><ul><li>Periyodik bakım ve kontrol</li><li>Basınç tankı ve şalter ayarları</li><li>Arıza tespiti ve onarım</li><li>Depo temizliği ve dezenfeksiyon yönlendirmesi</li></ul>'],
+        ['Hızlı Sevkiyat', 'truck', 'Stoktaki ürünlerde hızlı teslimat, proje ürünlerinde planlı sevkiyat.',
+            '<p>Stokta bulunan pompa ve hidrofor ürünlerini hızlıca teslim ediyor, modüler depo ve proje ürünlerinde üretim ve sevkiyat planını sizinle birlikte yapıyoruz.</p>'],
     ];
     $st = $pdo->prepare('INSERT INTO services(title, slug, icon, summary, content, sort) VALUES(?, ?, ?, ?, ?, ?)');
     foreach ($services as $i => [$title, $icon, $summary, $content]) {
@@ -57,36 +122,36 @@ function db_seed(): void
     }
 
     $faqs = [
-        ['Arıza tespiti ücretli mi?', 'Garanti kapsamındaki cihazlarda arıza tespiti ve onarım ücretsizdir. Garanti dışı cihazlarda arıza tespiti sonrası size fiyat bilgisi verilir; onay vermezseniz cihazınızı iade alabilirsiniz.'],
-        ['Onarım ne kadar sürer?', 'Standart arızalar çoğunlukla birkaç iş günü içinde tamamlanır. Parça tedariki gereken durumlarda süre parçanın temin süresine bağlıdır. Cihazınızın durumunu Servis Takip sayfasından anlık izleyebilirsiniz.'],
-        ['Hangi markalara hizmet veriyorsunuz?', 'Makita, Metabo ve HiKOKI (Hitachi) markalarının yetkili servisiyiz. Diğer marka profesyonel el aletleri ve elektrik motorları için de onarım ve bobinaj hizmeti veriyoruz.'],
-        ['Garanti başvurusu için neler gerekli?', 'Fatura ya da garanti belgesi ile cihazın kendisini getirmeniz yeterlidir. Mümkünse cihazı aksesuarlarıyla birlikte teslim etmeniz arıza tespitini hızlandırır.'],
-        ['Servis talebimin durumunu nasıl öğrenirim?', 'Talep oluşturduğunuzda size bir takip kodu verilir. Servis Takip sayfasında takip kodunuz ve telefon numaranızla cihazınızın hangi aşamada olduğunu görebilirsiniz.'],
+        ['Teklif almak için hangi bilgiler gerekli?', 'Modüler depo için ihtiyaç duyduğunuz yaklaşık hacim (m³) ve depo kurulacak alanın ölçüleri; pompa ve hidrofor için binadaki kat/daire sayısı veya ihtiyaç duyulan debi ve basınç bilgisi yeterlidir. Emin değilseniz sadece kullanım amacını yazmanız yeterli, ekibimiz sizi arayarak birlikte belirler.'],
+        ['Teklife ne kadar sürede dönüş yapıyorsunuz?', 'Standart ürünlerde genellikle aynı gün, projeye özel taleplerde keşif veya bilgi tamamlandıktan sonra en kısa sürede teklif iletiyoruz.'],
+        ['Modüler su deposu hangi ölçülerde kurulabilir?', 'Modüler depolar standart panellerin birleştirilmesiyle kurulduğu için, alanınıza uygun farklı en-boy-yükseklik kombinasyonlarında ve ihtiyacınız olan hacimde tasarlanabilir.'],
+        ['Hangi markaların ürünlerini satıyorsunuz?', 'Meksis modüler su depoları ile Grundfos, Wilo, Standart Pompa ve Sumak markalarının pompa ve hidrofor ürünlerini satıyoruz.'],
+        ['Montaj ve servis hizmeti veriyor musunuz?', 'Evet. Satışını yaptığımız ürünler için keşif, montaj, devreye alma ve periyodik bakım desteği sunuyoruz.'],
     ];
     $st = $pdo->prepare('INSERT INTO faqs(question, answer, sort) VALUES(?, ?, ?)');
     foreach ($faqs as $i => [$q, $a]) {
         $st->execute([$q, $a, $i + 1]);
     }
 
-    $cats = ['Bakım Rehberi', 'Teknik Bilgi', 'Duyurular'];
+    $blogCats = ['Rehber', 'Teknik Bilgi', 'Duyurular'];
     $st = $pdo->prepare('INSERT INTO categories(name, slug) VALUES(?, ?)');
-    foreach ($cats as $c) {
+    foreach ($blogCats as $c) {
         $st->execute([$c, slugify($c)]);
     }
 
     $posts = [
-        [1, 1, 'Elektrikli El Aletinizin Kömürünü Ne Zaman Değiştirmelisiniz?',
-            'Kıvılcım artışı, güç kaybı ve kesik çalışma kömür aşınmasının ilk işaretleridir. Kömür değişim zamanını doğru belirleyerek motorunuzu koruyun.',
-            '<p>Fırçalı motorlu elektrikli el aletlerinde <strong>karbon fırçalar (kömürler)</strong>, akımı dönen rotora ileten sarf parçalardır. Zamanla aşınmaları normaldir; ancak geç değiştirildiklerinde kollektöre ve rotora kalıcı hasar verebilirler.</p><h2>Kömür aşınmasının belirtileri</h2><ul><li>Havalandırma deliklerinden gelen kıvılcımda belirgin artış</li><li>Cihazın kesik kesik çalışması veya hiç çalışmaması</li><li>Güç ve devir kaybı</li><li>Yanık kokusu</li></ul><h2>Ne sıklıkla kontrol edilmeli?</h2><p>Yoğun profesyonel kullanımda her <strong>100–150 çalışma saatinde</strong> bir kontrol önerilir. Kömür boyu yaklaşık 5–6 mm\'nin altına düştüğünde değişim yapılmalıdır. Birçok Makita modelinde bulunan otomatik kesme (auto-stop) kömürleri, kritik seviyede motoru durdurarak rotoru korur.</p><h2>Neden orijinal kömür?</h2><p>Kömürün sertliği ve iletkenliği motor tasarımına göre belirlenir. Uyumsuz kömürler kollektörü çizer, kıvılcımı artırır ve rotorun yanmasına yol açabilir. Kömürleri her zaman <strong>çift olarak</strong> ve orijinal parça ile değiştirin.</p><blockquote>Kömür değişimi küçük bir masraftır; ihmal edildiğinde ise rotor değişimi gerekebilir.</blockquote><p>Cihazınızın kömür kontrolü için servisimize uğrayabilir veya online servis talebi oluşturabilirsiniz.</p>'],
-        [1, 1, 'Akülü Aletlerde Batarya Ömrünü Uzatmanın 7 Yolu',
-            'Li-ion bataryalar doğru kullanıldığında yıllarca ilk günkü performansını korur. Şarj, depolama ve kullanım alışkanlıklarınızı gözden geçirin.',
-            '<p>Akülü el aletlerinin en değerli bileşeni bataryadır. Aşağıdaki basit alışkanlıklarla bataryanızın ömrünü belirgin şekilde uzatabilirsiniz.</p><h2>1. Aşırı sıcak ve soğuktan koruyun</h2><p>Bataryayı güneş altında araç içinde veya dondurucu soğukta bırakmayın. İdeal çalışma ve depolama sıcaklığı 10–25 °C arasıdır.</p><h2>2. Sıcak bataryayı hemen şarj etmeyin</h2><p>Yoğun kullanım sonrası ısınan bataryanın soğumasını bekleyin. Orijinal hızlı şarj cihazlarının fan soğutma özelliği bu süreyi kısaltır.</p><h2>3. Orijinal şarj cihazı kullanın</h2><p>Orijinal şarj cihazları, hücreleri dengeleyerek ve sıcaklığı izleyerek şarj eder.</p><h2>4. Tamamen boşaltmayın</h2><p>Li-ion hücrelerin tamamen boşalması ömürlerini kısaltır. Güç düştüğünde şarja takın.</p><h2>5. Uzun süreli depolamada %40–60 doluluk</h2><p>Aylarca kullanılmayacak bataryaları yarı dolu, serin ve kuru bir yerde saklayın.</p><h2>6. Kontakları temiz tutun</h2><p>Toz ve metal talaşı kontaklarda temassızlığa ve ısınmaya yol açar.</p><h2>7. Darbelere dikkat</h2><p>Düşürülen bataryalarda iç hücre hasarı oluşabilir. Şişme, aşırı ısınma veya koku fark ederseniz bataryayı kullanmayı bırakıp servise getirin.</p>'],
-        [2, 0, 'Motor Bobinajı Nedir, Ne Zaman Gerekir?',
-            'Yanık kokusu, dumanlanma veya motorun hiç dönmemesi sargı arızasına işaret edebilir. Bobinaj sürecini ve önleyici tedbirleri anlattık.',
-            '<p><strong>Bobinaj</strong>, elektrik motorlarının manyetik alanı oluşturan bakır sargılarının yeniden sarılması işlemidir. Aşırı yük, nem, toz ya da izolasyon yaşlanması sonucu sargılar yanabilir.</p><h2>Sargı arızasının belirtileri</h2><ul><li>Motordan yanık kokusu ve duman gelmesi</li><li>Sigortanın ya da kaçak akım rölesinin attırması</li><li>Motorun uğultu yapıp dönmemesi</li><li>Kollektörde halka şeklinde kıvılcım</li></ul><h2>Bobinaj süreci</h2><ol><li>Motor sökülür ve eski sargı sökülerek tel kesiti, sarım sayısı kayıt altına alınır.</li><li>Oluklar temizlenir, yeni izolasyon kağıtları yerleştirilir.</li><li>Uygun kesitte emaye bakır tel ile orijinal şemaya göre sarım yapılır.</li><li>Sargı vernikle emprenye edilir ve fırınlanır.</li><li>Megger, yüksüz ve yük altında testler yapılır.</li></ol><h2>Yeniden sarım mı, parça değişimi mi?</h2><p>Küçük el aletlerinde orijinal rotor/stator değişimi çoğunlukla daha ekonomik ve hızlıdır. Endüstriyel motorlarda ise bobinaj, yeni motor maliyetine göre ciddi tasarruf sağlar. Hangisinin uygun olduğunu arıza tespiti sonrası birlikte değerlendiriyoruz.</p>'],
-        [3, 0, 'Online Servis Takip Sistemimiz Yayında',
-            'Artık cihazınızın servis sürecini takip kodunuzla internet üzerinden anlık olarak izleyebilirsiniz.',
-            '<p>Müşterilerimize daha şeffaf bir hizmet sunmak amacıyla <strong>online servis takip sistemimizi</strong> devreye aldık.</p><h2>Nasıl çalışır?</h2><ol><li>Web sitemizdeki <a href="/servis-talebi">Servis Talebi</a> formunu doldurun ya da cihazınızı doğrudan servisimize getirin.</li><li>Size özel bir takip kodu oluşturulur.</li><li><a href="/servis-takip">Servis Takip</a> sayfasında takip kodu ve telefon numaranızla cihazınızın durumunu görüntüleyin.</li></ol><p>Arıza tespiti, fiyat onayı, onarım ve teslime hazır aşamalarının tamamını buradan izleyebilirsiniz.</p>'],
+        [1, 1, 'Su Deposu Kapasitesi Nasıl Hesaplanır?',
+            'Binanız için doğru su deposu hacmini belirlemek; kişi sayısı, günlük tüketim ve kesinti süresine bağlıdır. Adım adım hesaplama rehberi.',
+            '<p>Su deposu seçerken en sık yapılan hata, kapasitenin ihtiyaçtan küçük ya da gereğinden büyük seçilmesidir. Küçük depo kesintilerde yetersiz kalır; çok büyük depo ise suyun uzun süre beklemesine ve gereksiz maliyete yol açar.</p><h2>1. Günlük su ihtiyacını belirleyin</h2><p>Konutlarda kişi başı günlük su tüketimi için genellikle <strong>150–200 litre</strong> arası bir değer esas alınır. Örneğin 20 daireli, daire başına ortalama 4 kişinin yaşadığı bir binada:</p><blockquote>20 daire × 4 kişi × 150 litre = 12.000 litre (12 m³) / gün</blockquote><h2>2. Kaç günlük yedek istediğinize karar verin</h2><p>Bölgenizdeki kesinti sıklığına göre depo genellikle <strong>1–2 günlük</strong> ihtiyaca göre boyutlandırılır. Yukarıdaki örnekte 1,5 günlük yedek için yaklaşık 18 m³ hacim gerekir.</p><h2>3. Yangın suyu ihtiyacını ekleyin</h2><p>Yangın tesisatı olan binalarda yangın suyu için ayrılması gereken hacim, ilgili yönetmelik ve proje hesaplarına göre ayrıca eklenmelidir.</p><h2>4. Yerleşim alanını ölçün</h2><p>Modüler depolar standart panellerle kurulduğu için alanınıza göre farklı en-boy-yükseklik kombinasyonları oluşturulabilir. Kapı ve merdiven ölçüleri kurulumu engellemez; paneller içeride birleştirilir.</p><p>Hesaplamada emin olamadığınız noktalar için bize ulaşın; ücretsiz ön değerlendirme ile size uygun depo hacmini birlikte belirleyelim.</p>'],
+        [1, 1, 'Hidrofor Seçerken Dikkat Edilmesi Gereken 6 Nokta',
+            'Kat sayısı, daire sayısı, pompa sayısı ve kontrol tipi… Binanız için doğru hidroforu seçmenin püf noktaları.',
+            '<p>Hidrofor, şebeke basıncının yetersiz kaldığı binalarda suyu istenen basınçla musluklara ulaştıran sistemdir. Doğru seçim hem konforu hem de enerji maliyetini doğrudan etkiler.</p><h2>1. Gerekli debi</h2><p>Aynı anda kullanılan musluk ve cihaz sayısına göre saatlik su ihtiyacı (m³/saat) belirlenir.</p><h2>2. Gerekli basınç</h2><p>Bina yüksekliği, en üst kattaki musluk için gereken basınç ve boru kayıpları hesaba katılır.</p><h2>3. Pompa sayısı</h2><p>Tek pompalı sistemler küçük yapılar için yeterlidir. Apartman ve sitelerde <strong>çift veya çok pompalı</strong> sistemler, bir pompa arızalandığında suyun kesilmemesini sağlar.</p><h2>4. Kontrol tipi</h2><p><strong>Frekans kontrollü</strong> sistemler pompayı ihtiyaç kadar çalıştırır; basınç sabit kalır ve enerji tüketimi belirgin şekilde azalır.</p><h2>5. Basınç tankı</h2><p>Doğru boyutta genleşme tankı, pompanın sık dur-kalk yapmasını önler ve ömrünü uzatır.</p><h2>6. Marka ve servis desteği</h2><p>Yedek parça bulunabilirliği ve satış sonrası destek, uzun vadede en az ürün kadar önemlidir.</p>'],
+        [2, 0, 'Modüler Su Deposu mu, Betonarme Depo mu?',
+            'Modüler su depolarının betonarme depolara göre avantajlarını; kurulum, hijyen, bakım ve maliyet açısından karşılaştırdık.',
+            '<p>Binalarda su depolamak için geleneksel olarak betonarme depolar kullanılır. Ancak son yıllarda <strong>modüler su depoları</strong> birçok avantajıyla öne çıkıyor.</p><h2>Kurulum hızı</h2><p>Betonarme depolar kalıp, beton dökümü ve kür süresi gerektirir. Modüler depolar ise hazır panellerin sahada birleştirilmesiyle kısa sürede kurulur.</p><h2>Hijyen</h2><p>Betonarme depolarda zamanla çatlak, sızıntı ve yosunlaşma görülebilir. Paslanmaz çelik veya GRP panelli modüler depolar hijyenik yüzeyleri sayesinde kolay temizlenir.</p><h2>Taşınabilirlik ve esneklik</h2><p>Paneller dar alanlardan taşınabilir; ihtiyaç arttığında depo genişletilebilir, taşınmak gerektiğinde sökülüp yeniden kurulabilir.</p><h2>Bakım</h2><p>Modüler depolarda bakım ve temizlik için içeri erişim kolaydır; hasarlı bir panel tek başına değiştirilebilir.</p><table><thead><tr><th></th><th>Modüler depo</th><th>Betonarme depo</th></tr></thead><tbody><tr><td>Kurulum</td><td>Hızlı</td><td>Uzun</td></tr><tr><td>Hijyen</td><td>Yüksek</td><td>Zamanla azalır</td></tr><tr><td>Genişletme</td><td>Mümkün</td><td>Zor</td></tr><tr><td>Taşınabilirlik</td><td>Var</td><td>Yok</td></tr></tbody></table>'],
+        [3, 0, 'Online Teklif Sistemimiz Yayında',
+            'Artık ihtiyacınız olan ürünler için web sitemiz üzerinden dakikalar içinde teklif talebi oluşturabilirsiniz.',
+            '<p>Müşterilerimize daha hızlı hizmet verebilmek için web sitemizde <strong>online teklif sistemini</strong> devreye aldık.</p><h2>Nasıl çalışır?</h2><ol><li><a href="/urunler">Ürünler</a> sayfasından ihtiyacınız olan ürünü seçin veya doğrudan <a href="/teklif-al">Teklif Al</a> formunu doldurun.</li><li>Talebiniz ekibimize anında ulaşır ve size bir talep numarası verilir.</li><li>Satış ekibimiz sizinle iletişime geçerek ihtiyacınıza uygun teklifi hazırlar.</li></ol>'],
     ];
     $st = $pdo->prepare("INSERT INTO posts(category_id, featured, title, slug, excerpt, content, status, published_at) VALUES(?, ?, ?, ?, ?, ?, 'published', ?)");
     foreach ($posts as $i => [$cat, $featured, $title, $excerpt, $content]) {

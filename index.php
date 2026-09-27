@@ -14,19 +14,23 @@ if ($path !== '/' && str_ends_with((string)parse_url($_SERVER['REQUEST_URI'] ?? 
 require APP . '/controllers.php';
 
 $routes = [
-    '#^/$#'                           => 'page_home',
-    '#^/hizmetler$#'                  => 'page_services',
-    '#^/hizmetler/([a-z0-9-]+)$#'     => 'page_service',
-    '#^/hakkimizda$#'                 => 'page_about',
-    '#^/blog$#'                       => 'page_blog',
-    '#^/blog/kategori/([a-z0-9-]+)$#' => 'page_blog_category',
-    '#^/blog/([a-z0-9-]+)$#'          => 'page_post',
-    '#^/iletisim$#'                   => 'page_contact',
-    '#^/servis-talebi$#'              => 'page_request',
-    '#^/servis-takip$#'               => 'page_track',
-    '#^/sss$#'                        => 'page_faq',
-    '#^/sitemap\.xml$#'               => 'page_sitemap',
-    '#^/robots\.txt$#'                => 'page_robots',
+    '#^/$#'                             => 'page_home',
+    '#^/urunler$#'                      => 'page_products',
+    '#^/urunler/kategori/([a-z0-9-]+)$#' => 'page_product_category',
+    '#^/urunler/([a-z0-9-]+)$#'         => 'page_product',
+    '#^/markalar$#'                     => 'page_brands',
+    '#^/hizmetler$#'                    => 'page_services',
+    '#^/hizmetler/([a-z0-9-]+)$#'       => 'page_service',
+    '#^/hakkimizda$#'                   => 'page_about',
+    '#^/blog$#'                         => 'page_blog',
+    '#^/blog/kategori/([a-z0-9-]+)$#'   => 'page_blog_category',
+    '#^/blog/([a-z0-9-]+)$#'            => 'page_post',
+    '#^/iletisim$#'                     => 'page_contact',
+    '#^/teklif-al$#'                    => 'page_quote',
+    '#^/sss$#'                          => 'page_faq',
+    '#^/(servis-talebi|servis-takip)$#' => fn() => redirect(url('teklif-al'), 301),
+    '#^/sitemap\.xml$#'                 => 'page_sitemap',
+    '#^/robots\.txt$#'                  => 'page_robots',
 ];
 
 foreach ($routes as $pattern => $handler) {

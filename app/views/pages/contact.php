@@ -1,4 +1,4 @@
-<?php partial('page-hero', ['heading' => 'İletişim', 'lead' => 'Sorularınız, fiyat talepleriniz ve kurumsal servis anlaşmaları için bize ulaşın.', 'crumbs' => [[null, 'İletişim']]]); ?>
+<?php partial('page-hero', ['heading' => 'İletişim', 'lead' => 'Ürün bilgisi, fiyat teklifi ve proje görüşmeleri için bize ulaşın.', 'crumbs' => [[null, 'İletişim']]]); ?>
 <section class="section">
   <div class="container contact-grid">
     <div class="contact-cards">
