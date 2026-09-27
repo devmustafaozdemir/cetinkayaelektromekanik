@@ -7,7 +7,9 @@ Modüler su depoları, pompa ve hidrofor sistemleri satışı için kurumsal web
 ## Özellikler
 
 **Web sitesi**
-- Marka renkleri (lacivert, kırmızı, galvaniz grisi), Archivo + Source Sans 3 yazı tipleri, mobil uyumlu tasarım
+- Yumuşak, modern tasarım: logodaki lacivert ve kırmızı, açık mavi yüzeyler, yuvarlak kartlar; Manrope + Inter yazı tipleri, mobil uyumlu
+- **Sahada kanıtlanmış** bandı: mutlu müşteri, sipariş, ürün çeşidi, tecrübe rakamları (admin → Site Ayarları → Ana Sayfa)
+- Marka logoları (`assets/img/brands/`; admin → Site Ayarları → Markalar bölümünden değiştirilebilir)
 - **Depo hesaplayıcı (ana sayfa):** en/boy/yükseklik ve panel malzemesi seçilir; çizim, hacim, litre ve yaklaşık daire sayısı anında güncellenir, “Bu ölçüde teklif iste” ölçüleri teklif formuna taşır
 - **2D çizim + 3D görünüm:** her ürün için sunucuda üretilen SVG çizim; “3D incele” ile döndürülebilir, yakınlaştırılabilir 3D model (Three.js, yalnızca tıklanınca yüklenir)
 - **Ürün kataloğu:** kategoriler, marka filtresi, arama, ürün detay sayfası (teknik özellik tablosu, benzer ürünler)

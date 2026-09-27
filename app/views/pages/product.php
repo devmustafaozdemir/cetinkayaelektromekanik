@@ -26,7 +26,7 @@ $waText = 'Merhaba, "' . $product['title'] . '" için fiyat bilgisi almak istiyo
         </div>
       </div>
       <div class="pd__info">
-        <?php if ($product['brand']): ?><a href="/urunler?marka=<?= rawurlencode($product['brand']) ?>" class="pd__brand"><?= e($product['brand']) ?></a><?php endif; ?>
+        <?php if ($product['brand']): ?><a href="/urunler?marka=<?= rawurlencode($product['brand']) ?>" class="pd__brand" title="<?= e($product['brand']) ?> ürünleri"><?= brand_logo($product['brand']) ?></a><?php endif; ?>
         <h1><?= e($product['title']) ?></h1>
         <p class="lead"><?= e($product['summary']) ?></p>
         <?php if ($specs): ?>

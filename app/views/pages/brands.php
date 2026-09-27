@@ -3,7 +3,7 @@
   <div class="container">
     <ul class="brand-list">
       <?php foreach (brands() as $b): ?>
-        <li><a href="/urunler?marka=<?= rawurlencode($b['name']) ?>"><strong><?= e($b['name']) ?></strong><span><?= e($b['desc']) ?></span><em><?= (int)($counts[$b['name']] ?? 0) ?> ürün</em></a></li>
+        <li><a href="/urunler?marka=<?= rawurlencode($b['name']) ?>"><span class="brand-list__logo"><?= brand_logo($b['name']) ?></span><span class="brand-list__text"><strong><?= e($b['name']) ?></strong><span><?= e($b['desc']) ?></span></span><em><?= (int)($counts[$b['name']] ?? 0) ?> ürün</em></a></li>
       <?php endforeach; ?>
     </ul>
   </div>

@@ -9,6 +9,13 @@ $nav = [
 ];
 $navCats = q_all('SELECT name, slug, art FROM product_categories ORDER BY sort, id');
 ?>
+<div class="topbar">
+  <div class="container topbar__inner">
+    <span><?= icon('map-pin') ?> <?= e(setting('address_short', 'Kocaeli')) ?></span>
+    <span class="hide-sm"><?= icon('clock') ?> <?= e(setting_lines('hours')[0] ?? '') ?></span>
+    <a href="mailto:<?= e(setting('email')) ?>" class="topbar__end hide-sm"><?= icon('mail') ?> <?= e(setting('email')) ?></a>
+  </div>
+</div>
 <header class="header" data-header>
   <div class="container header__inner">
     <a href="/" class="logo" aria-label="<?= e(setting('site_name')) ?> ana sayfa">

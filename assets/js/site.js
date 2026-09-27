@@ -83,42 +83,47 @@
   }
 
   /* ---------- Tank sizer (home) ---------- */
+  // Mirrors tank_materials() / svg_tank() in app/models.php
   const MATERIALS = {
-    galvaniz: ['#c9d0d7', '#a9b2bc', '#dde2e7', '#7f8a96'],
-    paslanmaz: ['#e3e7eb', '#c3cad1', '#f1f3f5', '#8d98a3'],
-    grp: ['#7fa9c4', '#5f8aa6', '#9cc0d6', '#406a86'],
-    sandvic: ['#eeeeea', '#d3d4cf', '#f8f8f5', '#9a9c95'],
+    galvaniz: ['#c3cbd4', '#8e9aa8', '#eef1f4', '#a4afbb'],
+    paslanmaz: ['#dfe4e9', '#a5afba', '#ffffff', '#bcc5ce'],
+    grp: ['#7fb0d1', '#4d7fa3', '#c1dcee', '#6b9cc0'],
+    sandvic: ['#ecedea', '#b6b8b2', '#ffffff', '#d2d4ce'],
   };
   const r3 = (x) => Math.round(x * 1000) / 1000;
-
-  // Mirrors svg_tank() in app/models.php
   function tankSVG(variant, W, L, H) {
-    const [cl, cr, ct, rib] = MATERIALS[variant] || MATERIALS.galvaniz;
+    const [base, dark, light, rib] = MATERIALS[variant] || MATERIALS.galvaniz;
+    const id = 'sz';
     const c = 0.8660254, h = 0.5, vw = 480, vh = 330, pad = 34;
     const s = Math.min((vw - 2 * pad) / ((W + L) * c), (vh - 2 * pad - 14) / ((W + L) * h + H + 0.35));
     const ox = vw / 2 + (L - W) * c * s / 2;
     const oy = (vh - ((W + L) * h * s + H * s)) / 2 + H * s - 4;
-    const m = (...v) => v.map(r3).join(',');
-    const face = (matrix, cols, rows, fill, dimples) => {
-      let g = `<g transform="matrix(${matrix})">`;
+    const f = (...v) => v.map(r3).join(',');
+    const flat = variant === 'sandvic';
+    const face = (m, cols, rows, tint, op, dimples) => {
+      let g = `<g transform="matrix(${m})"><rect x="0" y="0" width="${cols}" height="${rows}" fill="${rib}"/>`;
       for (let i = 0; i < cols; i++) for (let j = 0; j < rows; j++) {
-        g += `<rect x="${i + 0.015}" y="${j + 0.015}" width=".97" height=".97" fill="${fill}" stroke="${rib}" stroke-width=".03"/>`;
-        if (dimples && variant !== 'sandvic') g += `<circle cx="${i + 0.5}" cy="${j + 0.5}" r=".27" fill="none" stroke="${rib}" stroke-width=".028" opacity=".75"/><circle cx="${i + 0.47}" cy="${j + 0.47}" r=".2" fill="#fff" opacity=".18"/>`;
-        else if (dimples) g += `<rect x="${i + 0.12}" y="${j + 0.12}" width=".76" height=".76" fill="none" stroke="${rib}" stroke-width=".02" opacity=".5"/>`;
+        g += `<rect x="${i + 0.025}" y="${j + 0.025}" width=".95" height=".95" rx=".07" fill="url(#${id}pn)"/>`;
+        if (dimples && !flat) g += `<circle cx="${i + 0.5}" cy="${j + 0.5}" r=".31" fill="url(#${id}dm)"/>`;
+        else if (dimples) g += `<rect x="${i + 0.14}" y="${j + 0.14}" width=".72" height=".72" rx=".05" fill="#fff" opacity=".22"/>`;
       }
+      if (op > 0) g += `<rect x="0" y="0" width="${cols}" height="${rows}" fill="${tint}" opacity="${op}"/>`;
       return g + '</g>';
     };
-    const lm = m(c * s, h * s, 0, s, ox - L * c * s, oy + L * h * s - H * s);
-    const rm = m(c * s, -h * s, 0, s, ox + (W - L) * c * s, oy + (W + L) * h * s - H * s);
-    const tm = m(c * s, h * s, -c * s, h * s, ox, oy - H * s);
-    const gx = L - 0.35;
-    return `<svg class="art" viewBox="0 0 ${vw} ${vh}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">`
-      + `<ellipse cx="${r3(ox + (W - L) * c * s / 2)}" cy="${r3(oy + (W + L) * h * s + 10)}" rx="${r3((W + L) * c * s / 1.8)}" ry="12" fill="#13243d" opacity=".12"/>`
-      + `<path d="M${m(ox - L * c * s, oy + L * h * s)} L${m(ox + (W - L) * c * s, oy + (W + L) * h * s)} L${m(ox + W * c * s, oy + W * h * s)} l0,7 L${m(ox + (W - L) * c * s, oy + (W + L) * h * s + 7)} L${m(ox - L * c * s, oy + L * h * s + 7)}z" fill="#2d3d52"/>`
-      + face(lm, W, H, cl, true) + face(rm, L, H, cr, true) + face(tm, W, L, ct, false)
-      + `<g transform="matrix(${tm})"><circle cx=".75" cy=".75" r=".32" fill="${cr}" stroke="${rib}" stroke-width=".04"/><circle cx=".75" cy=".75" r=".22" fill="none" stroke="${rib}" stroke-width=".03"/><circle cx="${W - 0.5}" cy="${L - 0.5}" r=".12" fill="#2d3d52"/></g>`
-      + `<g transform="matrix(${rm})"><rect x="${r3(gx - 0.05)}" y=".25" width=".1" height="${r3(H - 0.45)}" rx=".05" fill="#f8fafc" stroke="#2d3d52" stroke-width=".025"/><rect x="${r3(gx - 0.035)}" y="${r3(0.25 + (H - 0.45) * 0.3)}" width=".07" height="${r3((H - 0.45) * 0.7)}" rx=".035" fill="#2b7fb8"/></g>`
-      + `<g transform="matrix(${lm})"><circle cx=".5" cy=".45" r=".13" fill="#2d3d52"/><circle cx=".5" cy=".45" r=".07" fill="#6b7a8c"/></g>`
+    const lm = f(c * s, h * s, 0, s, ox - L * c * s, oy + L * h * s - H * s);
+    const rm = f(c * s, -h * s, 0, s, ox + (W - L) * c * s, oy + (W + L) * h * s - H * s);
+    const tm = f(c * s, h * s, -c * s, h * s, ox, oy - H * s);
+    const gx = L - 0.35, gh = H - 0.45;
+    return `<svg class="art" viewBox="0 0 ${vw} ${vh}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>`
+      + `<filter id="${id}blur" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="7"/></filter>`
+      + `<linearGradient id="${id}pn" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${light}"/><stop offset="1" stop-color="${base}"/></linearGradient>`
+      + `<radialGradient id="${id}dm" cx=".42" cy=".38" r=".6"><stop offset="0" stop-color="#fff" stop-opacity=".85"/><stop offset=".45" stop-color="#fff" stop-opacity=".2"/><stop offset=".8" stop-color="${dark}" stop-opacity=".25"/><stop offset="1" stop-color="${dark}" stop-opacity=".55"/></radialGradient></defs>`
+      + `<ellipse cx="${r3(ox + (W - L) * c * s / 2)}" cy="${r3(oy + (W + L) * h * s + 12)}" rx="${r3((W + L) * c * s / 1.9)}" ry="14" fill="#1f3a60" opacity=".22" filter="url(#${id}blur)"/>`
+      + `<path d="M${f(ox - L * c * s, oy + L * h * s)} L${f(ox + (W - L) * c * s, oy + (W + L) * h * s)} L${f(ox + W * c * s, oy + W * h * s)} l0,7 L${f(ox + (W - L) * c * s, oy + (W + L) * h * s + 7)} L${f(ox - L * c * s, oy + L * h * s + 7)}z" fill="#3b4d66"/>`
+      + face(lm, W, H, '#ffffff', 0, true) + face(rm, L, H, '#1f3a60', 0.16, true) + face(tm, W, L, '#ffffff', 0.28, false)
+      + `<g transform="matrix(${tm})"><circle cx=".75" cy=".75" r=".33" fill="${dark}"/><circle cx=".73" cy=".73" r=".27" fill="url(#${id}pn)"/><circle cx=".73" cy=".73" r=".27" fill="url(#${id}dm)" opacity=".7"/><circle cx="${W - 0.5}" cy="${L - 0.5}" r=".13" fill="#3b4d66"/><circle cx="${W - 0.52}" cy="${L - 0.52}" r=".07" fill="#8b9bb0"/></g>`
+      + `<g transform="matrix(${rm})"><rect x="${r3(gx - 0.06)}" y=".25" width=".12" height="${r3(gh)}" rx=".06" fill="#ffffff" opacity=".9"/><rect x="${r3(gx - 0.035)}" y="${r3(0.25 + gh * 0.3)}" width=".07" height="${r3(gh * 0.7)}" rx=".035" fill="#3b8fd1"/></g>`
+      + `<g transform="matrix(${lm})"><circle cx=".5" cy=".45" r=".15" fill="#3b4d66"/><circle cx=".5" cy=".45" r=".09" fill="#9aa9bb"/><circle cx=".48" cy=".43" r=".04" fill="#e9eef3"/></g>`
       + '</svg>';
   }
 
@@ -164,6 +169,30 @@
   $$('[data-model-view]').forEach((root) => {
     viewSwitch(root, () => [root.dataset.model, {}]);
   });
+
+  /* ---------- Count-up for the proof numbers ("1.200+", "%100", "20+") ---------- */
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!reduce && 'IntersectionObserver' in window) {
+    const nf = new Intl.NumberFormat('tr-TR');
+    $$('[data-count]').forEach((el) => {
+      const m = el.dataset.count.match(/^(\D*)([\d.]+)(.*)$/);
+      if (!m) return;
+      const target = parseInt(m[2].replace(/\./g, ''), 10);
+      if (!target || m[3].startsWith('/')) return;
+      const io = new IntersectionObserver(([en]) => {
+        if (!en.isIntersecting) return;
+        io.disconnect();
+        const t0 = performance.now();
+        const tick = (t) => {
+          const p = Math.min(1, (t - t0) / 1400);
+          el.textContent = m[1] + nf.format(Math.round(target * (1 - Math.pow(1 - p, 3)))) + m[3];
+          if (p < 1) requestAnimationFrame(tick); else el.textContent = el.dataset.count;
+        };
+        requestAnimationFrame(tick);
+      }, { threshold: 0.4 });
+      io.observe(el);
+    });
+  }
 
   /* ---------- Reading progress + TOC ---------- */
   const bar = $('[data-progress]');

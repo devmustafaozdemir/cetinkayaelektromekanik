@@ -26,6 +26,24 @@
     <div><button class="btn btn--primary"><?= icon('check') ?> Logoyu Kaydet</button></div>
   </form>
   <?php endif; ?>
+  <?php if ($tab === 'brands'): ?>
+  <form method="post" enctype="multipart/form-data" class="card form-stack">
+    <?= csrf_field() ?>
+    <input type="hidden" name="brand_logos" value="1">
+    <h3>Marka logoları</h3>
+    <p class="muted small">Şeffaf arka planlı PNG/WEBP önerilir. Yüklediğiniz logo, sitedeki hazır logonun yerine geçer.</p>
+    <div class="brand-logos-admin">
+      <?php foreach (brands() as $b): $k = 'brand_logo_' . $b['slug']; ?>
+        <div class="brand-logos-admin__row">
+          <span class="brand-logos-admin__preview"><?php if ($b['logo']): ?><img src="<?= e($b['logo']) ?>" alt="<?= e($b['name']) ?>"><?php else: ?><em class="muted">Logo yok</em><?php endif; ?></span>
+          <div><strong><?= e($b['name']) ?></strong><input type="file" name="<?= $k ?>" accept="image/png,image/webp,image/jpeg">
+            <?php if (!empty($values[$k])): ?><label class="check"><input type="checkbox" name="remove_<?= $k ?>" value="1"> Yüklenen logoyu kaldır</label><?php endif; ?></div>
+        </div>
+      <?php endforeach; ?>
+    </div>
+    <div><button class="btn btn--primary"><?= icon('check') ?> Logoları Kaydet</button></div>
+  </form>
+  <?php endif; ?>
   <form method="post" class="card form-stack">
     <?= csrf_field() ?>
     <h3><?= e($groups[$tab][0]) ?></h3>

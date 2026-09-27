@@ -4,7 +4,9 @@ $groups = [
         'site_name'        => ['Firma adı', 'text'],
         'site_tagline'     => ['Slogan', 'text'],
         'meta_description' => ['Site açıklaması (SEO)', 'textarea', 'Google arama sonuçlarında görünen açıklama. 150-160 karakter önerilir.'],
-        'brands'           => ['Markalar', 'textarea', 'Her satıra bir marka: Marka Adı | Kısa açıklama (örn. Grundfos | Pompa ve hidrofor sistemleri)'],
+    ]],
+    'brands' => ['Markalar', 'award', [
+        'brands' => ['Marka listesi', 'textarea', 'Her satıra bir marka: Marka Adı | Kısa açıklama (örn. Grundfos | Pompa ve hidrofor sistemleri). Ürünlerdeki marka adı bununla aynı yazılmalı.'],
     ]],
     'contact' => ['İletişim', 'phone', [
         'phone'        => ['Telefon', 'text'],
@@ -22,7 +24,9 @@ $groups = [
         'hero_badge' => ['Üst rozet metni', 'text'],
         'hero_title' => ['Ana başlık', 'text'],
         'hero_text'  => ['Açıklama', 'textarea'],
-        'stats'      => ['İstatistikler', 'textarea', 'Her satır: değer|etiket  (örn. 25+|Yıllık Tecrübe)'],
+        'stats_title' => ['“Sahada kanıtlanmış” başlığı', 'text'],
+        'stats_text'  => ['“Sahada kanıtlanmış” metni', 'textarea'],
+        'stats'       => ['Rakamlar', 'textarea', 'Her satır: değer|etiket (örn. 500+|Mutlu müşteri). Dört satır önerilir; rakamlar sayfada sayarak belirir.'],
     ]],
     'about' => ['Hakkımızda', 'users', [
         'about_title'  => ['Başlık', 'text'],
@@ -55,6 +59,26 @@ if ($method === 'POST' && $tab === 'general' && isset($_POST['logo_action'])) {
     }
     flash('success', 'Logo güncellendi.');
     redirect(admin_url('settings', ['tab' => 'general']));
+}
+
+if ($method === 'POST' && $tab === 'brands' && isset($_POST['brand_logos'])) {
+    foreach (brands() as $b) {
+        $key = 'brand_logo_' . $b['slug'];
+        if (!empty($_POST['remove_' . $key])) {
+            delete_upload(setting($key));
+            setting_set($key, '');
+        } elseif (!empty($_FILES[$key]['name'])) {
+            try {
+                $name = store_image($_FILES[$key], 900);
+                delete_upload(setting($key));
+                setting_set($key, $name);
+            } catch (RuntimeException $ex) {
+                flash('error', $b['name'] . ': ' . $ex->getMessage());
+            }
+        }
+    }
+    flash('success', 'Marka logoları güncellendi.');
+    redirect(admin_url('settings', ['tab' => 'brands']));
 }
 
 if ($method === 'POST') {

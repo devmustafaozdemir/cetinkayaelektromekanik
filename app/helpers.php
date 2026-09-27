@@ -271,9 +271,33 @@ function brands(): array
     $out = [];
     foreach (setting_lines('brands') as $line) {
         [$name, $desc] = array_pad(array_map('trim', explode('|', $line, 2)), 2, '');
-        $out[] = ['name' => $name, 'desc' => $desc, 'slug' => slugify($name)];
+        $slug = slugify($name);
+        $out[] = ['name' => $name, 'desc' => $desc, 'slug' => $slug, 'logo' => brand_logo_url($slug)];
     }
     return $out;
+}
+
+/** Uploaded logo (admin) wins over the bundled one in assets/img/brands/. */
+function brand_logo_url(string $slug): string
+{
+    $up = setting('brand_logo_' . $slug);
+    if ($up !== '') {
+        return upload_url($up);
+    }
+    foreach (['webp', 'png', 'svg'] as $ext) {
+        if (is_file(ROOT . "/assets/img/brands/{$slug}.{$ext}")) {
+            return asset("img/brands/{$slug}.{$ext}");
+        }
+    }
+    return '';
+}
+
+function brand_logo(string $name, string $class = 'brand-logo'): string
+{
+    $url = brand_logo_url(slugify($name));
+    return $url !== ''
+        ? '<img class="' . e($class) . '" src="' . e($url) . '" alt="' . e($name) . '" loading="lazy">'
+        : '<span class="' . e($class) . ' brand-logo--text">' . e($name) . '</span>';
 }
 
 function product_arts(): array
@@ -316,9 +340,9 @@ function site_logo(bool $light = false): string
         . '<path d="M50 8h36l-4 12H62v6h-8z" fill="url(#lgS)" stroke="#6b737c" stroke-width="1"/>'
         . '<path d="M54 30l30-6-24 18h-8z" fill="#e1161c"/>'
         . '<path d="M50 46h26l-4 10H62v2h26l-4 10H50z" fill="url(#lgS)" stroke="#6b737c" stroke-width="1"/>'
-        . '<text x="104" y="50" font-family="Archivo, Arial Black, sans-serif" font-weight="800" font-size="44" style="font-stretch:112%" fill="' . $navy . '" letter-spacing="1">ÇETİNKAYA</text>'
+        . '<text x="104" y="50" font-family="Manrope, Arial Black, sans-serif" font-weight="800" font-size="43" fill="' . $navy . '" letter-spacing="1">ÇETİNKAYA</text>'
         . '<path d="M106 69h26M384 69h26" stroke="#e1161c" stroke-width="3"/>'
-        . '<text x="258" y="75" text-anchor="middle" font-family="Archivo, Arial, sans-serif" font-weight="700" font-size="17" fill="#e1161c" letter-spacing="5.2">ELEKTROMEKANİK</text>'
+        . '<text x="258" y="75" text-anchor="middle" font-family="Manrope, Arial, sans-serif" font-weight="700" font-size="16.5" fill="#e1161c" letter-spacing="5.2">ELEKTROMEKANİK</text>'
         . '</svg>';
 }
 

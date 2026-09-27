@@ -406,3 +406,8 @@ code { background: #f1f5f9; padding: .05rem .35rem; border-radius: 5px; font-siz
 .model-preview { background: linear-gradient(180deg, #f7f9fb, #e3e9ef); border: 1px solid var(--line); border-radius: 10px; padding: .4rem; }
 .model-preview svg { width: 100%; height: auto; }
 .logo-mark { background: #1f3a60; }
+.brand-logos-admin { display: grid; gap: .8rem; }
+.brand-logos-admin__row { display: grid; grid-template-columns: 180px 1fr; gap: 1rem; align-items: center; padding: .8rem; border: 1px solid var(--line); border-radius: 12px; }
+.brand-logos-admin__preview { height: 56px; display: grid; place-items: center; background: #f8fafc; border-radius: 8px; padding: .4rem; }
+.brand-logos-admin__preview img { max-height: 44px; max-width: 100%; object-fit: contain; }
+.brand-logos-admin__row strong { display: block; margin-bottom: .3rem; }
