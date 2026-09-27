@@ -202,7 +202,8 @@ async function publishNow(e) {
     const { data, error } = await sb.rpc('request_publish');
     const missing = error && /could not find|does not exist|PGRST202|404/i.test(`${error.code} ${error.message}`);
     if (error && !missing) throw error;
-    if (missing || data === false) toast('Anında yayın henüz ayarlanmamış (README › Anında yayın). Değişiklikler yine de en geç 1 saat içinde siteye yansır.', 'error');
+    if (missing) toast('Anında yayın kurulmamış: Supabase SQL Editor’de supabase/publish.sql dosyası çalıştırılmamış. Değişiklikler yine de en geç 1 saat içinde siteye yansır.', 'error');
+    else if (data === false) toast('Anında yayın kurulu ama GitHub token’ı bulunamadı: vault.create_secret satırlarını (github_token, github_repo, github_ref) SQL Editor’de çalıştırın.', 'error');
     else toast('Yayın başlatıldı. Site 1-2 dakika içinde güncellenir.');
   } catch (err) { toast(err.message || String(err), 'error'); } finally { btn.disabled = false; }
 }
