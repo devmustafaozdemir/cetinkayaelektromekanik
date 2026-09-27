@@ -9,7 +9,8 @@ DirectoryIndex index.php
   # RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
   # Block internal folders
-  RewriteRule ^(app|data)(/|$) - [F,L]
+  RewriteRule ^(app|data|tools|\.agents|\.claude)(/|$) - [F,L]
+  RewriteRule ^skills-lock\.json$ - [F,L]
   RewriteRule \.(sqlite|sqlite-wal|sqlite-shm|md|lock)$ - [F,L]
 
   RewriteRule ^admin$ /admin/ [R=301,L]
