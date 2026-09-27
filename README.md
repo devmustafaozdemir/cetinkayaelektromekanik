@@ -2,7 +2,15 @@
 
 Modüler su depoları, pompa ve hidrofor sistemleri satışı için kurumsal web sitesi: ürün kataloğu, online teklif sistemi, blog ve yönetim paneli.
 
-**Teknoloji:** PHP 8.1+ ve SQLite (ek kurulum/veritabanı sunucusu gerekmez). Standart cPanel / paylaşımlı hostinglerde çalışır.
+İki şekilde yayınlanabilir:
+
+| | **A) GitHub Pages + Supabase** (önerilen) | **B) PHP hosting** |
+|---|---|---|
+| Maliyet | Ücretsiz | Hosting ücreti |
+| Site | Statik HTML (GitHub Pages) | PHP 8.1+ ve SQLite |
+| İçerik, teklifler, görseller | Supabase (Postgres, Auth, Storage) | `data/site.sqlite`, `uploads/` |
+| Yönetim paneli | `…/yonetim/` | `…/admin/` |
+| Kurulum | [Supabase ile yayın](#a-supabase-ile-yayın-önerilen) | [Kurulum (hosting)](#b-kurulum-php-hosting) |
 
 ## Özellikler
 
@@ -19,18 +27,80 @@ Modüler su depoları, pompa ve hidrofor sistemleri satışı için kurumsal web
 - **Blog:** kategori, arama, öne çıkan yazı, içindekiler, okuma çubuğu, paylaşım, ilgili yazılar
 - SEO: meta/OG etiketleri, `sitemap.xml`, `robots.txt`, Store / Product / BlogPosting / FAQPage yapısal verileri
 
-**Yönetim paneli (`/admin`)**
+**Yönetim paneli (`/yonetim` veya `/admin`)**
 - Genel bakış: yeni/açık teklifler, satışa dönüşüm oranı, 14 günlük grafik, satış hunisi, en çok teklif istenen ürünler
 - **Teklif talepleri:** satış durumu (Yeni → İletişime Geçildi → Teklif Verildi → Satışa Döndü / Olumsuz), iç notlar, geçmiş, tek tıkla arama/WhatsApp/e-posta, telefonla gelen talepler için elle kayıt
 - **Ürünler:** görsel yükleme (otomatik WebP), zengin metin açıklama, teknik özellikler, marka, öne çıkarma, yayında/gizli
 - **Ürün kategorileri:** sürükle-bırak sıralama, kategori çizimi seçimi
 - Blog yazıları ve kategorileri, hizmetler, SSS, mesajlar
 - Site ayarları: iletişim bilgileri, markalar, ana sayfa metinleri, istatistikler, kurumsal metin, sosyal medya
-- Çoklu yönetici, şifre değiştirme
+- Çoklu yönetici, şifre değiştirme, şifremi unuttum (Supabase)
 
-**Güvenlik:** CSRF koruması, parola hash, giriş deneme sınırı, form spam koruması (honeypot + hız sınırı), HTML temizleme, yüklenen görsellerin yeniden kodlanması, `data/` ve `app/` klasörlerine erişim engeli.
+**Güvenlik:** Supabase satır düzeyi güvenlik (RLS: ziyaretçi yalnızca yayındaki içeriği okur, teklif/mesaj yalnızca doğrulamalı fonksiyonlarla eklenir, yazma yetkisi yalnızca yöneticide), form spam koruması (honeypot + hız sınırı), HTML temizleme. PHP sürümünde ek olarak CSRF koruması, parola hash, giriş deneme sınırı, yüklenen görsellerin yeniden kodlanması.
 
-## Kurulum (hosting)
+## A) Supabase ile yayın (önerilen)
+
+**Nasıl çalışır:** Site GitHub Pages'te statik HTML olarak yayınlanır (hızlı ve ücretsiz). Ürünler, blog, ayarlar, teklifler ve görseller Supabase'te durur. Ziyaretçinin gönderdiği teklif/mesaj doğrudan Supabase'e kaydedilir ve panelde anında görünür. Panelde bir içerik kaydedildiğinde GitHub Actions siteyi yeniden derleyip yayınlar (anında yayın kuruluysa 1-2 dakikada, değilse en geç 1 saat içinde).
+
+### Kurulum (bir kez, ~15 dakika)
+
+1. **Supabase projesi:** [supabase.com](https://supabase.com) → *New project*. Bölge olarak **Frankfurt (eu-central-1)** seçin, veritabanı şifresini bir yere kaydedin.
+2. **Veritabanı:** Supabase → *SQL Editor* → *New query*. [`supabase/schema.sql`](supabase/schema.sql) dosyasının tamamını yapıştırıp **Run**. Ardından aynı şekilde [`supabase/seed.sql`](supabase/seed.sql) (örnek ürün, blog, ayar içerikleri).
+3. **Yönetici hesabı:** *Authentication → Users → Add user → Create new user*. E-posta ve şifre yazın, **Auto Confirm User** işaretli olsun. **İlk oluşturulan kullanıcı otomatik olarak yönetici olur.**
+4. **Kayıtları kapatın:** *Authentication → Sign In / Providers* → **Allow new users to sign up** kapalı olsun (başkası hesap açamasın).
+5. **Adres ayarı:** *Authentication → URL Configuration* → *Site URL*: sitenizin adresi (örn. `https://devmustafaozdemir.github.io/cetinkayaelektromekanik`). *Redirect URLs*'e panel adresini ekleyin: `…/yonetim/` (şifre sıfırlama bağlantısı için).
+6. **Anahtarlar:** *Project Settings → API Keys*. **Project URL** ve **anon public** anahtarını (veya *publishable* anahtarı) kopyalayın. Bu anahtar herkese açık olacak şekilde tasarlanmıştır; **`service_role` / secret anahtarını asla kullanmayın.**
+7. **GitHub değişkenleri:** GitHub → depo → *Settings → Secrets and variables → Actions → Variables* → *New repository variable*:
+   - `SUPABASE_URL` = Project URL (örn. `https://abcd1234.supabase.co`)
+   - `SUPABASE_ANON_KEY` = anon / publishable anahtar
+   - (isteğe bağlı) `SITE_URL` = kendi alan adınız, örn. `https://cetinkayaelektromekanik.com.tr`
+8. **GitHub Pages:** *Settings → Pages → Build and deployment → Source:* **GitHub Actions**.
+9. **İlk yayın:** *Actions → Siteyi yayınla → Run workflow*. 1-2 dakika sonra:
+   - Site: `https://devmustafaozdemir.github.io/cetinkayaelektromekanik/`
+   - Panel: `https://devmustafaozdemir.github.io/cetinkayaelektromekanik/yonetim/`
+
+> “Branch … is not allowed to deploy to github-pages” hatası alırsanız: *Settings → Environments → github-pages → Deployment branches* bölümüne bu dalı ekleyin.
+
+### Anında yayın (önerilir)
+
+Panelde kaydettiğiniz değişikliğin 1-2 dakikada siteye yansıması için:
+
+1. GitHub → sağ üst profil → *Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token*. *Repository access:* yalnızca bu depo; *Permissions → Actions:* **Read and write**. Token'ı kopyalayın.
+2. Supabase → *SQL Editor*'de token'ı gizli kasaya (Vault) kaydedin:
+   ```sql
+   select vault.create_secret('github_pat_BURAYA_TOKEN', 'github_token');
+   select vault.create_secret('devmustafaozdemir/cetinkayaelektromekanik', 'github_repo');
+   select vault.create_secret('claude/adoring-hopper-jfy8yo', 'github_ref'); -- yayın yapılan dal
+   ```
+3. [`supabase/publish.sql`](supabase/publish.sql) dosyasının tamamını çalıştırın.
+
+Bundan sonra her kayıtta site kendiliğinden güncellenir; paneldeki **Siteyi şimdi yayınla** düğmesi de çalışır.
+
+### Kendi alan adınız (cetinkayaelektromekanik.com.tr)
+
+1. GitHub → *Settings → Pages → Custom domain*: `cetinkayaelektromekanik.com.tr` yazıp kaydedin, *Enforce HTTPS* işaretleyin.
+2. Alan adı DNS panelinde: `@` için A kayıtları `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`; `www` için CNAME `devmustafaozdemir.github.io`.
+3. GitHub değişkeni `SITE_URL` = `https://cetinkayaelektromekanik.com.tr`; Supabase *URL Configuration* adreslerini de yeni adresle güncelleyin. Ardından *Run workflow*.
+
+### Günlük kullanım
+
+- Panel: `…/yonetim/` → e-posta ve şifre ile giriş. Şifrenizi unutursanız giriş ekranındaki **Şifremi unuttum** bağlantısını kullanın.
+- Teklif talepleri ve mesajlar panelde anında görünür; sol menüde yeni talep sayısı gösterilir.
+- Yeni yönetici eklemek: Supabase'te kullanıcıyı oluşturun (3. adım), sonra SQL Editor'de:
+  ```sql
+  insert into public.admins (user_id) select id from auth.users where email = 'ornek@firma.com';
+  ```
+- Saatlik otomatik derleme Supabase projesini de aktif tutar (ücretsiz planda 7 gün hiç kullanılmayan projeler duraklatılır). GitHub, depoda 60 gün işlem olmazsa saatlik görevi durdurup e-posta gönderir; e-postadaki bağlantıdan tekrar etkinleştirmeniz yeterlidir.
+- Yedek: Supabase → *Database → Backups*; ayrıca *Table Editor*'den tabloları CSV olarak dışa aktarabilirsiniz.
+
+### Geliştirici notları
+
+- Derleme: [`tools/build-site.php`](tools/build-site.php) içeriği Supabase REST API'den okur, PHP şablonlarıyla tüm sayfaları statik HTML'e dönüştürür ve `_site/` klasörüne yazar (`SUPABASE_URL=… SUPABASE_ANON_KEY=… SITE_URL=… php tools/build-site.php`).
+- Panel kaynak kodu: `assets/src/admin/` (supabase-js + Quill) → `npm run build:admin` → `assets/js/admin/` (derlenmiş hali repoda).
+- Yerel test için Supabase benzetimi: `tools/dev/supabase-mock.php` (dosya başındaki açıklamaya bakın).
+- `supabase/seed.sql`, `app/seed.php`'den üretilir: `php tools/export-seed-sql.php > supabase/seed.sql`.
+
+## B) Kurulum (PHP hosting)
 
 1. Tüm dosyaları `public_html` (veya alan adının kök klasörü) içine yükleyin. `.htaccess` dosyalarının da yüklendiğinden emin olun.
 2. `data/` ve `uploads/` klasörlerine yazma izni verin (genellikle `755`, gerekirse `775`).
@@ -72,16 +142,11 @@ Ardından `http://localhost:8000` ve `http://localhost:8000/admin` adreslerini a
 
 Gerçek ürün fotoğrafı yüklerseniz ürün sayfasında önce fotoğraf gösterilir, 3D model yine açılabilir. Logo, admin → Site Ayarları → Genel → Logo bölümünden yüklenebilir; yüklenmezse yerleşik SVG logo kullanılır.
 
-## GitHub Pages önizlemesi
+## Eski statik önizleme (`docs/`)
 
-GitHub Pages PHP çalıştıramadığı için `docs/` klasöründe sitenin **statik önizleme kopyası** bulunur (tüm sayfalar + yönetim paneli ekranları, örnek teklif verileriyle). Formlar, arama ve giriş bu kopyada çalışmaz.
+Supabase kurulumu tamamlanana kadar `docs/` klasöründeki örnek verili önizleme (*Pages → Source: Deploy from a branch → /docs*) yayında kalabilir. Pages kaynağı **GitHub Actions** yapıldıktan sonra bu klasöre gerek kalmaz.
 
-- Yayınlamak: GitHub → **Settings → Pages → Build and deployment → Source: Deploy from a branch**, dal olarak bu dalı ve klasör olarak **`/docs`** seçin.
-- Adres: `https://devmustafaozdemir.github.io/cetinkayaelektromekanik/`
-- Yönetim paneli önizlemesi: `…/cetinkayaelektromekanik/yonetim/`
-- Değişiklikten sonra önizlemeyi yenilemek için: `php tools/build-pages.php`
-
-## Yedekleme
+## Yedekleme (PHP hosting)
 
 Tüm içerik `data/site.sqlite` dosyasında, görseller `uploads/` klasöründedir. Bu ikisini yedeklemek yeterlidir.
 
@@ -91,8 +156,12 @@ Tüm içerik `data/site.sqlite` dosyasında, görseller `uploads/` klasöründed
 index.php          Site yönlendirici
 router.php         PHP yerleşik sunucu için yönlendirici
 app/               Uygulama kodu (controller, görünümler, veritabanı)
-admin/             Yönetim paneli
-assets/            CSS, JS, görseller
-uploads/           Yüklenen görseller
-data/              SQLite veritabanı
+admin/             Yönetim paneli (PHP hosting)
+admin-app/         Yönetim paneli sayfası (Supabase, /yonetim/)
+assets/            CSS, JS, görseller (assets/src: kaynak kod)
+supabase/          Veritabanı şeması, örnek içerik, anında yayın
+tools/             Derleme araçları
+.github/workflows/ GitHub Pages yayın akışı
+uploads/           Yüklenen görseller (PHP hosting)
+data/              SQLite veritabanı (PHP hosting)
 ```

@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Yönetim Paneli</title>
+<link rel="icon" href="{{BASE}}assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{BASE}}assets/css/admin.css?v={{V}}">
+<link rel="stylesheet" href="{{BASE}}assets/js/admin/quill.snow.css?v={{V}}">
+<script>
+  window.APP_CONFIG = { supabaseUrl: '{{SB_URL}}', supabaseKey: '{{SB_KEY}}', siteUrl: '{{SITE_URL}}/' };
+  window.__RECOVERY = /type=recovery/.test(location.hash);
+</script>
+</head>
+<body class="auth-body">
+<div id="app"><div class="boot" role="status"><span class="boot__spinner"></span> Yükleniyor…</div></div>
+<noscript><p style="padding:2rem;font-family:sans-serif">Yönetim paneli için JavaScript gereklidir.</p></noscript>
+<script type="module" src="{{BASE}}assets/js/admin/app.js?v={{V}}"></script>
+</body>
+</html>

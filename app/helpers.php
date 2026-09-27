@@ -28,7 +28,11 @@ function asset(string $path): string
 
 function upload_url(?string $file): string
 {
-    return $file ? '/uploads/' . rawurlencode($file) : '';
+    if (!$file) {
+        return '';
+    }
+    // Images stored in Supabase Storage are saved as full https URLs
+    return preg_match('#^https?://#', $file) ? $file : '/uploads/' . rawurlencode($file);
 }
 
 function redirect(string $to, int $code = 302): never

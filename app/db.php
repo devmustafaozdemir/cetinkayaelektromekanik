@@ -29,7 +29,7 @@ function db_init(string $path): void
     }
     db_migrate();
     db_add_columns();
-    if ($fresh) {
+    if ($fresh && getenv('APP_NO_SEED') !== '1') {
         require APP . '/seed.php';
         db_seed();
     }

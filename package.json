@@ -1,12 +1,16 @@
 {
   "name": "cetinkaya-site-assets",
   "private": true,
-  "description": "Builds the lazy-loaded 3D viewer (assets/js/viewer3d.js). The PHP site itself needs no Node.js at runtime.",
+  "description": "Builds the lazy-loaded 3D viewer (assets/js/viewer3d.js) and the Supabase admin app (assets/js/admin). The site itself needs no Node.js at runtime.",
   "scripts": {
-    "build:3d": "esbuild assets/src/viewer3d.js --bundle --format=esm --minify --target=es2020 --legal-comments=eof --outfile=assets/js/viewer3d.js"
+    "build:3d": "esbuild assets/src/viewer3d.js --bundle --format=esm --minify --target=es2020 --legal-comments=eof --outfile=assets/js/viewer3d.js",
+    "build:admin": "node tools/build-admin.mjs",
+    "build": "npm run build:3d && npm run build:admin"
   },
   "devDependencies": {
+    "@supabase/supabase-js": "^2.117.2",
     "esbuild": "^0.25.0",
+    "quill": "^2.0.3",
     "three": "0.186.1"
   }
 }

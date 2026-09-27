@@ -18,7 +18,7 @@
       <?php else: ?>
         <h2>Mesaj gönderin</h2>
         <?php if (!empty($errors['form'])): ?><div class="alert" role="alert"><?= e($errors['form']) ?></div><?php endif; ?>
-        <form method="post" class="form" novalidate data-validate>
+        <form method="post" class="form" novalidate data-validate data-remote="message">
           <?= csrf_field() ?>
           <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
           <div class="form-row">

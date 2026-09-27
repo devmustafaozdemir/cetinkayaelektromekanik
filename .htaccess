@@ -9,7 +9,7 @@ DirectoryIndex index.php
   # RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
   # Block internal folders
-  RewriteRule ^(app|data|tools|\.agents|\.claude)(/|$) - [F,L]
+  RewriteRule ^(app|data|tools|supabase|admin-app|node_modules|\.agents|\.claude|\.github)(/|$) - [F,L]
   RewriteRule ^skills-lock\.json$ - [F,L]
   RewriteRule \.(sqlite|sqlite-wal|sqlite-shm|md|lock)$ - [F,L]
 

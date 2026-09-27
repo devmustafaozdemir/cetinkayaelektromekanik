@@ -221,6 +221,86 @@
     } catch (e) { /* clipboard unavailable */ }
   }));
 
+  /* ---------- Static (Supabase) mode: forms + search without a PHP server ---------- */
+  const sbUrl = document.querySelector('meta[name="sb-url"]')?.content;
+  const sbKey = document.querySelector('meta[name="sb-key"]')?.content;
+  const siteBase = document.querySelector('meta[name="site-base"]')?.content || '/';
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  async function rpc(fn, payload) {
+    const res = await fetch(`${sbUrl}/rest/v1/rpc/${fn}`, {
+      method: 'POST',
+      headers: { apikey: sbKey, 'Content-Type': 'application/json', ...(sbKey.startsWith('eyJ') ? { Authorization: `Bearer ${sbKey}` } : {}) }, // legacy anon JWT or new publishable key
+      body: JSON.stringify({ payload }),
+    });
+    const data = await res.json().catch(() => null);
+    if (!res.ok) throw new Error((data && data.message) || 'Gönderilemedi. Lütfen bizi arayın.');
+    return data;
+  }
+
+  if (sbUrl && sbKey) {
+    // Pre-fill the quote form from the tank sizer (?olcu=4x3x2&malzeme=grp)
+    const qf = $('form[data-remote="quote"]');
+    const params = new URLSearchParams(location.search);
+    const olcu = (params.get('olcu') || '').match(/^(\d+(?:[.,]\d)?)x(\d+(?:[.,]\d)?)x(\d+(?:[.,]\d)?)$/);
+    if (qf && olcu) {
+      const mats = { galvaniz: 'galvaniz', paslanmaz: 'paslanmaz çelik', grp: 'GRP', sandvic: 'izolasyonlu' };
+      const [w, l, h] = olcu.slice(1).map((x) => parseFloat(x.replace(',', '.')));
+      const q = $('[name="quantity"]', qf);
+      if (q && !q.value) q.value = params.get('etiket') || `${w} × ${l} × ${h} modül, ${mats[params.get('malzeme')] || 'galvaniz'} modüler depo`;
+      const cat = $('select[name="category"]', qf);
+      if (cat) [...cat.options].forEach((o) => { if (/depo/i.test(o.text)) cat.value = o.value || o.text; });
+    }
+
+    $$('form[data-remote]').forEach((form) => form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (form.dataset.invalid === '1') return;
+      const kind = form.dataset.remote;
+      const fd = new FormData(form);
+      const payload = Object.fromEntries(fd.entries());
+      delete payload._csrf;
+      if (kind === 'quote') { payload.product_slug = payload.urun || ''; delete payload.urun; }
+      const btn = $('button:not([type=button])', form);
+      const label = btn ? btn.textContent : '';
+      $('.alert', form.parentElement)?.remove();
+      try {
+        const result = await rpc(kind === 'quote' ? 'submit_quote' : 'submit_message', payload);
+        const box = document.createElement('div');
+        box.className = 'done';
+        box.innerHTML = kind === 'quote'
+          ? `<h2>Talebiniz bize ulaştı</h2><p>Satış ekibimiz <strong>${esc(payload.phone || '')}</strong> numarasından size dönecek. Görüşmede bu numarayı söylemeniz yeterli:</p><p class="done__code">${esc(result || '')}</p><div class="hero__actions"><a href="${siteBase}urunler/" class="btn btn--navy">Ürünlere dön</a></div>`
+          : `<h2>Mesajınız gönderildi</h2><p>Mesai saatleri içinde size dönüş yapacağız.</p><a href="${siteBase}" class="btn btn--line">Ana sayfaya dön</a>`;
+        form.replaceWith(box);
+        box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } catch (err) {
+        const a = document.createElement('div');
+        a.className = 'alert';
+        a.setAttribute('role', 'alert');
+        a.textContent = err.message;
+        form.prepend(a);
+        if (btn) { btn.disabled = false; btn.textContent = label; }
+      }
+    }));
+
+    // Search on static listing pages: filter the cards already on the page
+    $$('form.search').forEach((form) => {
+      const grid = $('.product-grid, .post-grid');
+      if (!grid) return;
+      const input = $('input[type="search"]', form);
+      const items = $$('.product, .post', grid.parentElement);
+      const norm = (t) => t.toLocaleLowerCase('tr-TR');
+      const run = () => {
+        const q = norm(input.value.trim());
+        let shown = 0;
+        items.forEach((it) => { const hit = !q || norm(it.textContent).includes(q); it.hidden = !hit; if (hit) shown++; });
+        const bar = $('.catalog__bar p');
+        if (bar) bar.textContent = q ? `${shown} ürün, “${input.value.trim()}” araması` : `${items.length} ürün`;
+      };
+      form.addEventListener('submit', (e) => { e.preventDefault(); run(); });
+      input.addEventListener('input', run);
+    });
+  }
+
   /* ---------- Light client-side validation (the server validates too) ---------- */
   $$('form[data-validate]').forEach((form) => form.addEventListener('submit', (e) => {
     let first = null;
@@ -229,8 +309,10 @@
       f.closest('.field, .check')?.classList.toggle('has-error', !ok);
       if (!ok && !first) first = f;
     });
+    form.dataset.invalid = first ? '1' : '0';
     if (first) { e.preventDefault(); first.focus(); return; }
     const b = $('button:not([type=button])', form);
-    if (b) { b.disabled = true; b.textContent = 'Gönderiliyor…'; }
-  }));
+    if (b && !form.dataset.remote) { b.disabled = true; b.textContent = 'Gönderiliyor…'; }
+    else if (b && sbUrl) { b.disabled = true; b.textContent = 'Gönderiliyor…'; }
+  }, true));
 })();

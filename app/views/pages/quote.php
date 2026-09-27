@@ -15,7 +15,7 @@
       <?php else: ?>
         <?php if (!empty($errors['form'])): ?><div class="alert" role="alert"><?= e($errors['form']) ?></div><?php endif; ?>
         <?php if ($errors && empty($errors['form'])): ?><div class="alert" role="alert">Formda düzeltilmesi gereken alanlar var; işaretli alanlara bakın.</div><?php endif; ?>
-        <form method="post" class="form" novalidate data-validate>
+        <form method="post" class="form" novalidate data-validate data-remote="quote">
           <?= csrf_field() ?>
           <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
           <?php if ($product): ?>
