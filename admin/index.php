@@ -33,6 +33,19 @@ function post_str(string $key, int $max = 10000): string
 /* ---------- First run: create the admin account ---------- */
 $hasUsers = (int)q_val('SELECT COUNT(*) FROM users') > 0;
 if (!$hasUsers) {
+    // First-run setup is locked behind the key in config.local.php (if set), so a stranger
+    // who finds /admin before the owner cannot create the first account.
+    global $config;
+    $setupKey = (string)($config['setup_key'] ?? '');
+    if ($setupKey !== '') {
+        $given = (string)($_GET['kurulum'] ?? $_SESSION['setup_key'] ?? '');
+        if (!hash_equals($setupKey, $given)) {
+            http_response_code(403);
+            echo view('../../admin/views/auth', ['mode' => 'locked', 'errors' => []]);
+            exit;
+        }
+        $_SESSION['setup_key'] = $given;
+    }
     $errors = [];
     if ($method === 'POST') {
         csrf_check();
@@ -44,6 +57,7 @@ if (!$hasUsers) {
         if ($pass !== ($_POST['password2'] ?? '')) $errors[] = 'Şifreler eşleşmiyor.';
         if (!$errors) {
             q('INSERT INTO users(username, name, password_hash, created_at) VALUES(?, ?, ?, now_tr())', [$username, $name ?: $username, password_hash($pass, PASSWORD_DEFAULT)]);
+            unset($_SESSION['setup_key']);
             session_regenerate_id(true);
             $_SESSION['uid'] = (int)db()->lastInsertId();
             flash('success', 'Yönetici hesabınız oluşturuldu. Hoş geldiniz!');

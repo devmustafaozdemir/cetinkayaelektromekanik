@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title><?= $mode === 'setup' ? 'Kurulum' : 'Giriş' ?> | Yönetim Paneli</title>
+<title><?= $mode === 'login' ? 'Giriş' : 'Kurulum' ?> | Yönetim Paneli</title>
 <link rel="icon" href="<?= asset('img/favicon.svg') ?>" type="image/svg+xml">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="<?= asset('css/admin.css') ?>">
@@ -25,6 +25,13 @@
       <small>© <?= date('Y') ?> <?= e(setting('site_name')) ?></small>
     </div>
     <div class="auth__main">
+      <?php if ($mode === 'locked'): ?>
+      <div class="auth__form">
+        <h2>Kurulum kilitli</h2>
+        <p class="muted">Yönetici hesabı henüz oluşturulmamış. Kurulumu başlatmak için size verilen kurulum bağlantısını kullanın (adresin sonunda <code>?kurulum=…</code> anahtarı bulunur).</p>
+        <a href="/" class="auth__back"><?= icon('arrow-left') ?> Siteye dön</a>
+      </div>
+      <?php else: ?>
       <form method="post" class="auth__form" autocomplete="on">
         <?= csrf_field() ?>
         <?php if ($mode === 'setup'): ?>
@@ -46,6 +53,7 @@
         <button class="btn btn--primary btn--block"><?= $mode === 'setup' ? 'Hesabı Oluştur' : 'Giriş Yap' ?></button>
         <a href="/" class="auth__back"><?= icon('arrow-left') ?> Siteye dön</a>
       </form>
+      <?php endif; ?>
     </div>
   </div>
 </body>

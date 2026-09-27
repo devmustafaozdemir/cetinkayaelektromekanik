@@ -35,7 +35,12 @@ Modüler su depoları, pompa ve hidrofor sistemleri satışı için kurumsal web
 1. Tüm dosyaları `public_html` (veya alan adının kök klasörü) içine yükleyin. `.htaccess` dosyalarının da yüklendiğinden emin olun.
 2. `data/` ve `uploads/` klasörlerine yazma izni verin (genellikle `755`, gerekirse `775`).
 3. Siteyi açın — veritabanı ilk ziyarette örnek içerikle otomatik oluşur.
-4. `https://alanadiniz.com.tr/admin` adresine gidin ve **ilk yönetici hesabını oluşturun**.
+4. `https://alanadiniz.com.tr/admin/?kurulum=ANAHTAR` adresine gidin ve **ilk yönetici hesabını oluşturun**. Anahtar `config.local.php` dosyasındaki `setup_key` değeridir; bu dosya yoksa oluşturun:
+   ```php
+   <?php
+   return ['setup_key' => 'uzun-rastgele-bir-deger'];
+   ```
+   Hesap oluşturulduktan sonra anahtar bir daha gerekmez; giriş `https://alanadiniz.com.tr/admin` adresinden yapılır.
 5. Panelde **Site Ayarları** bölümünden telefon, e-posta, adres, harita ve istatistikleri; **Ürünler** bölümünden ürünleri, görselleri ve teknik özellikleri kontrol edip güncelleyin.
 6. SSL aktifse `.htaccess` içindeki HTTPS yönlendirme satırlarının yorumunu kaldırın.
 
