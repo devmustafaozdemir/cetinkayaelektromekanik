@@ -98,7 +98,9 @@ function copy_dir(string $src, string $dst): void
 {
     foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($src, FilesystemIterator::SKIP_DOTS)) as $f) {
         if ($f->getFilename() === '.htaccess' || $f->getFilename() === '.gitkeep') continue;
-        $target = $dst . substr($f->getPathname(), strlen($src));
+        $rel = substr($f->getPathname(), strlen($src));
+        if (str_starts_with($rel, '/src/') || str_starts_with($rel, '/js/admin/')) continue; // sources + Supabase admin bundle aren't used here
+        $target = $dst . $rel;
         if (!is_dir(dirname($target))) mkdir(dirname($target), 0775, true);
         copy($f->getPathname(), $target);
     }
@@ -141,7 +143,10 @@ function rewrite(string $html, bool $isAdmin = false): string
         if (str_starts_with('/' . $path, $base)) {
             return $m[0]; // already rewritten
         }
-        if ($path !== '' && !str_contains($path, '.') && !str_contains($path, '?') && !str_contains($path, '#')) $path .= '/';
+        if ($path !== '' && !str_contains($path, '.') && !str_contains($path, '#')) {
+            [$p, $q] = array_pad(explode('?', $path, 2), 2, null);
+            $path = rtrim($p, '/') . '/' . ($q !== null ? '?' . $q : '');
+        }
         return $m[1] . '="' . $base . $path . '"';
     }, $html);
     return $html;

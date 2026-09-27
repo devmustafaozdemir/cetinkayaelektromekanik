@@ -18,7 +18,7 @@ Modüler su depoları, pompa ve hidrofor sistemleri satışı için kurumsal web
 - Yumuşak, modern tasarım: logodaki lacivert ve kırmızı, açık mavi yüzeyler, yuvarlak kartlar; Manrope + Inter yazı tipleri, mobil uyumlu
 - **Sahada kanıtlanmış** bandı: mutlu müşteri, sipariş, ürün çeşidi, tecrübe rakamları (admin → Site Ayarları → Ana Sayfa)
 - Marka logoları (`assets/img/brands/`; admin → Site Ayarları → Markalar bölümünden değiştirilebilir)
-- **Depo hesaplayıcı (ana sayfa):** en/boy/yükseklik ve panel malzemesi seçilir; çizim, hacim, litre ve yaklaşık daire sayısı anında güncellenir, “Bu ölçüde teklif iste” ölçüleri teklif formuna taşır
+- **Depo Tasarla (`/depo-tasarla`) ve ana sayfa hesaplayıcısı:** 1 modül = 1,08 m; en, boy ve yükseklik tam/yarım modül (1,08 / 0,54 m) adımlarla, yükseklik 0,5–4 kat. Hacim, litre, dış ölçü, taban alanı ve panel listesi (108×108 tam, 108×54 yarım) anında hesaplanır. **İhtiyaca göre** sekmesinde kullanım yeri, kişi sayısı, günlük tüketim, yedek gün, yangın rezervi ve isteğe bağlı yerleşim alanı girilir; en ekonomik depo ve iki alternatif (daha alçak / daha küçük taban) önerilir. “Bu depo için teklif iste” ölçüleri ve panel listesini teklif formuna taşır
 - **2D çizim + 3D görünüm:** her ürün için sunucuda üretilen SVG çizim; “3D incele” ile döndürülebilir, yakınlaştırılabilir 3D model (Three.js, yalnızca tıklanınca yüklenir)
 - **Ürün kataloğu:** kategoriler, marka filtresi, arama, ürün detay sayfası (teknik özellik tablosu, benzer ürünler)
 - **Teklif sistemi:** her üründe “Teklif İste”, ana sayfada hızlı teklif formu, talep türleri (ürün, proje/keşif, montaj, bakım-servis); müşteriye talep numarası verilir
@@ -130,7 +130,7 @@ Ardından `http://localhost:8000` ve `http://localhost:8000/admin` adreslerini a
 
 | Model tipi | Örnek |
 |---|---|
-| `tank:galvaniz`, `tank:paslanmaz`, `tank:grp`, `tank:sandvic` | Modüler depo (1×1 m paneller, ölçüye göre kurulur) |
+| `tank:galvaniz`, `tank:paslanmaz`, `tank:grp`, `tank:sandvic` | Modüler depo (108×108 cm kabartmalı paneller, yarım modül destekli) |
 | `booster:1` … `booster:4` | Tek/çift/üç/dört pompalı hidrofor seti |
 | `pump:horizontal`, `pump:vertical`, `pump:circulator` | Yatay santrifüj, dikey çok kademeli, sirkülasyon |
 | `sub:deep`, `sub:drain` | Derin kuyu ve drenaj dalgıç pompası |

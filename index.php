@@ -15,6 +15,7 @@ require APP . '/controllers.php';
 
 $routes = [
     '#^/$#'                             => 'page_home',
+    '#^/depo-tasarla$#'                 => 'page_designer',
     '#^/urunler$#'                      => 'page_products',
     '#^/urunler/kategori/([a-z0-9-]+)$#' => 'page_product_category',
     '#^/urunler/([a-z0-9-]+)$#'         => 'page_product',

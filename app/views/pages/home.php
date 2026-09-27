@@ -2,7 +2,6 @@
 $values = setting_lines('about_values');
 $stats = array_map(fn($l) => array_pad(explode('|', $l, 2), 2, ''), setting_lines('stats'));
 $statIcons = ['users', 'truck', 'layers', 'award', 'check-circle', 'star'];
-$materials = ['galvaniz' => 'Galvaniz', 'paslanmaz' => 'Paslanmaz', 'grp' => 'GRP', 'sandvic' => 'İzolasyonlu'];
 $tints = ['tank' => 'sky', 'booster' => 'navy', 'pump' => 'mist', 'submersible' => 'sea', 'drop' => 'sky'];
 ?>
 <section class="hero">
@@ -23,45 +22,7 @@ $tints = ['tank' => 'sky', 'booster' => 'navy', 'pump' => 'mist', 'submersible' 
       </ul>
     </div>
 
-    <div class="sizer" data-sizer data-viewer="<?= e(asset('js/viewer3d.js')) ?>">
-      <div class="sizer__top">
-        <div>
-          <h2>Deponuzu ölçün</h2>
-          <p>Ölçüleri seçin, hacmi ve kaç daireye yeteceğini görün.</p>
-        </div>
-        <div class="viewswitch" role="group" aria-label="Görünüm">
-          <button type="button" data-view="2d" aria-pressed="true">Çizim</button>
-          <button type="button" data-view="3d" aria-pressed="false">3D</button>
-        </div>
-      </div>
-      <div class="sizer__stage" data-stage>
-        <div class="sizer__svg" data-svg><?= model_svg('tank:galvaniz', 'art', ['w' => 4, 'l' => 3, 'h' => 2]) ?></div>
-        <div class="viewer" data-viewer-host hidden></div>
-        <p class="viewer__hint" data-hint hidden>Sürükleyerek çevirin</p>
-      </div>
-      <div class="sizer__controls">
-        <?php foreach (['w' => ['En', 4, 1, 12], 'l' => ['Boy', 3, 1, 12], 'h' => ['Yükseklik', 2, 1, 4]] as $k => [$label, $val, $min, $max]): ?>
-          <div class="stepper">
-            <span class="stepper__label" id="lbl-<?= $k ?>"><?= $label ?> (m)</span>
-            <div class="stepper__box">
-              <button type="button" data-step="<?= $k ?>" data-delta="-1" aria-label="<?= $label ?> azalt">−</button>
-              <output data-dim="<?= $k ?>" data-min="<?= $min ?>" data-max="<?= $max ?>" aria-labelledby="lbl-<?= $k ?>" aria-live="polite"><?= $val ?></output>
-              <button type="button" data-step="<?= $k ?>" data-delta="1" aria-label="<?= $label ?> artır">+</button>
-            </div>
-          </div>
-        <?php endforeach; ?>
-      </div>
-      <div class="sizer__materials" role="radiogroup" aria-label="Panel malzemesi">
-        <?php foreach ($materials as $k => $l): ?>
-          <label><input type="radio" name="material" value="<?= $k ?>"<?= $k === 'galvaniz' ? ' checked' : '' ?>><span><?= e($l) ?></span></label>
-        <?php endforeach; ?>
-      </div>
-      <div class="sizer__result">
-        <div><span class="sizer__volume"><span data-volume>24</span> m³</span><span class="sizer__meta"><strong data-litres>24.000</strong> litre</span></div>
-        <div class="sizer__flats"><strong data-flats>40</strong> dairenin<br>günlük ihtiyacı</div>
-      </div>
-      <a href="/teklif-al?olcu=4x3x2&amp;malzeme=galvaniz" class="btn btn--signal btn--block" data-quote>Bu ölçüde teklif iste</a>
-    </div>
+    <?php partial('designer', ['mode' => 'compact']); ?>
   </div>
   <div class="container">
     <div class="logo-strip">

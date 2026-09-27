@@ -87,19 +87,27 @@ function finsX(g, r, x0, len, count, y, z, mat) {
 }
 
 /* ---------- Modular tank ---------- */
+// Sizes are in modules (1 modül = 1,08 m); half modules allowed. Mirrors svg_tank() in app/models.php.
+const cellsOf = (a) => { // full cells, then a half one at the end
+  const n = Math.floor(a + 1e-9);
+  const out = [];
+  for (let i = 0; i < n; i++) out.push([i, 1]);
+  if (a - n > 1e-9) out.push([n, a - n]);
+  return out;
+};
+const seamsOf = (a) => [0, ...cellsOf(a).map(([s, z]) => s + z)];
+
 function panelGeometry(variant) {
-  const size = 0.965;
-  const g = new PlaneGeometry(size, size, 28, 28);
+  const g = new PlaneGeometry(0.965, 0.965, 36, 36);
   if (variant !== 'sandvic') {
-    // Pressed panel: a rounded bulge in the middle and a stiffening rim
+    // Pressed panel: a rounded-square boss with a flat top and a stiffening rim
     const p = g.attributes.position;
     for (let i = 0; i < p.count; i++) {
       const x = p.getX(i), y = p.getY(i);
-      const r = Math.hypot(x, y);
-      let z = 0;
-      if (r < 0.34) z += 0.045 * Math.cos((r / 0.34) * Math.PI / 2);
-      const edge = Math.max(Math.abs(x), Math.abs(y));
-      if (edge > 0.43) z += 0.012;
+      const d = Math.pow(Math.abs(x) ** 4 + Math.abs(y) ** 4, 0.25);
+      const t = MathUtils.clamp((0.35 - d) / 0.09, 0, 1);
+      let z = 0.042 * t * t * (3 - 2 * t);
+      if (Math.max(Math.abs(x), Math.abs(y)) > 0.44) z += 0.012;
       p.setZ(i, z);
     }
     g.computeVertexNormals();
@@ -114,28 +122,31 @@ function buildTank(variant = 'galvaniz', W = 4, L = 3, H = 2) {
   const mat = new MeshStandardMaterial({ color: spec.color, metalness: spec.metalness, roughness: spec.roughness, side: DoubleSide });
   const ribMat = new MeshStandardMaterial({ color: spec.rib, metalness: spec.metalness * 0.8, roughness: spec.roughness + 0.1 });
   const geo = panelGeometry(variant);
+  // rows from the base (y up): full rows first, the half row (if any) on top
+  const rows = cellsOf(H);
 
-  const walls = [];
-  // [position fn, rotationY, count u, count v]
-  for (let i = 0; i < W; i++) for (let j = 0; j < H; j++) {
-    walls.push([i - W / 2 + 0.5, baseH + j + 0.5, L / 2, 0, 0]);           // front (+z)
-    walls.push([i - W / 2 + 0.5, baseH + j + 0.5, -L / 2, Math.PI, 0]);    // back
+  const walls = []; // [x, y, z, rotY, rotX, scaleU, scaleV]
+  for (const [x0, cw] of cellsOf(W)) for (const [y0, ch] of rows) {
+    const x = x0 + cw / 2 - W / 2, y = baseH + y0 + ch / 2;
+    walls.push([x, y, L / 2, 0, 0, cw, ch], [x, y, -L / 2, Math.PI, 0, cw, ch]);
   }
-  for (let i = 0; i < L; i++) for (let j = 0; j < H; j++) {
-    walls.push([W / 2, baseH + j + 0.5, i - L / 2 + 0.5, Math.PI / 2, 0]);  // right (+x)
-    walls.push([-W / 2, baseH + j + 0.5, i - L / 2 + 0.5, -Math.PI / 2, 0]);
+  for (const [z0, cl] of cellsOf(L)) for (const [y0, ch] of rows) {
+    const z = z0 + cl / 2 - L / 2, y = baseH + y0 + ch / 2;
+    walls.push([W / 2, y, z, Math.PI / 2, 0, cl, ch], [-W / 2, y, z, -Math.PI / 2, 0, cl, ch]);
   }
-  for (let i = 0; i < W; i++) for (let k = 0; k < L; k++) {
-    walls.push([i - W / 2 + 0.5, baseH + H, k - L / 2 + 0.5, 0, -Math.PI / 2]); // roof
+  for (const [x0, cw] of cellsOf(W)) for (const [z0, cl] of cellsOf(L)) {
+    walls.push([x0 + cw / 2 - W / 2, baseH + H, z0 + cl / 2 - L / 2, 0, -Math.PI / 2, cw, cl]);
   }
   const panels = new InstancedMesh(geo, mat, walls.length);
   const o = new Object3D();
-  walls.forEach(([x, y, z, ry, rx], idx) => {
+  walls.forEach(([x, y, z, ry, rx, su, sv], idx) => {
     o.position.set(x, y, z);
     o.rotation.set(rx, ry, 0, 'YXZ');
+    o.scale.set(su, sv, 1);
     o.updateMatrix();
     panels.setMatrixAt(idx, o.matrix);
   });
+  o.scale.set(1, 1, 1);
   g.add(panels);
 
   // Inner shell visible through panel seams
@@ -143,14 +154,13 @@ function buildTank(variant = 'galvaniz', W = 4, L = 3, H = 2) {
 
   // External flanges along seams
   const ribs = [];
-  for (let i = 0; i <= W; i++) { ribs.push([i - W / 2, baseH + H / 2, L / 2 + 0.015, 0.035, H, 0.03]); ribs.push([i - W / 2, baseH + H / 2, -L / 2 - 0.015, 0.035, H, 0.03]); }
-  for (let i = 0; i <= L; i++) { ribs.push([W / 2 + 0.015, baseH + H / 2, i - L / 2, 0.03, H, 0.035]); ribs.push([-W / 2 - 0.015, baseH + H / 2, i - L / 2, 0.03, H, 0.035]); }
-  for (let j = 0; j <= H; j++) {
-    ribs.push([0, baseH + j, L / 2 + 0.015, W, 0.035, 0.03]); ribs.push([0, baseH + j, -L / 2 - 0.015, W, 0.035, 0.03]);
-    ribs.push([W / 2 + 0.015, baseH + j, 0, 0.03, 0.035, L]); ribs.push([-W / 2 - 0.015, baseH + j, 0, 0.03, 0.035, L]);
+  for (const x of seamsOf(W)) { ribs.push([x - W / 2, baseH + H / 2, L / 2 + 0.015, 0.035, H, 0.03], [x - W / 2, baseH + H / 2, -L / 2 - 0.015, 0.035, H, 0.03]); }
+  for (const z of seamsOf(L)) { ribs.push([W / 2 + 0.015, baseH + H / 2, z - L / 2, 0.03, H, 0.035], [-W / 2 - 0.015, baseH + H / 2, z - L / 2, 0.03, H, 0.035]); }
+  for (const y of [0, ...rows.map(([s, z]) => s + z)]) {
+    ribs.push([0, baseH + y, L / 2 + 0.015, W, 0.035, 0.03], [0, baseH + y, -L / 2 - 0.015, W, 0.035, 0.03]);
+    ribs.push([W / 2 + 0.015, baseH + y, 0, 0.03, 0.035, L], [-W / 2 - 0.015, baseH + y, 0, 0.03, 0.035, L]);
   }
-  const ribGeo = new BoxGeometry(1, 1, 1);
-  const ribInst = new InstancedMesh(ribGeo, ribMat, ribs.length);
+  const ribInst = new InstancedMesh(new BoxGeometry(1, 1, 1), ribMat, ribs.length);
   ribs.forEach(([x, y, z, sx, sy, sz], idx) => {
     o.position.set(x, y, z); o.rotation.set(0, 0, 0); o.scale.set(sx, sy, sz); o.updateMatrix();
     ribInst.setMatrixAt(idx, o.matrix);
@@ -158,34 +168,40 @@ function buildTank(variant = 'galvaniz', W = 4, L = 3, H = 2) {
   o.scale.set(1, 1, 1);
   g.add(ribInst);
 
-  // Base: steel beams every metre
+  // Base: steel beams under every seam
   const frame = M.frame();
-  for (let i = 0; i <= W; i++) g.add(box(0.1, baseH, L + 0.2, frame, i - W / 2, 0, 0));
+  for (const x of seamsOf(W)) g.add(box(0.1, baseH, L + 0.2, frame, x - W / 2, 0, 0));
 
-  // Roof manhole + vent
+  // Roof manhole (back corner) + vent (front corner)
   const top = baseH + H;
-  const mh = cylY(0.3, 0.06, ribMat, -W / 2 + 0.75, top + 0.02, -L / 2 + 0.75);
-  g.add(mh, cylY(0.24, 0.02, M.frame(), -W / 2 + 0.75, top + 0.08, -L / 2 + 0.75));
-  g.add(cylY(0.05, 0.25, M.steelDark(), W / 2 - 0.5, top, L / 2 - 0.5));
-  const cap = mesh(new SphereGeometry(0.1, 20, 12, 0, Math.PI * 2, 0, Math.PI / 2), M.steelDark(), W / 2 - 0.5, top + 0.25, L / 2 - 0.5);
-  g.add(cap);
+  const mx = -W / 2 + Math.min(0.62, W / 2), mz = -L / 2 + Math.min(0.62, L / 2);
+  g.add(cylY(0.3, 0.06, ribMat, mx, top + 0.02, mz), cylY(0.24, 0.02, M.frame(), mx, top + 0.08, mz));
+  if (W + L >= 3) {
+    g.add(cylY(0.05, 0.25, M.steelDark(), W / 2 - 0.45, top, L / 2 - 0.45));
+    g.add(mesh(new SphereGeometry(0.1, 20, 12, 0, Math.PI * 2, 0, Math.PI / 2), M.steelDark(), W / 2 - 0.45, top + 0.25, L / 2 - 0.45));
+  }
 
-  // Ladder on the right face
-  const lz = L / 2 - 0.5, lx = W / 2 + 0.12;
-  const rail = M.steelDark();
-  g.add(cylY(0.02, H + 0.9, rail, lx, 0, lz - 0.22), cylY(0.02, H + 0.9, rail, lx, 0, lz + 0.22));
-  for (let y = 0.3; y < H + 0.8; y += 0.3) g.add(cylZ(0.015, 0.44, rail, lx, y, lz));
-
-  // Level gauge + inlet/outlet pipes on the front face
-  const gx = W / 2 - 0.25;
+  // Right face (+x): level gauge near the front, ladder towards the back (rails continue above the roof)
   const glass = new MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 0.35, roughness: 0.05 });
-  g.add(cylY(0.035, H - 0.4, glass, gx, baseH + 0.2, L / 2 + 0.08));
-  g.add(cylY(0.022, (H - 0.4) * 0.7, M.water(), gx, baseH + 0.2, L / 2 + 0.08));
+  const gh = Math.max(0.12, H - 0.35);
+  g.add(cylY(0.035, gh, glass, W / 2 + 0.08, baseH + 0.15, L / 2 - 0.3));
+  g.add(cylY(0.022, gh * 0.7, M.water(), W / 2 + 0.08, baseH + 0.15, L / 2 - 0.3));
+  const lz = L / 2 - Math.max(0.55, L - 0.75) - 0.17, lx = W / 2 + 0.12;
+  const rail = M.steelDark();
+  g.add(cylY(0.02, H + baseH + 0.42, rail, lx, 0, lz - 0.17), cylY(0.02, H + baseH + 0.42, rail, lx, 0, lz + 0.17));
+  for (let y = baseH + 0.22; y < top + 0.35; y += 0.26) g.add(cylZ(0.015, 0.34, rail, lx, y, lz));
+  const hand = mesh(new TorusGeometry(0.17, 0.02, 8, 24, Math.PI), rail, lx, top + 0.42, lz);
+  hand.rotation.y = Math.PI / 2;
+  g.add(hand);
+
+  // Front face (+z): inlet near the top, outlet near the bottom
   const pipe = M.steelDark();
-  g.add(cylZ(0.07, 0.5, pipe, -W / 2 + 0.5, baseH + H - 0.35, L / 2 + 0.25));
-  g.add(cylZ(0.11, 0.03, M.frame(), -W / 2 + 0.5, baseH + H - 0.35, L / 2 + 0.02));
-  g.add(cylZ(0.08, 0.5, pipe, -W / 2 + 1.5, baseH + 0.35, L / 2 + 0.25));
-  g.add(cylZ(0.12, 0.03, M.frame(), -W / 2 + 1.5, baseH + 0.35, L / 2 + 0.02));
+  const nozzle = (x, y, r) => {
+    g.add(cylZ(r, 0.34, pipe, x, y, L / 2 + 0.17));
+    g.add(cylZ(r * 1.5, 0.03, M.frame(), x, y, L / 2 + 0.02), cylZ(r * 1.45, 0.03, M.frame(), x, y, L / 2 + 0.34));
+  };
+  nozzle(-W / 2 + 0.5, baseH + H - Math.min(0.4, H * 0.35), 0.075);
+  if (W >= 1.5 || H >= 1) nozzle(-W / 2 + Math.min(1.5, W - 0.5), baseH + Math.min(0.35, H * 0.35), 0.09);
   return g;
 }
 

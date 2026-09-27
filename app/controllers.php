@@ -33,6 +33,17 @@ function page_home(): void
     ]);
 }
 
+/* ---------- Tank designer ---------- */
+
+function page_designer(): void
+{
+    render('designer', [
+        'title'       => 'Depo Tasarla – Modüler Su Deposu Hesaplama',
+        'description' => 'Modüler su deposunu modül ölçüsüne (1 modül = 1,08 m) veya kişi sayısı, günlük tüketim, yedek gün ve yangın rezervine göre tasarlayın; hacim, dış ölçü ve panel listesini görün.',
+        'active'      => 'designer',
+    ]);
+}
+
 /* ---------- Products ---------- */
 
 function products_sql(): string
@@ -414,14 +425,15 @@ function page_quote(string $method): void
     if (isset($_GET['tamam']) && !empty($_SESSION['last_quote'])) {
         $created = q_one('SELECT * FROM quotes WHERE code = ?', [$_SESSION['last_quote']]);
     }
-    // Prefill from the home page tank sizer: ?olcu=4x3x2&malzeme=galvaniz
-    if ($method === 'GET' && preg_match('/^(\d{1,2})x(\d{1,2})x(\d)$/', (string)($_GET['olcu'] ?? ''), $m)) {
-        [$w, $l, $h] = [(int)$m[1], (int)$m[2], (int)$m[3]];
+    // Prefill from the tank designer: ?olcu=4x3x2.5&malzeme=galvaniz&detay=…
+    if ($method === 'GET' && preg_match('/^(\d{1,2}(?:\.5)?)x(\d{1,2}(?:\.5)?)x(\d(?:\.5)?)$/', (string)($_GET['olcu'] ?? ''), $m)) {
+        [$w, $l, $h] = [(float)$m[1], (float)$m[2], (float)$m[3]];
         $mat = ['galvaniz' => 'galvaniz', 'paslanmaz' => 'paslanmaz çelik', 'grp' => 'GRP', 'sandvic' => 'izolasyonlu'][$_GET['malzeme'] ?? ''] ?? 'galvaniz';
         $cat = (string)q_val("SELECT name FROM product_categories WHERE art = 'tank' ORDER BY sort LIMIT 1");
         $_SESSION['old'] = [
             'category' => $cat,
-            'quantity' => "{$w} × {$l} × {$h} m, " . ($w * $l * $h) . " m³ {$mat} modüler depo",
+            'quantity' => tank_mod($w) . ' × ' . tank_mod($l) . ' × ' . tank_mod($h) . ' modül · ' . number_format(tank_volume($w, $l, $h), 1, ',', '.') . " m³ {$mat} modüler depo",
+            'message'  => mb_substr(trim((string)($_GET['detay'] ?? '')), 0, 1000),
         ];
     }
     render('quote', [
@@ -440,7 +452,7 @@ function page_sitemap(): void
 {
     header('Content-Type: application/xml; charset=utf-8');
     $b = base_url();
-    $urls = [['/', null], ['/urunler', null], ['/markalar', null], ['/hizmetler', null], ['/hakkimizda', null], ['/blog', null], ['/sss', null], ['/iletisim', null], ['/teklif-al', null]];
+    $urls = [['/', null], ['/depo-tasarla', null], ['/urunler', null], ['/markalar', null], ['/hizmetler', null], ['/hakkimizda', null], ['/blog', null], ['/sss', null], ['/iletisim', null], ['/teklif-al', null]];
     foreach (q_all('SELECT slug FROM product_categories') as $c) $urls[] = ['/urunler/kategori/' . $c['slug'], null];
     foreach (q_all('SELECT slug, updated_at FROM products WHERE active = 1') as $p) $urls[] = ['/urunler/' . $p['slug'], $p['updated_at']];
     foreach (q_all('SELECT slug FROM services WHERE active = 1') as $s) $urls[] = ['/hizmetler/' . $s['slug'], null];

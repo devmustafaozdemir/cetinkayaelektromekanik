@@ -152,7 +152,11 @@ function rewrite(string $html): string
     $html = preg_replace_callback('#(href|src|action|data-viewer)="/(?!/)([^"]*)"#', function ($m) use ($base) {
         $path = $m[2];
         if ($base !== '/' && str_starts_with('/' . $path, $base)) return $m[0];
-        if ($path !== '' && !str_contains($path, '.') && !str_contains($path, '?') && !str_contains($path, '#')) $path .= '/';
+        // folder URLs need a trailing slash on static hosting, also before a query string (/depo-tasarla/?olcu=…)
+        if ($path !== '' && !str_contains($path, '.') && !str_contains($path, '#')) {
+            [$p, $q] = array_pad(explode('?', $path, 2), 2, null);
+            $path = rtrim($p, '/') . '/' . ($q !== null ? '?' . $q : '');
+        }
         return $m[1] . '="' . $base . $path . '"';
     }, $html);
     // Admin links in page chrome point to the Supabase admin app

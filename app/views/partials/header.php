@@ -1,6 +1,7 @@
 <?php
 $nav = [
     'products' => ['/urunler', 'Ürünler'],
+    'designer' => ['/depo-tasarla', 'Depo Tasarla'],
     'brands'   => ['/markalar', 'Markalar'],
     'services' => ['/hizmetler', 'Hizmetler'],
     'about'    => ['/hakkimizda', 'Hakkımızda'],
@@ -13,7 +14,8 @@ $navCats = q_all('SELECT name, slug, art FROM product_categories ORDER BY sort, 
   <div class="container topbar__inner">
     <span><?= icon('map-pin') ?> <?= e(setting('address_short', 'Kocaeli')) ?></span>
     <span class="hide-sm"><?= icon('clock') ?> <?= e(setting_lines('hours')[0] ?? '') ?></span>
-    <a href="mailto:<?= e(setting('email')) ?>" class="topbar__end hide-sm"><?= icon('mail') ?> <?= e(setting('email')) ?></a>
+    <a href="<?= e(tel_href(setting('phone'))) ?>" class="topbar__end"><?= icon('phone') ?> <?= e(setting('phone')) ?></a>
+    <a href="mailto:<?= e(setting('email')) ?>" class="hide-sm"><?= icon('mail') ?> <?= e(setting('email')) ?></a>
   </div>
 </div>
 <header class="header" data-header>
@@ -45,7 +47,7 @@ $navCats = q_all('SELECT name, slug, art FROM product_categories ORDER BY sort, 
       </div>
     </nav>
     <div class="header__actions">
-      <a href="<?= e(tel_href(setting('phone'))) ?>" class="header__phone hide-md"><?= icon('phone') ?> <?= e(setting('phone')) ?></a>
+      <a href="<?= e(tel_href(setting('phone'))) ?>" class="header__phone hide-md" aria-label="Telefon: <?= e(setting('phone')) ?>" title="<?= e(setting('phone')) ?>"><?= icon('phone') ?></a>
       <a href="/teklif-al" class="btn btn--signal btn--sm hide-sm">Teklif iste</a>
       <button class="nav-toggle" type="button" aria-controls="nav" aria-expanded="false" aria-label="Menüyü aç">
         <span></span><span></span><span></span>

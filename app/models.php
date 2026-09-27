@@ -65,67 +65,137 @@ function model_svg(string $spec, string $class = 'art', array $opt = []): string
         . '</defs>';
     $GLOBALS['__svg_id'] = $id;
     $body = match ($type) {
-        'tank'    => svg_tank($variant ?: 'galvaniz', (int)($opt['w'] ?? 4), (int)($opt['l'] ?? 3), (int)($opt['h'] ?? 2), $id),
+        'tank'    => svg_tank($variant ?: 'galvaniz', (float)($opt['w'] ?? 4), (float)($opt['l'] ?? 3), (float)($opt['h'] ?? 2), $id, !empty($opt['dims'])),
         'booster' => svg_booster(max(1, min(4, (int)$variant)), $id),
         'pump'    => match ($variant) { 'vertical' => svg_pump_vertical($id), 'circulator' => svg_circulator($id), default => svg_pump_horizontal($id) },
         'sub'     => $variant === 'drain' ? svg_drain($id) : svg_deepwell($id),
-        default   => svg_tank('galvaniz', 4, 3, 2, $id),
+        default   => svg_tank('galvaniz', 4.0, 3.0, 2.0, $id),
     };
     return '<svg class="' . e($class) . '" viewBox="0 0 480 330" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' . $defs . $body . '</svg>';
 }
 
-/** Isometric modular tank built from 1×1 m panels (mirrored in assets/js/site.js → tankSVG). */
-function svg_tank(string $variant, int $W, int $L, int $H, string $id = 't'): string
+const TANK_MODULE = 1.08; // 1 modül = 1,08 m (panel 108×108 cm, yarım panel 108×54 cm)
+
+/** Panel cells along a side of $a modules: [[start, size], …] – full modules, then a half one. */
+function tank_cells(float $a): array
+{
+    $n = (int)floor($a + 1e-9);
+    $out = [];
+    for ($i = 0; $i < $n; $i++) $out[] = [$i, 1.0];
+    if ($a - $n > 1e-9) $out[] = [$n, $a - $n];
+    return $out;
+}
+
+/** Panel counts (walls, roof, floor) for a W×L×H module tank. */
+function tank_panels(float $W, float $L, float $H): array
+{
+    $n = ['full' => 0, 'half' => 0, 'quarter' => 0];
+    $add = function (float $a, float $b, int $times) use (&$n) {
+        $fa = (int)floor($a + 1e-9); $ha = $a - $fa > 1e-9 ? 1 : 0;
+        $fb = (int)floor($b + 1e-9); $hb = $b - $fb > 1e-9 ? 1 : 0;
+        $n['full'] += $fa * $fb * $times; $n['half'] += ($fa * $hb + $ha * $fb) * $times; $n['quarter'] += $ha * $hb * $times;
+    };
+    $add($W, $H, 2); $add($L, $H, 2); $add($W, $L, 2);
+    return $n;
+}
+
+function tank_volume(float $W, float $L, float $H): float
+{
+    return $W * $L * $H * TANK_MODULE ** 3;
+}
+
+/** Isometric modular tank (mirrored in assets/js/site.js → tankSVG). Sizes in modules, half steps allowed. */
+function svg_tank(string $variant, float $W, float $L, float $H, string $id = 't', bool $dims = false): string
 {
     [$base, $dark, $light, $rib] = tank_materials()[$variant] ?? tank_materials()['galvaniz'];
-    $c = 0.8660254; $h = 0.5;
-    $vw = 480; $vh = 330; $pad = 34;
-    $s = min(($vw - 2 * $pad) / (($W + $L) * $c), ($vh - 2 * $pad - 14) / (($W + $L) * $h + $H + 0.35));
-    $ox = $vw / 2 + ($L - $W) * $c * $s / 2;
-    $oy = ($vh - (($W + $L) * $h * $s + $H * $s)) / 2 + $H * $s - 4;
-    $f = fn(float ...$v) => implode(',', array_map(fn($x) => round($x, 3), $v));
-    $flat = $variant === 'sandvic' || $variant === 'grp_flat';
-    $defs = '<defs>'
-        . '<linearGradient id="' . $id . 'pn" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="' . $light . '"/><stop offset="1" stop-color="' . $base . '"/></linearGradient>'
-        . '<radialGradient id="' . $id . 'dm" cx=".42" cy=".38" r=".6"><stop offset="0" stop-color="#fff" stop-opacity=".85"/><stop offset=".45" stop-color="#fff" stop-opacity=".2"/><stop offset=".8" stop-color="' . $dark . '" stop-opacity=".25"/><stop offset="1" stop-color="' . $dark . '" stop-opacity=".55"/></radialGradient>'
-        . '</defs>';
-    $face = function (string $m, int $cols, int $rows, string $tint, float $tintOpacity, bool $dimples) use ($id, $rib, $flat): string {
-        $g = '<g transform="matrix(' . $m . ')">';
-        $g .= '<rect x="0" y="0" width="' . $cols . '" height="' . $rows . '" fill="' . $rib . '"/>';
-        for ($i = 0; $i < $cols; $i++) {
-            for ($j = 0; $j < $rows; $j++) {
-                $g .= '<rect x="' . ($i + .025) . '" y="' . ($j + .025) . '" width=".95" height=".95" rx=".07" fill="url(#' . $id . 'pn)"/>';
-                if ($dimples && !$flat) {
-                    $g .= '<circle cx="' . ($i + .5) . '" cy="' . ($j + .5) . '" r=".31" fill="url(#' . $id . 'dm)"/>';
-                } elseif ($dimples) {
-                    $g .= '<rect x="' . ($i + .14) . '" y="' . ($j + .14) . '" width=".72" height=".72" rx=".05" fill="#fff" opacity=".22"/>';
+    $flat = $variant === 'sandvic';
+    $c = 0.8660254; $h = 0.5; $vw = 480; $vh = 330; $bh = 7;
+    [$mL, $mR, $mT, $mB] = $dims ? [34, 52, 26, 40] : [30, 30, 30, 36];
+    $s = min(($vw - $mL - $mR) / (($W + $L) * $c), ($vh - $mT - $mB - $bh) / (($W + $L) * $h + $H));
+    $boxW = ($W + $L) * $c * $s; $boxH = (($W + $L) * $h + $H) * $s + $bh;
+    $ox = $mL + ($vw - $mL - $mR - $boxW) / 2 + $L * $c * $s;
+    $oy = $mT + ($vh - $mT - $mB - $boxH) / 2 + $H * $s;
+    $r = fn(float $x) => round($x, 3);
+    $f = fn(float ...$v) => implode(',', array_map($r, $v));
+    $face = function (string $m, float $a, float $b, string $tint, float $op, bool $wall) use ($id, $rib, $dark, $flat, $r): string {
+        $g = '<g transform="matrix(' . $m . ')"><rect width="' . $r($a) . '" height="' . $r($b) . '" fill="' . $rib . '"/>';
+        // wall rows from the top: the half row (if any) sits at the top of the tank
+        $rows = $wall ? array_map(fn($c) => [$b - $c[0] - $c[1], $c[1]], tank_cells($b)) : tank_cells($b);
+        foreach (tank_cells($a) as [$x0, $cw]) {
+            foreach ($rows as [$y0, $ch]) {
+                $g .= '<rect x="' . $r($x0 + .025) . '" y="' . $r($y0 + .025) . '" width="' . $r($cw - .05) . '" height="' . $r($ch - .05) . '" rx=".05" fill="url(#' . $id . 'pn)"/>';
+                $mg = min($cw, $ch) * .2 + .02;
+                $bw = $r($cw - 2 * $mg); $bb = $r($ch - 2 * $mg);
+                if ($flat) {
+                    $g .= '<rect x="' . $r($x0 + $mg) . '" y="' . $r($y0 + $mg) . '" width="' . $bw . '" height="' . $bb . '" rx=".04" fill="#fff" opacity=".22"/>';
+                } else {
+                    $g .= '<rect x="' . $r($x0 + $mg + .035) . '" y="' . $r($y0 + $mg + .035) . '" width="' . $bw . '" height="' . $bb . '" rx=".09" fill="' . $dark . '" opacity=".45"/>'
+                        . '<rect x="' . $r($x0 + $mg) . '" y="' . $r($y0 + $mg) . '" width="' . $bw . '" height="' . $bb . '" rx=".09" fill="url(#' . $id . 'bs)"/>';
                 }
             }
         }
-        if ($tintOpacity > 0) {
-            $g .= '<rect x="0" y="0" width="' . $cols . '" height="' . $rows . '" fill="' . $tint . '" opacity="' . $tintOpacity . '"/>';
-        }
+        if ($op > 0) $g .= '<rect width="' . $r($a) . '" height="' . $r($b) . '" fill="' . $tint . '" opacity="' . $op . '"/>';
         return $g . '</g>';
     };
-    $lm = $f($c * $s, $h * $s, 0, $s, $ox - $L * $c * $s, $oy + $L * $h * $s - $H * $s);
+    $lmA = [$c * $s, $h * $s, 0, $s, $ox - $L * $c * $s, $oy + $L * $h * $s - $H * $s];
+    $lm = $f(...$lmA);
     $rm = $f($c * $s, -$h * $s, 0, $s, $ox + ($W - $L) * $c * $s, $oy + ($W + $L) * $h * $s - $H * $s);
     $tm = $f($c * $s, $h * $s, -$c * $s, $h * $s, $ox, $oy - $H * $s);
-    $o = $defs;
-    $o .= '<ellipse cx="' . round($ox + ($W - $L) * $c * $s / 2, 1) . '" cy="' . round($oy + ($W + $L) * $h * $s + 12, 1) . '" rx="' . round(($W + $L) * $c * $s / 1.9, 1) . '" ry="14" fill="#1f3a60" opacity=".22" filter="url(#' . $id . 'blur)"/>';
-    $o .= '<path d="M' . $f($ox - $L * $c * $s, $oy + $L * $h * $s) . ' L' . $f($ox + ($W - $L) * $c * $s, $oy + ($W + $L) * $h * $s) . ' L' . $f($ox + $W * $c * $s, $oy + $W * $h * $s)
-        . ' l0,7 L' . $f($ox + ($W - $L) * $c * $s, $oy + ($W + $L) * $h * $s + 7) . ' L' . $f($ox - $L * $c * $s, $oy + $L * $h * $s + 7) . 'z" fill="#3b4d66"/>';
-    $o .= $face($lm, $W, $H, '#ffffff', 0.0, true);
-    $o .= $face($rm, $L, $H, '#1f3a60', 0.16, true);
-    $o .= $face($tm, $W, $L, '#ffffff', 0.28, false);
+    $A = [$ox - $L * $c * $s, $oy + $L * $h * $s];
+    $B = [$ox + ($W - $L) * $c * $s, $oy + ($W + $L) * $h * $s];
+    $C = [$ox + $W * $c * $s, $oy + $W * $h * $s];
+    $o = '<defs>'
+        . '<linearGradient id="' . $id . 'pn" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="' . $light . '"/><stop offset="1" stop-color="' . $base . '"/></linearGradient>'
+        . '<linearGradient id="' . $id . 'bs" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".45" stop-color="' . $light . '"/><stop offset="1" stop-color="' . $base . '"/></linearGradient>'
+        . '</defs>';
+    // ground shadow + steel base
+    $o .= '<ellipse cx="' . $r(($A[0] + $C[0]) / 2) . '" cy="' . $r($B[1] + 12) . '" rx="' . $r($boxW / 1.9) . '" ry="14" fill="#1f3a60" opacity=".22" filter="url(#' . $id . 'blur)"/>';
+    $o .= '<path d="M' . $f(...$A) . ' L' . $f(...$B) . ' L' . $f(...$C) . ' l0,' . $bh . ' L' . $f($B[0], $B[1] + $bh) . ' L' . $f($A[0], $A[1] + $bh) . 'z" fill="#3b4d66"/>';
+    $o .= '<path d="M' . $f(...$A) . ' L' . $f(...$B) . ' L' . $f(...$C) . '" fill="none" stroke="#6d7f96" stroke-width="1.2"/>';
+    $o .= $face($lm, $W, $H, '#ffffff', 0.0, true) . $face($rm, $L, $H, '#1f3a60', 0.16, true) . $face($tm, $W, $L, '#ffffff', 0.28, false);
     // roof: manhole + vent
-    $o .= '<g transform="matrix(' . $tm . ')"><circle cx=".75" cy=".75" r=".33" fill="' . $dark . '"/><circle cx=".73" cy=".73" r=".27" fill="url(#' . $id . 'pn)"/><circle cx=".73" cy=".73" r=".27" fill="url(#' . $id . 'dm)" opacity=".7"/>'
-        . '<circle cx="' . ($W - .5) . '" cy="' . ($L - .5) . '" r=".13" fill="#3b4d66"/><circle cx="' . ($W - .52) . '" cy="' . ($L - .52) . '" r=".07" fill="#8b9bb0"/></g>';
-    // level gauge on the right face
-    $gx = $L - 0.35; $gh = $H - 0.45;
-    $o .= '<g transform="matrix(' . $rm . ')"><rect x="' . ($gx - .06) . '" y=".25" width=".12" height="' . $gh . '" rx=".06" fill="#ffffff" opacity=".9"/>'
-        . '<rect x="' . ($gx - .035) . '" y="' . (.25 + $gh * .3) . '" width=".07" height="' . ($gh * .7) . '" rx=".035" fill="#3b8fd1"/></g>';
-    // inlet pipe on the left face
-    $o .= '<g transform="matrix(' . $lm . ')"><circle cx=".5" cy=".45" r=".15" fill="#3b4d66"/><circle cx=".5" cy=".45" r=".09" fill="#9aa9bb"/><circle cx=".48" cy=".43" r=".04" fill="#e9eef3"/></g>';
+    $mx = min(.62, $W / 2); $my = min(.62, $L / 2);
+    $o .= '<g transform="matrix(' . $tm . ')"><circle cx="' . $mx . '" cy="' . $my . '" r=".32" fill="' . $dark . '"/><circle cx="' . $r($mx - .02) . '" cy="' . $r($my - .02) . '" r=".26" fill="url(#' . $id . 'bs)"/><circle cx="' . $r($mx - .02) . '" cy="' . $r($my - .02) . '" r=".26" fill="none" stroke="' . $dark . '" stroke-width=".03"/>';
+    if ($W + $L >= 3) $o .= '<circle cx="' . $r($W - .45) . '" cy="' . $r($L - .45) . '" r=".13" fill="#3b4d66"/><circle cx="' . $r($W - .47) . '" cy="' . $r($L - .47) . '" r=".07" fill="#8b9bb0"/>';
+    $o .= '</g>';
+    // right face: level gauge + ladder (rails continue above the roof)
+    $gh = max(.12, $H - .35);
+    $o .= '<g transform="matrix(' . $rm . ')"><rect x=".25" y=".2" width=".1" height="' . $r($gh) . '" rx=".05" fill="#fff" opacity=".9"/><rect x=".27" y="' . $r(.2 + $gh * .3) . '" width=".06" height="' . $r($gh * .7) . '" rx=".03" fill="#3b8fd1"/>';
+    $lx = max(.55, $L - .75); $top = -.42; $bot = $H + $bh / $s;
+    $rungs = '';
+    for ($y = $H - .22; $y > $top + .1; $y -= .26) $rungs .= 'M' . $r($lx) . ',' . $r($y) . 'h.34';
+    $o .= '<path d="M' . $r($lx) . ',' . $r($bot) . 'V' . $top . 'M' . $r($lx + .34) . ',' . $r($bot) . 'V' . $top . $rungs . '" fill="none" stroke="#56677b" stroke-width="1.6" vector-effect="non-scaling-stroke"/>'
+        . '<path d="M' . $r($lx) . ',' . $top . 'q.17,-.2 .34,0" fill="none" stroke="#56677b" stroke-width="1.6" vector-effect="non-scaling-stroke"/></g>';
+    // left face: inlet (top) and outlet (bottom) nozzles
+    $nozzle = function (float $x, float $y, float $rad) use ($lmA, $lm, $c, $h, $s, $r): string {
+        $px = $lmA[0] * $x + $lmA[2] * $y + $lmA[4];
+        $py = $lmA[1] * $x + $lmA[3] * $y + $lmA[5];
+        $dx = -$c * .3 * $s; $dy = $h * .3 * $s;
+        return '<g transform="matrix(' . $lm . ')"><circle cx="' . $r($x) . '" cy="' . $r($y) . '" r="' . $r($rad * 1.5) . '" fill="#56677b"/></g>'
+            . '<line x1="' . $r($px) . '" y1="' . $r($py) . '" x2="' . $r($px + $dx) . '" y2="' . $r($py + $dy) . '" stroke="#8494a6" stroke-width="' . $r(2 * $rad * $s) . '"/>'
+            . '<g transform="translate(' . $r($dx) . ',' . $r($dy) . ')"><g transform="matrix(' . $lm . ')"><circle cx="' . $r($x) . '" cy="' . $r($y) . '" r="' . $r($rad * 1.45) . '" fill="#6d7d90"/><circle cx="' . $r($x) . '" cy="' . $r($y) . '" r="' . $r($rad * .8) . '" fill="#2c3a4c"/></g></g>';
+    };
+    $o .= $nozzle(.5, min(.4, $H * .35), .075);
+    if ($W >= 1.5 || $H >= 1) $o .= $nozzle(min(1.5, $W - .5), $H - min(.35, $H * .35), .09);
+    if ($dims) {
+        $fmt = fn(float $mod) => number_format($mod * TANK_MODULE, 2, ',', '.') . ' m';
+        $ln = 'stroke="#1f3a60" stroke-opacity=".55" stroke-width="1"';
+        $txt = fn(float $x, float $y, int $rot, string $t) => '<text x="' . $r($x) . '" y="' . $r($y) . '" transform="rotate(' . $rot . ' ' . $r($x) . ' ' . $r($y) . ')" text-anchor="middle" dominant-baseline="middle" font-size="12.5" font-weight="700" fill="#1f3a60" stroke="#fff" stroke-width="3.5" paint-order="stroke" stroke-linejoin="round">' . $t . '</text>';
+        $dim = function (array $P, array $Q, array $n, int $rot, string $label) use ($bh, $f, $ln, $txt): string {
+            $off = 14;
+            $P2 = [$P[0] + $n[0] * $off, $P[1] + $bh + $n[1] * $off];
+            $Q2 = [$Q[0] + $n[0] * $off, $Q[1] + $bh + $n[1] * $off];
+            $tick = fn(array $X) => 'M' . $f($X[0] - $n[0] * 4, $X[1] - $n[1] * 4) . 'L' . $f($X[0] + $n[0] * 4, $X[1] + $n[1] * 4);
+            return '<path d="M' . $f($P[0] + $n[0] * 3, $P[1] + $bh + $n[1] * 3) . 'L' . $f($P2[0] + $n[0] * 3, $P2[1] + $n[1] * 3)
+                . 'M' . $f($Q[0] + $n[0] * 3, $Q[1] + $bh + $n[1] * 3) . 'L' . $f($Q2[0] + $n[0] * 3, $Q2[1] + $n[1] * 3)
+                . 'M' . $f(...$P2) . 'L' . $f(...$Q2) . $tick($P2) . $tick($Q2) . '" fill="none" ' . $ln . '/>'
+                . $txt(($P2[0] + $Q2[0]) / 2 + $n[0] * 12, ($P2[1] + $Q2[1]) / 2 + $n[1] * 12, $rot, $label);
+        };
+        $o .= $dim($A, $B, [-$c, $h], 30, $fmt($W)) . $dim($B, $C, [$c, $h], -30, $fmt($L));
+        $x = $C[0] + 16; $y1 = $C[1] + $bh; $y2 = $C[1] - $H * $s;
+        $o .= '<path d="M' . $r($C[0] + 4) . ',' . $r($y1) . 'H' . $r($x + 3) . 'M' . $r($C[0] + 4) . ',' . $r($y2) . 'H' . $r($x + 3) . 'M' . $r($x) . ',' . $r($y1) . 'V' . $r($y2)
+            . 'M' . $r($x - 4) . ',' . $r($y1) . 'h8M' . $r($x - 4) . ',' . $r($y2) . 'h8" fill="none" ' . $ln . '/>' . $txt($x + 13, ($y1 + $y2) / 2, -90, $fmt($H));
+    }
     return $o;
 }
 
@@ -270,4 +340,44 @@ function svg_drain(string $id): string
     }
     $o .= '<path d="M172 268h136" stroke="#3b4d66" stroke-width="10" stroke-linecap="round"/>';
     return $o;
+}
+
+/** Relative wall cost per module of perimeter: lower rows carry more pressure → thicker sheet (+15 % per row). */
+function tank_wall_factor(float $H): float
+{
+    $sum = 0.0;
+    foreach (tank_cells($H) as [$y, $z]) {
+        $top = $H - $y - $z; // rows counted from the top, half row first
+        $sum += $z * (1 + 0.15 * ($top + $z - 1));
+    }
+    return $sum;
+}
+
+/** Tank options for a required volume (m³), cheapest first (mirrors tankOptions() in assets/js/site.js). */
+function tank_options(float $need, float $maxH = 3, float $maxA = 20, float $maxB = 20): array
+{
+    $out = [];
+    for ($h2 = 1; $h2 <= $maxH * 2; $h2++) {
+        $H = $h2 / 2;
+        for ($w2 = 2; $w2 <= 40; $w2++) {
+            $W = $w2 / 2;
+            for ($l2 = 2; $l2 <= $w2; $l2++) {
+                $L = $l2 / 2;
+                if (!(($W <= $maxA && $L <= $maxB) || ($W <= $maxB && $L <= $maxA))) continue;
+                $v = tank_volume($W, $L, $H);
+                if ($v < $need) continue;
+                $p = tank_panels($W, $L, $H);
+                $out[] = ['W' => $W, 'L' => $L, 'H' => $H, 'v' => $v, 'cost' => 2 * $W * $L + 2 * ($W + $L) * tank_wall_factor($H) + 0.3 * ($p['half'] + $p['quarter'])];
+                break;
+            }
+        }
+    }
+    usort($out, fn($a, $b) => [$a['cost'], $a['v']] <=> [$b['cost'], $b['v']]);
+    return $out;
+}
+
+/** "2,5" style module number. */
+function tank_mod(float $x): string
+{
+    return str_replace('.', ',', (string)(float)$x);
 }
