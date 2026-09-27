@@ -1,5 +1,6 @@
 import { sb, check, esc, icon, $, $$, toast, SITE_URL } from './lib.js';
 import * as V from './views.js';
+import { LOGO, LOGO_LIGHT } from './logo.js';
 
 const app = document.getElementById('app');
 
@@ -46,7 +47,7 @@ let renderId = 0;
 /* ---------- Auth screens ---------- */
 const AUTH_SIDE = `
   <div class="auth__side">
-    <div class="auth__brand"><span class="logo-mark">${icon('panels')}</span><div><strong>Çetinkaya</strong><small>Yönetim Paneli</small></div></div>
+    <div class="auth__brand">${LOGO_LIGHT}<small>Yönetim Paneli</small></div>
     <div>
       <h1>Ürünlerinizi, tekliflerinizi ve site içeriğinizi tek yerden yönetin.</h1>
       <ul>
@@ -141,7 +142,7 @@ function shell() {
   app.innerHTML = `
     <div class="app">
       <aside class="sidebar" id="sidebar">
-        <a href="#/" class="sidebar__brand"><span class="logo-mark">${icon('panels')}</span><div><strong>Çetinkaya</strong><small>Yönetim Paneli</small></div></a>
+        <a href="#/" class="sidebar__brand" aria-label="Genel bakış">${LOGO}<small>Yönetim Paneli</small></a>
         <nav class="sidebar__nav">
           ${MENU.map(([key, label, ic, href]) => (key === null
             ? `<div class="sidebar__label">${label}</div>`

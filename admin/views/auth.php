@@ -12,7 +12,7 @@
 <body class="auth-body">
   <div class="auth">
     <div class="auth__side">
-      <div class="auth__brand"><span class="logo-mark"><?= icon('panels') ?></span><div><strong>Çetinkaya</strong><small>Yönetim Paneli</small></div></div>
+      <div class="auth__brand"><?= str_replace(['logo__svg', 'lgS'], ['brand-logo', 'lgL'], site_logo(true)) ?><small>Yönetim Paneli</small></div>
       <div>
         <h1>Ürünlerinizi, tekliflerinizi ve site içeriğinizi tek yerden yönetin.</h1>
         <ul>

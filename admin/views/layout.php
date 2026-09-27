@@ -34,7 +34,7 @@ $menu = [
 <body>
 <div class="app">
   <aside class="sidebar" id="sidebar">
-    <a href="/admin/" class="sidebar__brand"><span class="logo-mark"><?= icon('panels') ?></span><div><strong>Çetinkaya</strong><small>Yönetim Paneli</small></div></a>
+    <a href="/admin/" class="sidebar__brand"><?= str_replace('logo__svg', 'brand-logo', site_logo()) ?><small>Yönetim Paneli</small></a>
     <nav class="sidebar__nav">
       <?php foreach ($menu as $m): ?>
         <?php if ($m[0] === null): ?>
