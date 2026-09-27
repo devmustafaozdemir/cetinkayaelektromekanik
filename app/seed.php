@@ -7,7 +7,7 @@ function db_seed(): void
     $pdo = db();
     $pdo->beginTransaction();
 
-    $settings = [
+    $settings = text_defaults() + [
         'site_name'        => 'Çetinkaya Elektromekanik',
         'site_tagline'     => 'Modüler Su Depoları · Pompa ve Hidrofor Sistemleri',
         'meta_description' => 'Kocaeli / İzmit\'te Meksis modüler su depoları, Grundfos, Wilo, Standart Pompa ve Sumak pompa ve hidrofor sistemleri satışı. Projeye özel keşif, teklif, montaj ve servis.',

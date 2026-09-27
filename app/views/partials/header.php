@@ -4,11 +4,12 @@ $nav = [
     'designer' => ['/depo-tasarla', 'Depo Tasarla'],
     'brands'   => ['/markalar', 'Markalar'],
     'services' => ['/hizmetler', 'Hizmetler'],
-    'about'    => ['/hakkimizda', 'Hakkımızda'],
+    'about'    => ['/hakkimizda', 'Kurumsal'],
     'blog'     => ['/blog', 'Blog'],
     'contact'  => ['/iletisim', 'İletişim'],
 ];
 $navCats = q_all('SELECT name, slug, art FROM product_categories ORDER BY sort, id');
+$navCorp = [['/hakkimizda', 'Hakkımızda', 'building'], ['/referanslar', 'Referanslar', 'award'], ['/cozum-ortaklari', 'Çözüm Ortakları', 'handshake'], ['/sss', 'Sık Sorulan Sorular', 'help']];
 ?>
 <div class="topbar">
   <div class="container topbar__inner">
@@ -34,6 +35,13 @@ $navCats = q_all('SELECT name, slug, art FROM product_categories ORDER BY sort, 
                 <a href="/urunler/kategori/<?= e($c['slug']) ?>" class="mega__item"><span class="mega__art"><?= product_art($c['art']) ?></span><?= e($c['name']) ?></a>
               <?php endforeach; ?>
               <a href="/urunler" class="mega__all">Tüm ürünleri gör</a>
+            </div>
+          </li>
+          <?php elseif ($key === 'about'): ?>
+          <li class="has-mega">
+            <a href="<?= $href ?>"<?= $active === $key ? ' aria-current="page"' : '' ?>><?= e($label) ?> <?= icon('chevron-down', 'icon icon--sm') ?></a>
+            <div class="mega mega--list">
+              <?php foreach ($navCorp as [$h, $l, $ic]): ?><a href="<?= $h ?>" class="mega__item"><span class="mega__ic"><?= icon($ic) ?></span><?= e($l) ?></a><?php endforeach; ?>
             </div>
           </li>
           <?php else: ?>

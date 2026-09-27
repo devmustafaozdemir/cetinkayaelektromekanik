@@ -23,7 +23,7 @@ Modüler su depoları, pompa ve hidrofor sistemleri satışı için kurumsal web
 - **Ürün kataloğu:** kategoriler, marka filtresi, arama, ürün detay sayfası (teknik özellik tablosu, benzer ürünler)
 - **Teklif sistemi:** her üründe “Teklif İste”, ana sayfada hızlı teklif formu, talep türleri (ürün, proje/keşif, montaj, bakım-servis); müşteriye talep numarası verilir
 - Markalar sayfası (Meksis, Grundfos, Wilo, Standart Pompa, Sumak)
-- Hizmetler (keşif, montaj, bakım, sevkiyat), Kurumsal, SSS, İletişim + harita, WhatsApp butonu
+- Hizmetler (keşif, montaj, bakım, sevkiyat), Kurumsal menüsü (Hakkımızda, **Referanslar**, **Çözüm Ortakları**, SSS), İletişim + harita, WhatsApp butonu
 - **Blog:** kategori, arama, öne çıkan yazı, içindekiler, okuma çubuğu, paylaşım, ilgili yazılar
 - SEO: meta/OG etiketleri, `sitemap.xml`, `robots.txt`, Store / Product / BlogPosting / FAQPage yapısal verileri
 
@@ -32,7 +32,8 @@ Modüler su depoları, pompa ve hidrofor sistemleri satışı için kurumsal web
 - **Teklif talepleri:** satış durumu (Yeni → İletişime Geçildi → Teklif Verildi → Satışa Döndü / Olumsuz), iç notlar, geçmiş, tek tıkla arama/WhatsApp/e-posta, telefonla gelen talepler için elle kayıt
 - **Ürünler:** görsel yükleme (otomatik WebP), zengin metin açıklama, teknik özellikler, marka, öne çıkarma, yayında/gizli
 - **Ürün kategorileri:** sürükle-bırak sıralama, kategori çizimi seçimi
-- Blog yazıları ve kategorileri, hizmetler, SSS, mesajlar
+- Blog yazıları ve kategorileri, hizmetler, SSS, mesajlar, referanslar ve çözüm ortakları (logo yükleme, sıralama)
+- **Sayfa Metinleri:** ana sayfa bölüm başlıkları, çalışma adımları, alt bilgi ve teklif sayfası metinleri; **Depo Tasarla:** kullanım yerleri ve günlük tüketim değerleri
 - Site ayarları: iletişim bilgileri, markalar, ana sayfa metinleri, istatistikler, kurumsal metin, sosyal medya
 - Çoklu yönetici, şifre değiştirme, şifremi unuttum (Supabase)
 

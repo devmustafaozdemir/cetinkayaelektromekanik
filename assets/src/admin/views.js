@@ -758,3 +758,70 @@ export async function settings({ id }) {
     },
   };
 }
+
+/* =================== References & partners (logo lists) =================== */
+function logoList({ table, route, title, noun, fields, meta }) {
+  return async ({ query }) => {
+    const rows = check(await sb.from(table).select('*').order('sort').order('id'));
+    const edit = rows.find((r) => String(r.id) === query.get('id')) || null;
+    const isNew = query.get('id') === 'yeni';
+    const showForm = edit || isNew || !rows.length;
+    const r = edit || {};
+    return {
+      title,
+      html: `<div class="grid-2 grid-2--aside">
+        <div>
+          <div class="page-head"><p class="muted small">${rows.length} kayıt · sıralama sitede görünen sıradır.</p><a href="#/${route}?id=yeni" class="btn btn--primary">${icon('plus')} Yeni ${noun}</a></div>
+          <div class="card card--flush">${rows.length ? `<table class="table"><tbody>${rows.map((x, i) => `<tr>
+            <td><div class="row-title">${x.logo ? `<span class="thumb thumb--logo"><img src="${esc(x.logo)}" alt=""></span>` : `<span class="thumb">${esc(x.name.charAt(0))}</span>`}<span>${esc(x.name)}<small>${esc(meta(x))}</small></span></div></td>
+            <td>${x.active ? '' : '<span class="status status--slate">Gizli</span>'}${x.featured === 0 ? '<span class="status status--slate">Ana sayfada yok</span>' : ''}</td>
+            <td class="actions">${moveButtons(i, rows.length)}<a href="#/${route}?id=${x.id}" class="icon-btn" title="Düzenle">${icon('edit')}</a><button class="icon-btn icon-btn--danger" data-del="${x.id}" title="Sil">${icon('trash')}</button></td></tr>`).join('')}</tbody></table>`
+            : empty('award', `Henüz ${noun.toLocaleLowerCase('tr-TR')} eklenmedi`, 'Sağdaki formdan ilk kaydı ekleyin; sitede ilgili sayfada görünür.')}</div>
+        </div>
+        ${showForm ? `<form class="card form-stack sticky" data-form><h3>${edit ? `${noun} düzenle` : `Yeni ${noun.toLocaleLowerCase('tr-TR')}`}</h3>
+          ${fields.map(([name, label, type]) => (type === 'textarea' ? area(name, label, r[name] || '', 3) : field(name, label, r[name] || '', type || 'text', name === 'name' ? 'required' : ''))).join('')}
+          <div class="field"><span>Logo <small class="muted">(isteğe bağlı, şeffaf PNG önerilir)</small></span>${dropzone('logo_file', r.logo, 'Logo seçin')}${r.logo ? '<label class="check"><input type="checkbox" name="remove_logo" value="1"> Logoyu kaldır</label>' : ''}</div>
+          ${sw('active', 'Sitede göster', edit ? edit.active : 1)}
+          ${table === 'refs' ? sw('featured', 'Ana sayfada göster', edit ? edit.featured : 1) : ''}
+          <button class="btn btn--primary btn--block" data-save>${icon('check')} Kaydet</button>${edit || isNew ? `<a href="#/${route}" class="btn btn--block">Vazgeç</a>` : ''}
+          ${publishNote}
+        </form>` : `<div class="card"><h3>${title}</h3><p class="muted small">Düzenlemek için listeden bir kayda tıklayın ya da “Yeni ${noun}” ile ekleyin.</p></div>`}
+      </div>`,
+      mount(root) {
+        imageWire(root);
+        $$('[data-move]', root).forEach((b) => b.onclick = () => move(table, rows, Number(b.dataset.move), Number(b.dataset.dir)));
+        $$('[data-del]', root).forEach((b) => b.onclick = async () => {
+          if (!confirmDelete(noun)) return;
+          try { check(await sb.from(table).delete().eq('id', b.dataset.del)); toast(`${noun} silindi.`); go(`#/${route}`); window.dispatchEvent(new HashChangeEvent('hashchange')); } catch (e) { toast(e.message, 'error'); }
+        });
+        const form = $('[data-form]', root);
+        form?.addEventListener('submit', (e) => {
+          e.preventDefault();
+          withBusy($('[data-save]', form), async () => {
+            const d = Object.fromEntries(fields.map(([name]) => [name, val(form, name)]));
+            d.active = checked(form, 'active');
+            if (table === 'refs') d.featured = checked(form, 'featured');
+            if (!d.name) throw new Error('Ad zorunludur.');
+            if (d.url && !/^https?:\/\//.test(d.url)) d.url = 'https://' + d.url;
+            const f = form.elements.logo_file.files[0];
+            if (f) d.logo = await uploadImage(f, table, 600); else if (checked(form, 'remove_logo')) d.logo = '';
+            if (edit) check(await sb.from(table).update(d).eq('id', edit.id).select());
+            else check(await sb.from(table).insert({ ...d, sort: rows.length + 1 }).select());
+            toast(`${noun} kaydedildi.`); go(`#/${route}`); window.dispatchEvent(new HashChangeEvent('hashchange'));
+          });
+        });
+      },
+    };
+  };
+}
+
+export const references = logoList({
+  table: 'refs', route: 'referanslar', title: 'Referanslar', noun: 'Referans',
+  fields: [['name', 'Müşteri / proje adı *'], ['project', 'Yapılan iş', 'textarea'], ['sector', 'Sektör (örn. Konut, Sanayi)'], ['city', 'Şehir / ilçe'], ['year', 'Yıl']],
+  meta: (x) => [x.sector, x.city, x.year].filter(Boolean).join(' · '),
+});
+export const partners = logoList({
+  table: 'partners', route: 'cozum-ortaklari', title: 'Çözüm Ortakları', noun: 'Çözüm ortağı',
+  fields: [['name', 'Firma adı *'], ['kind', 'İş birliği türü (örn. Montaj, Tedarik)'], ['description', 'Kısa açıklama', 'textarea'], ['url', 'Web sitesi (örn. firma.com.tr)']],
+  meta: (x) => [x.kind, x.url].filter(Boolean).join(' · '),
+});

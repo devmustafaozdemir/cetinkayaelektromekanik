@@ -9,7 +9,7 @@ $materials = ['galvaniz' => 'Galvaniz', 'paslanmaz' => 'Paslanmaz', 'grp' => 'GR
 $vol = tank_volume($w, $l, $h);
 $pc = tank_panels($w, $l, $h);
 $m = fn(float $mod) => number_format($mod * TANK_MODULE, 2, ',', '.');
-$uses = ['konut' => 'Konut', 'villa' => 'Villa / müstakil ev', 'ofis' => 'Ofis / iş yeri', 'okul' => 'Okul', 'otel' => 'Otel', 'hastane' => 'Hastane', 'fabrika' => 'Fabrika / sanayi'];
+$uses = water_uses();
 ?>
 <div class="sizer<?= $full ? ' sizer--full' : '' ?>" data-designer="<?= $full ? 'full' : 'compact' ?>" data-viewer="<?= e(asset('js/viewer3d.js')) ?>">
   <div class="sizer__view">
@@ -64,13 +64,13 @@ $uses = ['konut' => 'Konut', 'villa' => 'Villa / müstakil ev', 'ofis' => 'Ofis 
     <?php if ($full): ?>
       <form class="need" data-need-form data-pane="ihtiyac" hidden novalidate>
         <label class="field"><span>Kullanım yeri</span>
-          <select name="use"><?php foreach ($uses as $k => $label): ?><option value="<?= $k ?>"><?= e($label) ?></option><?php endforeach; ?></select>
+          <select name="use"><?php foreach ($uses as $i => [$label, $lpd, $count, $hint]): ?><option value="<?= $i ?>" data-lpd="<?= $lpd ?>" data-count="<?= e($count) ?>" data-hint="<?= e($hint) ?>"><?= e($label) ?></option><?php endforeach; ?></select>
         </label>
         <div class="need__row">
-          <label class="field"><span data-count-label>Kişi sayısı</span><input type="number" name="people" value="80" min="1" max="100000" inputmode="numeric"></label>
-          <label class="field"><span>Günlük tüketim <small>L/kişi</small></span><input type="number" name="lpd" value="150" min="1" max="2000" inputmode="numeric"></label>
+          <label class="field"><span data-count-label><?= e($uses[0][2] ?? 'Kişi sayısı') ?></span><input type="number" name="people" value="80" min="1" max="100000" inputmode="numeric"></label>
+          <label class="field"><span>Günlük tüketim <small>L/kişi</small></span><input type="number" name="lpd" value="<?= (int)($uses[0][1] ?? 150) ?>" min="1" max="2000" inputmode="numeric"></label>
         </div>
-        <p class="need__hint" data-use-hint>Konutta yaklaşık daire sayısı × 4 kişi.</p>
+        <p class="need__hint" data-use-hint><?= e($uses[0][3] ?? '') ?></p>
         <div class="field"><span>Yedek süre</span>
           <div class="chips" role="group" aria-label="Yedek süre">
             <?php foreach (['0.5' => '½ gün', '1' => '1 gün', '1.5' => '1,5 gün', '2' => '2 gün', '3' => '3 gün'] as $d => $label): ?>

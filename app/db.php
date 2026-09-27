@@ -87,6 +87,28 @@ CREATE TABLE IF NOT EXISTS services (
     sort    INTEGER NOT NULL DEFAULT 0,
     active  INTEGER NOT NULL DEFAULT 1
 );
+CREATE TABLE IF NOT EXISTS refs (
+    id       INTEGER PRIMARY KEY AUTOINCREMENT,
+    name     TEXT NOT NULL,
+    sector   TEXT NOT NULL DEFAULT '',
+    city     TEXT NOT NULL DEFAULT '',
+    project  TEXT NOT NULL DEFAULT '',
+    year     TEXT NOT NULL DEFAULT '',
+    logo     TEXT NOT NULL DEFAULT '',
+    featured INTEGER NOT NULL DEFAULT 1,
+    sort     INTEGER NOT NULL DEFAULT 0,
+    active   INTEGER NOT NULL DEFAULT 1
+);
+CREATE TABLE IF NOT EXISTS partners (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    name        TEXT NOT NULL,
+    kind        TEXT NOT NULL DEFAULT '',
+    description TEXT NOT NULL DEFAULT '',
+    logo        TEXT NOT NULL DEFAULT '',
+    url         TEXT NOT NULL DEFAULT '',
+    sort        INTEGER NOT NULL DEFAULT 0,
+    active      INTEGER NOT NULL DEFAULT 1
+);
 CREATE TABLE IF NOT EXISTS faqs (
     id       INTEGER PRIMARY KEY AUTOINCREMENT,
     question TEXT NOT NULL,

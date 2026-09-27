@@ -64,11 +64,9 @@
       <?php endif; ?>
     </div>
     <aside class="aside-box">
-      <h2>Bundan sonra</h2>
+      <h2><?= e(setting('quote_next_title')) ?></h2>
       <ol class="next-steps">
-        <li><strong>Talep numaranız oluşur</strong><span>Ekibimize anında bildirim gider.</span></li>
-        <li><strong>Sizi ararız</strong><span>Eksik bilgi varsa birlikte tamamlarız.</span></li>
-        <li><strong>Teklifi göndeririz</strong><span>Ürün, sevkiyat ve montaj ayrı kalemlerle.</span></li>
+        <?php foreach (setting_pairs('quote_next') as [$h, $t]): ?><li><strong><?= e($h) ?></strong><span><?= e($t) ?></span></li><?php endforeach; ?>
       </ol>
       <hr class="aside-box__rule">
       <p>Acil ihtiyaçlarda doğrudan arayın.</p>

@@ -73,6 +73,8 @@ $tables = [
     'posts'              => ['published_at', 'created_at', 'updated_at'],
     'services'           => [],
     'faqs'               => [],
+    'refs'               => [],
+    'partners'           => [],
 ];
 $html = ['products' => 'content', 'posts' => 'content', 'services' => 'content'];
 $counts = [];

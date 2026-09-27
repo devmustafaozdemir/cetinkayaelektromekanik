@@ -29,6 +29,7 @@ function page_home(): void
         'services'   => q_all('SELECT * FROM services WHERE active = 1 ORDER BY sort, id LIMIT 4'),
         'posts'      => q_all('SELECT p.*, c.name AS category, c.slug AS category_slug ' . published_posts_sql() . ' ORDER BY p.featured DESC, p.published_at DESC LIMIT 3'),
         'faqs'       => q_all('SELECT * FROM faqs WHERE active = 1 ORDER BY sort, id LIMIT 5'),
+        'refs'       => q_all('SELECT * FROM refs WHERE active = 1 AND featured = 1 ORDER BY sort, id LIMIT 8'),
         'schema'     => local_business_schema(),
     ]);
 }
@@ -179,6 +180,26 @@ function page_about(): void
         'title'       => 'Hakkımızda',
         'description' => excerpt(setting('about_text'), 160),
         'active'      => 'about',
+    ]);
+}
+
+function page_refs(): void
+{
+    render('refs', [
+        'title'       => 'Referanslar',
+        'description' => setting('refs_lead'),
+        'active'      => 'about',
+        'refs'        => q_all('SELECT * FROM refs WHERE active = 1 ORDER BY sort, id'),
+    ]);
+}
+
+function page_partners(): void
+{
+    render('partners', [
+        'title'       => 'Çözüm Ortakları',
+        'description' => setting('partners_lead'),
+        'active'      => 'about',
+        'partners'    => q_all('SELECT * FROM partners WHERE active = 1 ORDER BY sort, id'),
     ]);
 }
 
@@ -452,7 +473,7 @@ function page_sitemap(): void
 {
     header('Content-Type: application/xml; charset=utf-8');
     $b = base_url();
-    $urls = [['/', null], ['/depo-tasarla', null], ['/urunler', null], ['/markalar', null], ['/hizmetler', null], ['/hakkimizda', null], ['/blog', null], ['/sss', null], ['/iletisim', null], ['/teklif-al', null]];
+    $urls = [['/', null], ['/depo-tasarla', null], ['/urunler', null], ['/markalar', null], ['/hizmetler', null], ['/hakkimizda', null], ['/referanslar', null], ['/cozum-ortaklari', null], ['/blog', null], ['/sss', null], ['/iletisim', null], ['/teklif-al', null]];
     foreach (q_all('SELECT slug FROM product_categories') as $c) $urls[] = ['/urunler/kategori/' . $c['slug'], null];
     foreach (q_all('SELECT slug, updated_at FROM products WHERE active = 1') as $p) $urls[] = ['/urunler/' . $p['slug'], $p['updated_at']];
     foreach (q_all('SELECT slug FROM services WHERE active = 1') as $s) $urls[] = ['/hizmetler/' . $s['slug'], null];

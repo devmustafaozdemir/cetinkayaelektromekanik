@@ -229,15 +229,6 @@
     return out.sort((a, b) => a.cost - b.cost || a.v - b.v);
   }
 
-  const USES = {
-    konut: ['Konut', 150, 'Kişi sayısı', 'Konutta yaklaşık daire sayısı × 4 kişi.'],
-    villa: ['Villa / müstakil ev', 200, 'Kişi sayısı', ''],
-    ofis: ['Ofis / iş yeri', 50, 'Çalışan sayısı', ''],
-    okul: ['Okul', 40, 'Öğrenci + personel', ''],
-    otel: ['Otel', 250, 'Yatak sayısı', ''],
-    hastane: ['Hastane', 500, 'Yatak sayısı', ''],
-    fabrika: ['Fabrika / sanayi', 80, 'Çalışan sayısı', 'Proses suyu varsa günlük tüketime ekleyin.'],
-  };
 
   $$('[data-designer]').forEach((root) => {
     const st = { w: 4, l: 3, h: 2, material: 'galvaniz' };
@@ -329,7 +320,8 @@
     let days = 1;
     function calcNeed(applyBest) {
       if (!nform) return;
-      const use = USES[nform.elements.use.value] || USES.konut;
+      const uo = nform.elements.use.selectedOptions[0];
+      const use = [uo.text, +uo.dataset.lpd, uo.dataset.count, uo.dataset.hint];
       const people = Math.max(0, +nform.elements.people.value || 0);
       const lpd = Math.max(0, +nform.elements.lpd.value || 0);
       const fire = Math.max(0, +nform.elements.fire.value || 0);
@@ -365,7 +357,7 @@
     }
     if (nform) {
       nform.addEventListener('submit', (e) => e.preventDefault());
-      nform.elements.use.addEventListener('change', () => { nform.elements.lpd.value = (USES[nform.elements.use.value] || USES.konut)[1]; calcNeed(true); });
+      nform.elements.use.addEventListener('change', () => { nform.elements.lpd.value = nform.elements.use.selectedOptions[0].dataset.lpd; calcNeed(true); });
       $$('[data-days]', nform).forEach((b) => b.addEventListener('click', () => {
         days = +b.dataset.days;
         $$('[data-days]', nform).forEach((x) => x.setAttribute('aria-pressed', String(x === b)));

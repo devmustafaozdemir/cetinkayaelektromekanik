@@ -1,7 +1,7 @@
 <?php
 partial('page-hero', ['heading' => 'Depo Tasarla', 'lead' => 'Modüler su deponuzu ölçüye ya da ihtiyacınıza göre tasarlayın. Hacim, dış ölçü ve panel listesi anında hesaplanır; beğendiğiniz depo için tek tıkla teklif isteyin.', 'crumbs' => [[null, 'Depo Tasarla']]]);
 $m = fn(float $mod) => number_format($mod * TANK_MODULE, 2, ',', '.');
-$uses = [['Konut', 150, 'kişi'], ['Villa / müstakil ev', 200, 'kişi'], ['Ofis / iş yeri', 50, 'çalışan'], ['Okul', 40, 'öğrenci + personel'], ['Otel', 250, 'yatak'], ['Hastane', 500, 'yatak'], ['Fabrika / sanayi', 80, 'çalışan']];
+$uses = water_uses();
 $sizes = [];
 foreach ([5, 10, 20, 30, 50, 75, 100, 150, 200] as $v) {
     $o = tank_options((float)$v)[0] ?? null;
@@ -44,7 +44,7 @@ foreach ([5, 10, 20, 30, 50, 75, 100, 150, 200] as $v) {
         <caption>Ortalama günlük su tüketimi</caption>
         <thead><tr><th>Kullanım</th><th>Litre / gün</th></tr></thead>
         <tbody>
-          <?php foreach ($uses as [$label, $lpd, $per]): ?><tr><td><?= e($label) ?></td><td><?= $lpd ?> L <small class="muted">/ <?= e($per) ?></small></td></tr><?php endforeach; ?>
+          <?php foreach ($uses as [$label, $lpd, $per]): ?><tr><td><?= e($label) ?></td><td><?= $lpd ?> L <small class="muted">/ <?= e(mb_strtolower(preg_replace('/\s*sayısı$/u', '', $per))) ?></small></td></tr><?php endforeach; ?>
         </tbody>
       </table>
     </div>

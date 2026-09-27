@@ -17,6 +17,9 @@ const MENU = [
   ['categories', 'Blog Kategorileri', 'tag', '#/blog-kategorileri'],
   ['services', 'Hizmetler', 'layers', '#/hizmetler'],
   ['faqs', 'SSS', 'help', '#/sss'],
+  [null, 'Kurumsal'],
+  ['refs', 'Referanslar', 'award', '#/referanslar'],
+  ['partners', 'Çözüm Ortakları', 'handshake', '#/cozum-ortaklari'],
   [null, 'Sistem'],
   ['settings', 'Site Ayarları', 'settings', '#/ayarlar'],
   ['account', 'Hesabım', 'users', '#/hesabim'],
@@ -36,6 +39,8 @@ const ROUTES = [
   [/^\/hizmetler$/, V.services, 'services'],
   [/^\/hizmetler\/(\d+|yeni)$/, V.serviceEdit, 'services'],
   [/^\/sss$/, V.faqs, 'faqs'],
+  [/^\/referanslar$/, V.references, 'refs'],
+  [/^\/cozum-ortaklari$/, V.partners, 'partners'],
   [/^\/ayarlar(?:\/([a-z]+))?$/, V.settings, 'settings'],
   [/^\/hesabim$/, account, 'account'],
 ];

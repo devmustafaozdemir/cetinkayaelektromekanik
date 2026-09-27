@@ -6,8 +6,8 @@ $hours = setting_lines('hours');
 <footer class="footer">
   <div class="container footer__cta">
     <div>
-      <h2>Projenizin ölçülerini bize gönderin, fiyatı biz hesaplayalım.</h2>
-      <p>Depo hacmi, bina yüksekliği ya da ihtiyaç duyduğunuz debi; elinizdeki bilgi ne ise onunla başlayabiliriz.</p>
+      <h2><?= e(setting('footer_cta_title')) ?></h2>
+      <p><?= e(setting('footer_cta_text')) ?></p>
     </div>
     <div class="footer__cta-actions">
       <a href="/teklif-al" class="btn btn--signal btn--lg">Teklif iste</a>
@@ -35,6 +35,9 @@ $hours = setting_lines('hours');
       <h3>Firma</h3>
       <ul>
         <li><a href="/hakkimizda">Hakkımızda</a></li>
+        <li><a href="/referanslar">Referanslar</a></li>
+        <li><a href="/cozum-ortaklari">Çözüm ortakları</a></li>
+        <li><a href="/depo-tasarla">Depo tasarla</a></li>
         <li><a href="/hizmetler">Hizmetler</a></li>
         <li><a href="/blog">Blog</a></li>
         <li><a href="/sss">Sık sorulan sorular</a></li>

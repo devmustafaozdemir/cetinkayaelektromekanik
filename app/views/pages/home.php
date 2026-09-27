@@ -16,9 +16,7 @@ $tints = ['tank' => 'sky', 'booster' => 'navy', 'pump' => 'mist', 'submersible' 
         <a href="<?= e(tel_href(setting('phone'))) ?>" class="btn btn--line btn--lg"><?= icon('phone') ?> <?= e(setting('phone')) ?></a>
       </div>
       <ul class="hero__trust">
-        <li><?= icon('check-circle') ?> Orijinal ve garantili ürün</li>
-        <li><?= icon('check-circle') ?> Ücretsiz kapasite hesabı</li>
-        <li><?= icon('check-circle') ?> Montaj ve servis desteği</li>
+        <?php foreach (setting_lines('hero_trust') as $t): ?><li><?= icon('check-circle') ?> <?= e($t) ?></li><?php endforeach; ?>
       </ul>
     </div>
 
@@ -53,9 +51,9 @@ $tints = ['tank' => 'sky', 'booster' => 'navy', 'pump' => 'mist', 'submersible' 
 <section class="block">
   <div class="container">
     <div class="block__head block__head--center">
-      <span class="kicker">Ürün grupları</span>
-      <h2>Su tesisatının her halkası için</h2>
-      <p>Depolamadan basınçlandırmaya, kuyudan drenaja kadar ihtiyacınız olan ürünler tek adreste.</p>
+      <span class="kicker"><?= e(setting('home_cats_kicker')) ?></span>
+      <h2><?= e(setting('home_cats_title')) ?></h2>
+      <p><?= e(setting('home_cats_text')) ?></p>
     </div>
     <div class="cat-grid">
       <?php foreach ($categories as $c): ?>
@@ -76,7 +74,7 @@ $tints = ['tank' => 'sky', 'booster' => 'navy', 'pump' => 'mist', 'submersible' 
 <section class="block block--soft">
   <div class="container">
     <div class="block__head block__head--row">
-      <div><span class="kicker">Öne çıkanlar</span><h2>Sık teklif istenen ürünler</h2></div>
+      <div><span class="kicker"><?= e(setting('home_featured_kicker')) ?></span><h2><?= e(setting('home_featured_title')) ?></h2></div>
       <a href="/urunler" class="btn btn--line">Tüm ürünler <?= icon('arrow-right') ?></a>
     </div>
     <div class="product-grid">
@@ -89,14 +87,13 @@ $tints = ['tank' => 'sky', 'booster' => 'navy', 'pump' => 'mist', 'submersible' 
 <section class="block">
   <div class="container">
     <div class="block__head block__head--center">
-      <span class="kicker">Nasıl çalışıyoruz?</span>
-      <h2>Talebinizden teslimata 4 adım</h2>
+      <span class="kicker"><?= e(setting('home_steps_kicker')) ?></span>
+      <h2><?= e(setting('home_steps_title')) ?></h2>
     </div>
     <ol class="steps">
-      <li><span class="steps__icon"><?= icon('clipboard') ?></span><h3>İhtiyacı konuşuruz</h3><p>Kullanım amacı, daire sayısı, kurulum alanı ve mevcut tesisat.</p></li>
-      <li><span class="steps__icon"><?= icon('ruler') ?></span><h3>Kapasiteyi hesaplarız</h3><p>Depo hacmi, debi ve basma yüksekliğine göre doğru ürünü seçeriz.</p></li>
-      <li><span class="steps__icon"><?= icon('calculator') ?></span><h3>Teklifi göndeririz</h3><p>Ürün, sevkiyat ve montaj kalemleri ayrı ayrı, yazılı olarak.</p></li>
-      <li><span class="steps__icon"><?= icon('truck') ?></span><h3>Teslim eder, kurarız</h3><p>İsterseniz montajı ve devreye almayı da ekibimiz yapar.</p></li>
+      <?php $stepIcons = ['clipboard', 'ruler', 'calculator', 'truck', 'check-circle', 'handshake']; foreach (setting_pairs('home_steps') as $i => [$h, $t]): ?>
+        <li><span class="steps__icon"><?= icon($stepIcons[$i % count($stepIcons)]) ?></span><h3><?= e($h) ?></h3><p><?= e($t) ?></p></li>
+      <?php endforeach; ?>
     </ol>
   </div>
 </section>
@@ -105,11 +102,12 @@ $tints = ['tank' => 'sky', 'booster' => 'navy', 'pump' => 'mist', 'submersible' 
   <div class="container why">
     <div class="why__art" aria-hidden="true">
       <div class="why__stage"><?= model_svg('tank:paslanmaz', 'art', ['w' => 4, 'l' => 3, 'h' => 2]) ?></div>
-      <div class="why__badge why__badge--a"><?= icon('shield') ?><span><strong>Orijinal</strong>garantili ürün</span></div>
-      <div class="why__badge why__badge--b"><?= icon('wrench') ?><span><strong>Montaj</strong>ve servis</span></div>
+      <?php foreach (array_slice(setting_pairs('home_why_badges'), 0, 2) as $i => [$a, $b]): ?>
+        <div class="why__badge why__badge--<?= $i ? 'b' : 'a' ?>"><?= icon($i ? 'wrench' : 'shield') ?><span><strong><?= e($a) ?></strong><?= e($b) ?></span></div>
+      <?php endforeach; ?>
     </div>
     <div>
-      <span class="kicker">Neden Çetinkaya?</span>
+      <span class="kicker"><?= e(setting('home_why_kicker')) ?></span>
       <h2><?= e(setting('about_title')) ?></h2>
       <p class="muted"><?= e(explode("\n", setting('about_text'))[0]) ?></p>
       <ul class="ticks"><?php foreach ($values as $v): ?><li><?= e($v) ?></li><?php endforeach; ?></ul>
@@ -122,8 +120,8 @@ $tints = ['tank' => 'sky', 'booster' => 'navy', 'pump' => 'mist', 'submersible' 
 <section class="block">
   <div class="container">
     <div class="block__head block__head--center">
-      <span class="kicker">Satış sonrası</span>
-      <h2>Satıştan sonra da yanınızdayız</h2>
+      <span class="kicker"><?= e(setting('home_services_kicker')) ?></span>
+      <h2><?= e(setting('home_services_title')) ?></h2>
     </div>
     <div class="svc-grid">
       <?php foreach ($services as $s): ?>
@@ -134,11 +132,23 @@ $tints = ['tank' => 'sky', 'booster' => 'navy', 'pump' => 'mist', 'submersible' 
 </section>
 <?php endif; ?>
 
+<?php if ($refs): ?>
+<section class="block">
+  <div class="container">
+    <div class="block__head block__head--row">
+      <div><span class="kicker"><?= e(setting('home_refs_kicker')) ?></span><h2><?= e(setting('home_refs_title')) ?></h2><p><?= e(setting('home_refs_text')) ?></p></div>
+      <a href="/referanslar" class="btn btn--line">Tüm referanslar <?= icon('arrow-right') ?></a>
+    </div>
+    <ul class="ref-grid"><?php foreach ($refs as $r) partial('ref-card', ['r' => $r]); ?></ul>
+  </div>
+</section>
+<?php endif; ?>
+
 <?php if ($posts): ?>
 <section class="block block--soft">
   <div class="container">
     <div class="block__head block__head--row">
-      <div><span class="kicker">Blog</span><h2>Rehberler ve teknik bilgiler</h2></div>
+      <div><span class="kicker"><?= e(setting('home_blog_kicker')) ?></span><h2><?= e(setting('home_blog_title')) ?></h2></div>
       <a href="/blog" class="btn btn--line">Bütün yazılar <?= icon('arrow-right') ?></a>
     </div>
     <div class="post-grid">
@@ -151,9 +161,9 @@ $tints = ['tank' => 'sky', 'booster' => 'navy', 'pump' => 'mist', 'submersible' 
 <section class="block">
   <div class="container duo">
     <div>
-      <span class="kicker">Sık sorulan sorular</span>
-      <h2>Aklınıza takılanlar</h2>
-      <p class="muted">Cevabını bulamadığınız bir soru varsa arayın ya da WhatsApp'tan yazın.</p>
+      <span class="kicker"><?= e(setting('home_faq_kicker')) ?></span>
+      <h2><?= e(setting('home_faq_title')) ?></h2>
+      <p class="muted"><?= e(setting('home_faq_text')) ?></p>
       <div class="contact-chips">
         <a href="<?= e(tel_href(setting('phone'))) ?>"><?= icon('phone') ?><span><small>Telefon</small><?= e(setting('phone')) ?></span></a>
         <a href="<?= e(wa_href(setting('whatsapp', setting('phone2')))) ?>" target="_blank" rel="noopener"><?= icon('whatsapp') ?><span><small>WhatsApp</small><?= e(setting('whatsapp', setting('phone2'))) ?></span></a>

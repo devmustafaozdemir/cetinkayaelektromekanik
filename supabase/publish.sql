@@ -86,7 +86,7 @@ revoke all on function public.publish_on_change() from public, anon, authenticat
 do $$
 declare t text;
 begin
-  foreach t in array array['settings', 'categories', 'product_categories', 'products', 'posts', 'services', 'faqs'] loop
+  foreach t in array array['settings', 'categories', 'product_categories', 'products', 'posts', 'services', 'faqs', 'refs', 'partners'] loop
     execute format('drop trigger if exists publish_on_change on public.%I', t);
     execute format('create trigger publish_on_change after insert or update or delete on public.%I for each statement execute function public.publish_on_change()', t);
   end loop;

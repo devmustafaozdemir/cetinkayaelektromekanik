@@ -72,7 +72,59 @@ function settings(): array
 function setting(string $key, string $default = ''): string
 {
     $s = settings();
-    return isset($s[$key]) && $s[$key] !== '' ? $s[$key] : $default;
+    return isset($s[$key]) && $s[$key] !== '' ? $s[$key] : ($default !== '' ? $default : (text_defaults()[$key] ?? ''));
+}
+
+/** Default texts for the editable page sections (admin › Site Ayarları › Sayfa Metinleri). */
+function text_defaults(): array
+{
+    return [
+        'hero_trust'            => "Orijinal ve garantili ürün\nÜcretsiz kapasite hesabı\nMontaj ve servis desteği",
+        'home_cats_kicker'      => 'Ürün grupları',
+        'home_cats_title'       => 'Su tesisatının her halkası için',
+        'home_cats_text'        => 'Depolamadan basınçlandırmaya, kuyudan drenaja kadar ihtiyacınız olan ürünler tek adreste.',
+        'home_featured_kicker'  => 'Öne çıkanlar',
+        'home_featured_title'   => 'Sık teklif istenen ürünler',
+        'home_steps_kicker'     => 'Nasıl çalışıyoruz?',
+        'home_steps_title'      => 'Talebinizden teslimata 4 adım',
+        'home_steps'            => "İhtiyacı konuşuruz|Kullanım amacı, daire sayısı, kurulum alanı ve mevcut tesisat.\nKapasiteyi hesaplarız|Depo hacmi, debi ve basma yüksekliğine göre doğru ürünü seçeriz.\nTeklifi göndeririz|Ürün, sevkiyat ve montaj kalemleri ayrı ayrı, yazılı olarak.\nTeslim eder, kurarız|İsterseniz montajı ve devreye almayı da ekibimiz yapar.",
+        'home_why_kicker'       => 'Neden Çetinkaya?',
+        'home_why_badges'       => "Orijinal|garantili ürün\nMontaj|ve servis",
+        'home_services_kicker'  => 'Satış sonrası',
+        'home_services_title'   => 'Satıştan sonra da yanınızdayız',
+        'home_refs_kicker'      => 'Referanslar',
+        'home_refs_title'       => 'Birlikte çalıştığımız projeler',
+        'home_refs_text'        => 'Konut sitelerinden sanayi tesislerine, su deposu ve pompa sistemlerini kurduğumuz projelerden bazıları.',
+        'home_blog_kicker'      => 'Blog',
+        'home_blog_title'       => 'Rehberler ve teknik bilgiler',
+        'home_faq_kicker'       => 'Sık sorulan sorular',
+        'home_faq_title'        => 'Aklınıza takılanlar',
+        'home_faq_text'         => "Cevabını bulamadığınız bir soru varsa arayın ya da WhatsApp'tan yazın.",
+        'footer_cta_title'      => 'Projenizin ölçülerini bize gönderin, fiyatı biz hesaplayalım.',
+        'footer_cta_text'       => 'Depo hacmi, bina yüksekliği ya da ihtiyaç duyduğunuz debi; elinizdeki bilgi ne ise onunla başlayabiliriz.',
+        'quote_next_title'      => 'Bundan sonra',
+        'quote_next'            => "Talep numaranız oluşur|Ekibimize anında bildirim gider.\nSizi ararız|Eksik bilgi varsa birlikte tamamlarız.\nTeklifi göndeririz|Ürün, sevkiyat ve montaj ayrı kalemlerle.",
+        'refs_lead'             => 'Su deposu, hidrofor ve pompa sistemlerini tedarik edip kurduğumuz projelerden bazıları.',
+        'partners_lead'         => 'Ürün tedariki, projelendirme ve montajda birlikte çalıştığımız firmalar.',
+        'water_use'             => "Konut|150|Kişi sayısı|Konutta yaklaşık daire sayısı × 4 kişi.\nVilla / müstakil ev|200|Kişi sayısı|\nOfis / iş yeri|50|Çalışan sayısı|\nOkul|40|Öğrenci + personel|\nOtel|250|Yatak sayısı|\nHastane|500|Yatak sayısı|\nFabrika / sanayi|80|Çalışan sayısı|Proses suyu varsa günlük tüketime ekleyin.",
+    ];
+}
+
+/** Designer consumption table: [[label, litres/day, count label, hint], …] from the water_use setting. */
+function water_uses(): array
+{
+    $out = [];
+    foreach (setting_lines('water_use') as $l) {
+        $p = array_map('trim', array_pad(explode('|', $l, 4), 4, ''));
+        if ($p[0] !== '' && (int)$p[1] > 0) $out[] = [$p[0], (int)$p[1], $p[2] !== '' ? $p[2] : 'Kişi sayısı', $p[3]];
+    }
+    return $out ?: [['Konut', 150, 'Kişi sayısı', '']];
+}
+
+/** "Başlık|Metin" lines → [[a, b], …] */
+function setting_pairs(string $key): array
+{
+    return array_map(fn($l) => array_map('trim', array_pad(explode('|', $l, 2), 2, '')), setting_lines($key));
 }
 
 function setting_set(string $key, string $value): void
