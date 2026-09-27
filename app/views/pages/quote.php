@@ -33,15 +33,7 @@
                 <label class="choice"><input type="radio" name="type" value="<?= $k ?>"<?= old('type', 'product') === $k ? ' checked' : '' ?>><span><?= e($l) ?></span></label>
               <?php endforeach; ?>
             </div>
-            <?php if (!$product): ?>
-            <label class="field"><span>Ürün grubu</span>
-              <select name="category">
-                <option value="">Seçin</option>
-                <?php foreach ($categories as $c): ?><option<?= old('category') === $c['name'] ? ' selected' : '' ?>><?= e($c['name']) ?></option><?php endforeach; ?>
-                <option<?= old('category') === 'Birden fazla / proje' ? ' selected' : '' ?>>Birden fazla / proje</option>
-              </select>
-            </label>
-            <?php endif; ?>
+            <input type="hidden" name="category" value="<?= e(old('category')) ?>">
             <label class="field"><span>Miktar veya kapasite <small>isteğe bağlı</small></span><input type="text" name="quantity" value="<?= e(old('quantity')) ?>" placeholder="Örneğin 20 m³ depo, 2 pompa ya da 12 katlı bina"></label>
             <label class="field<?= isset($errors['message']) ? ' has-error' : '' ?>"><span>Açıklama</span><textarea name="message" rows="4" placeholder="Kullanım amacı, kurulum yeri, daire sayısı gibi bilgiler"><?= e(old('message')) ?></textarea><?php if (isset($errors['message'])): ?><em><?= e($errors['message']) ?></em><?php endif; ?></label>
           </fieldset>

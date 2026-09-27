@@ -22,7 +22,7 @@ export const MODEL_TYPES = {
   'pump:horizontal': 'Pompa – yatay santrifüj', 'pump:vertical': 'Pompa – dikey çok kademeli', 'pump:circulator': 'Pompa – sirkülasyon',
   'sub:deep': 'Dalgıç – derin kuyu', 'sub:drain': 'Dalgıç – drenaj',
 };
-export const ARTS = { tank: 'Modüler depo', booster: 'Hidrofor', pump: 'Santrifüj pompa', submersible: 'Dalgıç pompa', drop: 'Su damlası' };
+export const ARTS = { tank: 'Modüler depo', booster: 'Hidrofor', pump: 'Santrifüj pompa', submersible: 'Dalgıç pompa', drop: 'Su damlası', none: 'Çizim yok' };
 export const SERVICE_ICONS = ['droplet', 'ruler', 'wrench', 'cog', 'gauge', 'truck', 'shield', 'package', 'calendar', 'building', 'calculator', 'handshake', 'award', 'layers'];
 export const SETTINGS_GROUPS = {
   general: ['Genel', 'settings', {

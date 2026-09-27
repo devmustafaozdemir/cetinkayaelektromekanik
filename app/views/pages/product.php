@@ -18,7 +18,7 @@ $waText = 'Merhaba, "' . $product['title'] . '" için fiyat bilgisi almak istiyo
           <div class="viewer" data-viewer-host hidden></div>
         </div>
         <div class="pd__visual-bar">
-          <div class="viewswitch viewswitch--light" role="group" aria-label="Görünüm">
+          <div class="viewswitch viewswitch--light" role="group" aria-label="Görünüm"<?= $model === '' ? ' hidden' : '' ?>>
             <button type="button" data-view="2d" aria-pressed="true"><?= $product['image'] ? 'Fotoğraf' : 'Çizim' ?></button>
             <button type="button" data-view="3d" aria-pressed="false">3D incele</button>
           </div>

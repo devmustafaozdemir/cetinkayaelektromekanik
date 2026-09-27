@@ -60,4 +60,5 @@ $hours = setting_lines('hours');
     <span><?= e(implode(', ', array_column(brands(), 'name'))) ?></span>
   </div>
 </footer>
+<a class="fab-call" href="<?= e(tel_href(setting('phone'))) ?>" aria-label="Bizi arayın: <?= e(setting('phone')) ?>"><?= icon('phone') ?></a>
 <a class="fab-wa" href="<?= e(wa_href(setting('whatsapp', setting('phone2')), 'Merhaba, fiyat bilgisi almak istiyorum.')) ?>" target="_blank" rel="noopener" aria-label="WhatsApp ile yazın"><?= icon('whatsapp') ?></a>

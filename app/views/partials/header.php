@@ -2,7 +2,6 @@
 $nav = [
     'products' => ['/urunler', 'Ürünler'],
     'designer' => ['/depo-tasarla', 'Depo Tasarla'],
-    'brands'   => ['/markalar', 'Markalar'],
     'services' => ['/hizmetler', 'Hizmetler'],
     'about'    => ['/hakkimizda', 'Kurumsal'],
     'blog'     => ['/blog', 'Blog'],
@@ -30,16 +29,19 @@ $navCorp = [['/hakkimizda', 'Hakkımızda', 'building'], ['/referanslar', 'Refer
           <?php if ($key === 'products' && $navCats): ?>
           <li class="has-mega">
             <a href="<?= $href ?>"<?= $active === $key ? ' aria-current="page"' : '' ?>><?= e($label) ?> <?= icon('chevron-down', 'icon icon--sm') ?></a>
+            <button type="button" class="sub-toggle" aria-expanded="false" aria-label="<?= e($label) ?> alt menüsünü aç"><?= icon('chevron-down') ?></button>
             <div class="mega">
               <?php foreach ($navCats as $c): ?>
                 <a href="/urunler/kategori/<?= e($c['slug']) ?>" class="mega__item"><span class="mega__art"><?= product_art($c['art']) ?></span><?= e($c['name']) ?></a>
               <?php endforeach; ?>
               <a href="/urunler" class="mega__all">Tüm ürünleri gör</a>
+              <a href="/markalar" class="mega__all mega__all--soft">Markalar</a>
             </div>
           </li>
           <?php elseif ($key === 'about'): ?>
           <li class="has-mega">
             <a href="<?= $href ?>"<?= $active === $key ? ' aria-current="page"' : '' ?>><?= e($label) ?> <?= icon('chevron-down', 'icon icon--sm') ?></a>
+            <button type="button" class="sub-toggle" aria-expanded="false" aria-label="<?= e($label) ?> alt menüsünü aç"><?= icon('chevron-down') ?></button>
             <div class="mega mega--list">
               <?php foreach ($navCorp as [$h, $l, $ic]): ?><a href="<?= $h ?>" class="mega__item"><span class="mega__ic"><?= icon($ic) ?></span><?= e($l) ?></a><?php endforeach; ?>
             </div>

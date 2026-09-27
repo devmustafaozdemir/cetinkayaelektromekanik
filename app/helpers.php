@@ -358,7 +358,7 @@ function brand_logo(string $name, string $class = 'brand-logo'): string
 
 function product_arts(): array
 {
-    return ['tank' => 'Modüler depo', 'pump' => 'Santrifüj pompa', 'booster' => 'Hidrofor', 'submersible' => 'Dalgıç pompa', 'drop' => 'Su damlası'];
+    return ['tank' => 'Modüler depo', 'pump' => 'Santrifüj pompa', 'booster' => 'Hidrofor', 'submersible' => 'Dalgıç pompa', 'drop' => 'Su damlası', 'none' => 'Çizim yok'];
 }
 
 /** Category photo with the illustration as fallback (shown if the photo is missing or fails to load). */
@@ -366,6 +366,9 @@ function category_photo(array $c, bool $credit = true): string
 {
     $art = product_art($c['art'] ?? 'tank');
     $src = !empty($c['photo']) ? $c['photo'] : '';
+    if ($src === '' && ($c['art'] ?? '') === 'none') {
+        return '<span class="photo photo--art photo--none">' . icon('droplet') . '</span>';
+    }
     if ($src === '') {
         return '<span class="photo photo--art">' . $art . '</span>';
     }

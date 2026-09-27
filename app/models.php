@@ -28,6 +28,7 @@ function model_types(): array
 /** Category drawing keys (stored in product_categories.art) → default model spec. */
 function art_default_model(string $art): string
 {
+    if ($art === 'none') return ''; // category without a drawing
     return ['tank' => 'tank:galvaniz', 'booster' => 'booster:3', 'pump' => 'pump:horizontal', 'submersible' => 'sub:deep', 'drop' => 'tank:grp'][$art] ?? 'tank:galvaniz';
 }
 
@@ -53,6 +54,10 @@ function model_svg(string $spec, string $class = 'art', array $opt = []): string
 {
     static $n = 0;
     $n++;
+    if ($spec === '') { // no drawing: a quiet placeholder mark
+        $mark = str_replace('<svg ', '<svg x="205" y="130" width="70" height="70" style="color:#a9bbd0" ', icon('package'));
+        return '<svg class="' . e($class) . ' art--none" viewBox="0 0 480 330" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' . $mark . '</svg>';
+    }
     $id = 'm' . $n;
     [$type, $variant] = array_pad(explode(':', $spec, 2), 2, '');
     $defs = '<defs>'

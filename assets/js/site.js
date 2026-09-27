@@ -19,6 +19,14 @@
     window.addEventListener('resize', () => { if (window.innerWidth > 1140) setOpen(false); });
   }
 
+  /* ---------- Mobile nav: sub-menus open with their arrow ---------- */
+  $$('.sub-toggle').forEach((b) => b.addEventListener('click', () => {
+    const li = b.closest('li');
+    const open = !li.classList.contains('is-open');
+    li.classList.toggle('is-open', open);
+    b.setAttribute('aria-expanded', String(open));
+  }));
+
   /* ---------- Photos fall back to the drawing if they fail ---------- */
   $$('img[data-fallback]').forEach((img) => {
     const fail = () => {
@@ -452,8 +460,8 @@
     if (q && !q.value) q.value = `${fmtMod(w)} × ${fmtMod(l)} × ${fmtMod(h)} modül · ${nf1.format(tankVolume(w, l, h))} m³ ${MAT_LABELS[params.get('malzeme')] || 'galvaniz'} modüler depo`;
     const msg = $('[name="message"]', qf);
     if (msg && !msg.value && params.get('detay')) msg.value = params.get('detay').slice(0, 1000);
-    const cat = $('select[name="category"]', qf);
-    if (cat) [...cat.options].forEach((o) => { if (/depo/i.test(o.text)) cat.value = o.value || o.text; });
+    const cat = $('[name="category"]', qf);
+    if (cat && !cat.value) cat.value = 'Modüler Su Depoları';
   }
 
   if (sbUrl && sbKey) {
