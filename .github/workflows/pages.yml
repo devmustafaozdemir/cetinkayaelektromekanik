@@ -1,6 +1,6 @@
 # Builds the static site from Supabase content and publishes it to GitHub Pages.
 # Setup: README › "Supabase ile yayın". Until SUPABASE_URL / SUPABASE_ANON_KEY are
-# set (Settings › Secrets and variables › Actions), the build is skipped.
+# set (Settings › Secrets and variables › Actions), the docs/ demo preview is published.
 name: Siteyi yayınla
 
 on:
@@ -25,8 +25,6 @@ jobs:
     # pushes to other branches don't publish; schedule/dispatch always run on the default branch
     if: github.event_name != 'push' || github.ref_name == github.event.repository.default_branch
     runs-on: ubuntu-latest
-    outputs:
-      ready: ${{ steps.cfg.outputs.ready }}
     env:
       SUPABASE_URL: ${{ vars.SUPABASE_URL || secrets.SUPABASE_URL }}
       SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY || secrets.SUPABASE_ANON_KEY }}
@@ -37,11 +35,19 @@ jobs:
         id: cfg
         run: |
           if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
-            echo "::warning::SUPABASE_URL ve SUPABASE_ANON_KEY tanımlı değil; yayın atlandı (README › Supabase ile yayın)."
+            echo "::warning::SUPABASE_URL ve SUPABASE_ANON_KEY tanımlı değil; docs/ önizlemesi yayınlanıyor (README › Supabase ile yayın)."
             echo "ready=false" >> "$GITHUB_OUTPUT"
           else
             echo "ready=true" >> "$GITHUB_OUTPUT"
           fi
+
+      # Until Supabase is configured, publish the static demo preview in docs/
+      - uses: actions/checkout@v4
+        if: steps.cfg.outputs.ready != 'true'
+      - uses: actions/upload-pages-artifact@v3
+        if: steps.cfg.outputs.ready != 'true'
+        with:
+          path: docs
 
       - uses: actions/checkout@v4
         if: steps.cfg.outputs.ready == 'true'
@@ -73,7 +79,6 @@ jobs:
 
   deploy:
     needs: build
-    if: needs.build.outputs.ready == 'true'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
