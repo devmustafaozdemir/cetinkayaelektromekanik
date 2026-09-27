@@ -44,6 +44,15 @@ php -S localhost:8000 router.php
 
 Ardından `http://localhost:8000` ve `http://localhost:8000/admin` adreslerini açın.
 
+## GitHub Pages önizlemesi
+
+GitHub Pages PHP çalıştıramadığı için `docs/` klasöründe sitenin **statik önizleme kopyası** bulunur (tüm sayfalar + yönetim paneli ekranları, örnek verilerle). Formlar ve giriş bu kopyada çalışmaz.
+
+- Yayınlamak: GitHub → **Settings → Pages → Build and deployment → Source: Deploy from a branch**, dal olarak bu dalı ve klasör olarak **`/docs`** seçin.
+- Adres: `https://devmustafaozdemir.github.io/cetinkayaelektromekanik/`
+- Yönetim paneli önizlemesi: `…/cetinkayaelektromekanik/yonetim/`
+- Değişiklikten sonra önizlemeyi yenilemek için: `php tools/build-pages.php`
+
 ## Yedekleme
 
 Tüm içerik `data/site.sqlite` dosyasında, görseller `uploads/` klasöründedir. Bu ikisini yedeklemek yeterlidir.

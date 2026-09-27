@@ -10,7 +10,7 @@ date_default_timezone_set('Europe/Istanbul');
 mb_internal_encoding('UTF-8');
 
 $config = [
-    'db_path' => DATA_DIR . '/site.sqlite',
+    'db_path' => getenv('APP_DB_PATH') ?: DATA_DIR . '/site.sqlite',
     'debug'   => getenv('APP_DEBUG') === '1',
 ];
 if (is_file(ROOT . '/config.local.php')) {
