@@ -45,6 +45,12 @@ function sb_get(string $table): array
         $body = (string)curl_exec($ch);
         $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
+        if ($code === 404 && str_contains($body, 'PGRST205') && in_array($table, ['refs', 'partners'], true)) {
+            // added in a later schema version: build without it until supabase/schema.sql is re-run
+            fwrite(STDERR, "Uyarı: '{$table}' tablosu yok; supabase/schema.sql dosyasını Supabase SQL Editor'de yeniden çalıştırın.\n");
+            echo "::warning::Supabase'de '{$table}' tablosu yok. supabase/schema.sql dosyasını SQL Editor'de yeniden çalıştırın.\n";
+            return [];
+        }
         if ($code !== 200) {
             fwrite(STDERR, "Supabase okuma hatası ({$table}): HTTP {$code} {$body}\n");
             exit(1);
