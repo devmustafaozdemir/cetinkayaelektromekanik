@@ -1,8 +1,2 @@
-/data/*.sqlite*
-/uploads/*
-!/uploads/.htaccess
-!/uploads/.gitkeep
-/config.local.php
 .DS_Store
 /node_modules/
-/_site/

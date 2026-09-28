@@ -1,6 +1,6 @@
 /**
  * Lazy-loaded 3D viewer. Builds parametric models from the same specs as the
- * server-side 2D drawings (app/models.php): "tank:<variant>", "booster:<n>",
+ * 2D drawings (web/lib/generated.ts): "tank:<variant>", "booster:<n>",
  * "pump:<horizontal|vertical|circulator>", "sub:<deep|drain>".
  *
  * Build: npm run build:3d  →  assets/js/viewer3d.js
@@ -87,7 +87,7 @@ function finsX(g, r, x0, len, count, y, z, mat) {
 }
 
 /* ---------- Modular tank ---------- */
-// Sizes are in modules (1 modül = 1,08 m); half modules allowed. Mirrors svg_tank() in app/models.php.
+// Sizes are in modules (1 modül = 1,08 m); half modules allowed. Mirrors the 2D tank drawing in assets/js/site.js.
 const cellsOf = (a) => { // full cells, then a half one at the end
   const n = Math.floor(a + 1e-9);
   const out = [];

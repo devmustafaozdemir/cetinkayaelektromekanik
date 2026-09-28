@@ -4,12 +4,12 @@ Modüler su depoları, pompa ve hidrofor sistemleri satışı için kurumsal web
 
 **Teknoloji:** Next.js 16 (React, TypeScript) + Supabase (veritabanı, giriş, görseller). Kurulum ve sunucuya yükleme: [`web/README.md`](web/README.md).
 
-| Klasör | Durum |
+| Klasör | İçerik |
 |---|---|
-| `web/` | **Güncel site** (Next.js, kendi sunucunuzda Node.js ile çalışır) |
-| `assets/` | Ortak stil, etkileşim betikleri, 3D görüntüleyici, yönetim paneli kaynağı |
-| `supabase/` | Veritabanı şeması ve örnek içerik |
-| `app/`, `admin/`, `index.php`, `docs/`, `tools/build-*.php` | Önceki PHP sürümü ve GitHub Pages önizlemesi (Next.js sürümü yayına alınınca kaldırılabilir) |
+| `web/` | Next.js sitesi (sayfalar, veri katmanı, `/yonetim` paneli sunumu) |
+| `assets/` | Stil, site etkileşimleri (`js/site.js`), 3D görüntüleyici, yönetim paneli kaynak kodu (`src/admin`) |
+| `supabase/` | Veritabanı şeması (`schema.sql`) ve örnek içerik (`seed.sql`) |
+| `.github/workflows/` | Paketleme, Release ve isteğe bağlı otomatik sunucu yüklemesi |
 
 ## Özellikler
 
@@ -18,7 +18,7 @@ Modüler su depoları, pompa ve hidrofor sistemleri satışı için kurumsal web
 - **Sahada kanıtlanmış** bandı: mutlu müşteri, sipariş, ürün çeşidi, tecrübe rakamları (admin → Site Ayarları → Ana Sayfa)
 - Marka logoları (`assets/img/brands/`; admin → Site Ayarları → Markalar bölümünden değiştirilebilir)
 - **Depo Tasarla (`/depo-tasarla`) ve ana sayfa hesaplayıcısı:** 1 modül = 1,08 m; en, boy ve yükseklik tam/yarım modül (1,08 / 0,54 m) adımlarla, yükseklik 0,5–4 kat. Hacim, litre, dış ölçü, taban alanı ve panel listesi (108×108 tam, 108×54 yarım) anında hesaplanır. **İhtiyaca göre** sekmesinde kullanım yeri, kişi sayısı, günlük tüketim, yedek gün, yangın rezervi ve isteğe bağlı yerleşim alanı girilir; en ekonomik depo ve iki alternatif (daha alçak / daha küçük taban) önerilir. “Bu depo için teklif iste” ölçüleri ve panel listesini teklif formuna taşır
-- **2D çizim + 3D görünüm:** her ürün için sunucuda üretilen SVG çizim; “3D incele” ile döndürülebilir, yakınlaştırılabilir 3D model (Three.js, yalnızca tıklanınca yüklenir)
+- **2D çizim + 3D görünüm:** her ürün için SVG çizim; “3D incele” ile döndürülebilir, yakınlaştırılabilir 3D model (Three.js, yalnızca tıklanınca yüklenir)
 - **Ürün kataloğu:** kategoriler, marka filtresi, arama, ürün detay sayfası (teknik özellik tablosu, benzer ürünler)
 - **Teklif sistemi:** her üründe “Teklif İste”, ana sayfada hızlı teklif formu, talep türleri (ürün, proje/keşif, montaj, bakım-servis); müşteriye talep numarası verilir
 - Markalar sayfası (Meksis, Grundfos, Wilo, Standart Pompa, Sumak)
@@ -26,7 +26,7 @@ Modüler su depoları, pompa ve hidrofor sistemleri satışı için kurumsal web
 - **Blog:** kategori, arama, öne çıkan yazı, içindekiler, okuma çubuğu, paylaşım, ilgili yazılar
 - SEO: meta/OG etiketleri, `sitemap.xml`, `robots.txt`, Store / Product / BlogPosting / FAQPage yapısal verileri
 
-**Yönetim paneli (`/yonetim` veya `/admin`)**
+**Yönetim paneli (`/yonetim`)**
 - Genel bakış: yeni/açık teklifler, satışa dönüşüm oranı, 14 günlük grafik, satış hunisi, en çok teklif istenen ürünler
 - **Teklif talepleri:** satış durumu (Yeni → İletişime Geçildi → Teklif Verildi → Satışa Döndü / Olumsuz), iç notlar, geçmiş, tek tıkla arama/WhatsApp/e-posta, telefonla gelen talepler için elle kayıt
 - **Ürünler:** görsel yükleme (otomatik WebP), zengin metin açıklama, teknik özellikler, marka, öne çıkarma, yayında/gizli
@@ -36,97 +36,37 @@ Modüler su depoları, pompa ve hidrofor sistemleri satışı için kurumsal web
 - Site ayarları: iletişim bilgileri, markalar, ana sayfa metinleri, istatistikler, kurumsal metin, sosyal medya
 - Çoklu yönetici, şifre değiştirme, şifremi unuttum (Supabase)
 
-**Güvenlik:** Supabase satır düzeyi güvenlik (RLS: ziyaretçi yalnızca yayındaki içeriği okur, teklif/mesaj yalnızca doğrulamalı fonksiyonlarla eklenir, yazma yetkisi yalnızca yöneticide), form spam koruması (honeypot + hız sınırı), HTML temizleme. PHP sürümünde ek olarak CSRF koruması, parola hash, giriş deneme sınırı, yüklenen görsellerin yeniden kodlanması.
+**Güvenlik:** Supabase satır düzeyi güvenlik (RLS: ziyaretçi yalnızca yayındaki içeriği okur, teklif/mesaj yalnızca doğrulamalı fonksiyonlarla eklenir, yazma yetkisi yalnızca yöneticide), form spam koruması (honeypot + hız sınırı), HTML temizleme.
 
-## A) Supabase ile yayın (önerilen)
+## Kurulum
 
-**Nasıl çalışır:** Site GitHub Pages'te statik HTML olarak yayınlanır (hızlı ve ücretsiz). Ürünler, blog, ayarlar, teklifler ve görseller Supabase'te durur. Ziyaretçinin gönderdiği teklif/mesaj doğrudan Supabase'e kaydedilir ve panelde anında görünür. Panelde bir içerik kaydedildiğinde GitHub Actions siteyi yeniden derleyip yayınlar (anında yayın kuruluysa 1-2 dakikada, değilse en geç 1 saat içinde).
+### 1. Supabase (bir kez, ~10 dakika)
 
-### Kurulum (bir kez, ~15 dakika)
+1. [supabase.com](https://supabase.com) → *New project*, bölge **Frankfurt (eu-central-1)**.
+2. *SQL Editor → New query*: [`supabase/schema.sql`](supabase/schema.sql) dosyasının tamamını yapıştırıp **Run**; ardından [`supabase/seed.sql`](supabase/seed.sql) (örnek içerik). `schema.sql` güncellendiğinde tekrar çalıştırmak güvenlidir, verileri silmez.
+3. *Authentication → Users → Add user*: e-posta + şifre, **Auto Confirm User** işaretli. **İlk kullanıcı otomatik yönetici olur.**
+4. *Authentication → Sign In / Providers*: **Allow new users to sign up** kapalı.
+5. *Authentication → URL Configuration*: *Site URL* = sitenizin adresi, *Redirect URLs* = `https://alanadiniz/yonetim`.
+6. *Project Settings → API Keys*: **Project URL** ve **anon public** anahtarını not edin (`service_role` anahtarını hiçbir yere girmeyin).
 
-1. **Supabase projesi:** [supabase.com](https://supabase.com) → *New project*. Bölge olarak **Frankfurt (eu-central-1)** seçin, veritabanı şifresini bir yere kaydedin.
-2. **Veritabanı:** Supabase → *SQL Editor* → *New query*. [`supabase/schema.sql`](supabase/schema.sql) dosyasının tamamını yapıştırıp **Run**. Ardından aynı şekilde [`supabase/seed.sql`](supabase/seed.sql) (örnek ürün, blog, ayar içerikleri).
-3. **Yönetici hesabı:** *Authentication → Users → Add user → Create new user*. E-posta ve şifre yazın, **Auto Confirm User** işaretli olsun. **İlk oluşturulan kullanıcı otomatik olarak yönetici olur.**
-4. **Kayıtları kapatın:** *Authentication → Sign In / Providers* → **Allow new users to sign up** kapalı olsun (başkası hesap açamasın).
-5. **Adres ayarı:** *Authentication → URL Configuration* → *Site URL*: sitenizin adresi (örn. `https://devmustafaozdemir.github.io/cetinkayaelektromekanik`). *Redirect URLs*'e panel adresini ekleyin: `…/yonetim/` (şifre sıfırlama bağlantısı için).
-6. **Anahtarlar:** *Project Settings → API Keys*. **Project URL** ve **anon public** anahtarını (veya *publishable* anahtarı) kopyalayın. Bu anahtar herkese açık olacak şekilde tasarlanmıştır; **`service_role` / secret anahtarını asla kullanmayın.**
-7. **GitHub değişkenleri:** GitHub → depo → *Settings → Secrets and variables → Actions → Variables* → *New repository variable*:
-   - `SUPABASE_URL` = Project URL (örn. `https://abcd1234.supabase.co`)
-   - `SUPABASE_ANON_KEY` = anon / publishable anahtar
-   - (isteğe bağlı) `SITE_URL` = kendi alan adınız, örn. `https://cetinkayaelektromekanik.com.tr`
-8. **GitHub Pages:** *Settings → Pages → Build and deployment → Source:* **GitHub Actions**.
-9. **İlk yayın:** *Actions → Siteyi yayınla → Run workflow*. 1-2 dakika sonra:
-   - Site: `https://devmustafaozdemir.github.io/cetinkayaelektromekanik/`
-   - Panel: `https://devmustafaozdemir.github.io/cetinkayaelektromekanik/yonetim/`
+### 2. Sunucu
 
-> “Branch … is not allowed to deploy to github-pages” hatası alırsanız: *Settings → Environments → github-pages → Deployment branches* bölümüne bu dalı ekleyin.
+Site Node.js ile çalışır (cPanel "Setup Node.js App" ya da VPS). Paket, ortam değişkenleri ve GitHub ile otomatik yükleme: **[`web/README.md`](web/README.md)**.
 
-### Anında yayın (önerilir)
+## Günlük kullanım
 
-Panelde kaydettiğiniz değişikliğin 1-2 dakikada siteye yansıması için:
-
-1. GitHub → sağ üst profil → *Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token*. *Repository access:* yalnızca bu depo; *Permissions → Actions:* **Read and write**. Token'ı kopyalayın.
-2. Supabase → *SQL Editor*'de token'ı gizli kasaya (Vault) kaydedin:
-   ```sql
-   select vault.create_secret('github_pat_BURAYA_TOKEN', 'github_token');
-   select vault.create_secret('devmustafaozdemir/cetinkayaelektromekanik', 'github_repo');
-   select vault.create_secret('claude/adoring-hopper-jfy8yo', 'github_ref'); -- yayın yapılan dal
-   ```
-3. [`supabase/publish.sql`](supabase/publish.sql) dosyasının tamamını çalıştırın.
-
-Bundan sonra her kayıtta site kendiliğinden güncellenir; paneldeki **Siteyi şimdi yayınla** düğmesi de çalışır.
-
-### Kendi alan adınız (cetinkayaelektromekanik.com.tr)
-
-1. GitHub → *Settings → Pages → Custom domain*: `cetinkayaelektromekanik.com.tr` yazıp kaydedin, *Enforce HTTPS* işaretleyin.
-2. Alan adı DNS panelinde: `@` için A kayıtları `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`; `www` için CNAME `devmustafaozdemir.github.io`.
-3. GitHub değişkeni `SITE_URL` = `https://cetinkayaelektromekanik.com.tr`; Supabase *URL Configuration* adreslerini de yeni adresle güncelleyin. Ardından *Run workflow*.
-
-### Günlük kullanım
-
-- Panel: `…/yonetim/` → e-posta ve şifre ile giriş. Şifrenizi unutursanız giriş ekranındaki **Şifremi unuttum** bağlantısını kullanın.
-- Teklif talepleri ve mesajlar panelde anında görünür; sol menüde yeni talep sayısı gösterilir.
-- Yeni yönetici eklemek: Supabase'te kullanıcıyı oluşturun (3. adım), sonra SQL Editor'de:
+- Panel: `https://alanadiniz/yonetim` → e-posta ve şifre. Şifre unutulursa giriş ekranındaki **Şifremi unuttum**.
+- Panelde kaydettiğiniz her şey sitede **hemen** görünür.
+- Teklif talepleri ve mesajlar panelde anında görünür.
+- Yeni yönetici: Supabase'te kullanıcıyı oluşturun, sonra SQL Editor'de
   ```sql
   insert into public.admins (user_id) select id from auth.users where email = 'ornek@firma.com';
   ```
-- Saatlik otomatik derleme Supabase projesini de aktif tutar (ücretsiz planda 7 gün hiç kullanılmayan projeler duraklatılır). GitHub, depoda 60 gün işlem olmazsa saatlik görevi durdurup e-posta gönderir; e-postadaki bağlantıdan tekrar etkinleştirmeniz yeterlidir.
-- Yedek: Supabase → *Database → Backups*; ayrıca *Table Editor*'den tabloları CSV olarak dışa aktarabilirsiniz.
-
-### Geliştirici notları
-
-- Derleme: [`tools/build-site.php`](tools/build-site.php) içeriği Supabase REST API'den okur, PHP şablonlarıyla tüm sayfaları statik HTML'e dönüştürür ve `_site/` klasörüne yazar (`SUPABASE_URL=… SUPABASE_ANON_KEY=… SITE_URL=… php tools/build-site.php`).
-- Panel kaynak kodu: `assets/src/admin/` (supabase-js + Quill) → `npm run build:admin` → `assets/js/admin/` (derlenmiş hali repoda).
-- Yerel test için Supabase benzetimi: `tools/dev/supabase-mock.php` (dosya başındaki açıklamaya bakın).
-- `supabase/seed.sql`, `app/seed.php`'den üretilir: `php tools/export-seed-sql.php > supabase/seed.sql`.
-
-## B) Kurulum (PHP hosting)
-
-1. Tüm dosyaları `public_html` (veya alan adının kök klasörü) içine yükleyin. `.htaccess` dosyalarının da yüklendiğinden emin olun.
-2. `data/` ve `uploads/` klasörlerine yazma izni verin (genellikle `755`, gerekirse `775`).
-3. Siteyi açın — veritabanı ilk ziyarette örnek içerikle otomatik oluşur.
-4. `https://alanadiniz.com.tr/admin/?kurulum=ANAHTAR` adresine gidin ve **ilk yönetici hesabını oluşturun**. Anahtar `config.local.php` dosyasındaki `setup_key` değeridir; bu dosya yoksa oluşturun:
-   ```php
-   <?php
-   return ['setup_key' => 'uzun-rastgele-bir-deger'];
-   ```
-   Hesap oluşturulduktan sonra anahtar bir daha gerekmez; giriş `https://alanadiniz.com.tr/admin` adresinden yapılır.
-5. Panelde **Site Ayarları** bölümünden telefon, e-posta, adres, harita ve istatistikleri; **Ürünler** bölümünden ürünleri, görselleri ve teknik özellikleri kontrol edip güncelleyin.
-6. SSL aktifse `.htaccess` içindeki HTTPS yönlendirme satırlarının yorumunu kaldırın.
-
-> Hosting PHP sürümü en az 8.1 olmalı; `pdo_sqlite` ve `gd` eklentileri açık olmalıdır (çoğu hostingde varsayılan olarak açıktır).
-
-## Yerelde çalıştırma
-
-```bash
-php -S localhost:8000 router.php
-```
-
-Ardından `http://localhost:8000` ve `http://localhost:8000/admin` adreslerini açın.
+- Yedek: Supabase → *Database → Backups*; *Table Editor*'den CSV dışa aktarma.
 
 ## 2D çizimler ve 3D modeller
 
-Ürün görselleri fotoğraf gerektirmez: her ürünün **model tipi** (admin → Ürünler → “Çizim ve 3D model”) hem 2D çizimi hem 3D modeli belirler.
+Ürün görselleri fotoğraf gerektirmez: her ürünün **model tipi** (panel → Ürünler → “Çizim ve 3D model”) hem 2D çizimi hem 3D modeli belirler.
 
 | Model tipi | Örnek |
 |---|---|
@@ -135,33 +75,7 @@ Ardından `http://localhost:8000` ve `http://localhost:8000/admin` adreslerini a
 | `pump:horizontal`, `pump:vertical`, `pump:circulator` | Yatay santrifüj, dikey çok kademeli, sirkülasyon |
 | `sub:deep`, `sub:drain` | Derin kuyu ve drenaj dalgıç pompası |
 
-- 2D çizimler: `app/models.php` (sunucuda SVG olarak üretilir, JavaScript gerekmez)
-- 3D modeller: `assets/src/viewer3d.js` → derlenmiş hali `assets/js/viewer3d.js` (repoda hazır, hostingde Node.js gerekmez)
-- Teknoloji: **Three.js** (parametrik modeller, OrbitControls, RoomEnvironment yansımaları). Paket yaklaşık 150 KB (gzip) ve yalnızca 3D butonuna basıldığında yüklenir; WebGL desteklemeyen cihazlarda 3D butonu gizlenir.
-- 3D kodunu değiştirdikten sonra: `npm install && npm run build:3d`
-
-Gerçek ürün fotoğrafı yüklerseniz ürün sayfasında önce fotoğraf gösterilir, 3D model yine açılabilir. Logo, admin → Site Ayarları → Genel → Logo bölümünden yüklenebilir; yüklenmezse yerleşik SVG logo kullanılır.
-
-## Eski statik önizleme (`docs/`)
-
-Supabase kurulumu tamamlanana kadar `docs/` klasöründeki örnek verili önizleme (*Pages → Source: Deploy from a branch → /docs*) yayında kalabilir. Pages kaynağı **GitHub Actions** yapıldıktan sonra bu klasöre gerek kalmaz.
-
-## Yedekleme (PHP hosting)
-
-Tüm içerik `data/site.sqlite` dosyasında, görseller `uploads/` klasöründedir. Bu ikisini yedeklemek yeterlidir.
-
-## Klasör yapısı
-
-```
-index.php          Site yönlendirici
-router.php         PHP yerleşik sunucu için yönlendirici
-app/               Uygulama kodu (controller, görünümler, veritabanı)
-admin/             Yönetim paneli (PHP hosting)
-admin-app/         Yönetim paneli sayfası (Supabase, /yonetim/)
-assets/            CSS, JS, görseller (assets/src: kaynak kod)
-supabase/          Veritabanı şeması, örnek içerik, anında yayın
-tools/             Derleme araçları
-.github/workflows/ GitHub Pages yayın akışı
-uploads/           Yüklenen görseller (PHP hosting)
-data/              SQLite veritabanı (PHP hosting)
-```
+- 2D çizimler: `web/lib/generated.ts` (depo tasarlayıcıdaki canlı çizim: `assets/js/site.js`)
+- 3D: `assets/src/viewer3d.js` (Three.js) → `npm run build:3d` → `assets/js/viewer3d.js`
+- Yönetim paneli: `assets/src/admin/` → `npm run build:admin` → `assets/js/admin/`
+- Kategori için “Çizim yok” seçilebilir; fotoğraf yüklenirse önce fotoğraf gösterilir.

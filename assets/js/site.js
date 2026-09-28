@@ -92,7 +92,7 @@
 
   /* ---------- Modular tank: drawing + designer ---------- */
   // 1 modül = 1,08 m; en, boy ve yükseklik tam/yarım modül (1,08 / 0,54 m) adımlarla.
-  // Drawing mirrors svg_tank() in app/models.php; 3D in assets/src/viewer3d.js.
+  // Server-side first render: web/lib/generated.ts; 3D in assets/src/viewer3d.js.
   const MOD = 1.08;
   const MATERIALS = {
     galvaniz: ['#c3cbd4', '#8e9aa8', '#eef1f4', '#a4afbb'],

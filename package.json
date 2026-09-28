@@ -1,7 +1,7 @@
 {
   "name": "cetinkaya-site-assets",
   "private": true,
-  "description": "Builds the lazy-loaded 3D viewer (assets/js/viewer3d.js) and the Supabase admin app (assets/js/admin). The site itself needs no Node.js at runtime.",
+  "description": "Front-end assets shared by the Next.js site (web/): 3D viewer and admin panel bundles.",
   "scripts": {
     "build:3d": "esbuild assets/src/viewer3d.js --bundle --format=esm --minify --target=es2020 --legal-comments=eof --outfile=assets/js/viewer3d.js",
     "build:admin": "node tools/build-admin.mjs",

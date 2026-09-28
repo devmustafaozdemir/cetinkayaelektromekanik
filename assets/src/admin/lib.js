@@ -7,7 +7,7 @@ export const sb = createClient(cfg.supabaseUrl, cfg.supabaseKey, {
 });
 export const SITE_URL = cfg.siteUrl || '/';
 
-/* ---------- Domain constants (mirrors app/helpers.php, app/models.php) ---------- */
+/* ---------- Domain constants (mirrors web/lib/site.ts) ---------- */
 export const QUOTE_STATUSES = {
   new: ['Yeni Talep', 'amber'],
   contacted: ['İletişime Geçildi', 'blue'],

@@ -1,5 +1,5 @@
 -- Örnek içerik. schema.sql'den SONRA çalıştırın. Mevcut kayıtların üzerine yazmaz.
--- Oluşturan: php tools/export-seed-sql.php
+-- Örnek içerik (ayarlar, ürünler, blog, hizmetler, SSS). schema.sql dosyasından sonra bir kez çalıştırın.
 
 begin;
 insert into public.settings (key, value) values ('hero_trust', 'Orijinal ve garantili ürün

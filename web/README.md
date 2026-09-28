@@ -108,4 +108,4 @@ npm run dev                  # http://localhost:3000
 
 - Sayfalar: `app/` · ortak parçalar: `components/` · veri: `lib/data.ts` · yardımcılar: `lib/site.ts`
 - Stil, site etkileşimleri (depo tasarlayıcı, 2D/3D, formlar, menü), 3D görüntüleyici ve panel paketi kök dizindeki `assets/` klasöründen `public/assets`'e kopyalanır (`npm run sync-assets`, `dev` ve `build` bunu kendiliğinden yapar).
-- İkonlar, 2D çizimler ve varsayılan sayfa metinleri `lib/generated.ts` dosyasındadır; PHP sürümünden `php tools/export-next-data.php` ile üretilir.
+- İkonlar, 2D çizimler (SVG) ve varsayılan sayfa metinleri `lib/generated.ts` dosyasındadır.
